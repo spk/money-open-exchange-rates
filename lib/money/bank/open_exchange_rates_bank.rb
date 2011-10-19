@@ -23,8 +23,10 @@ class Money
       end
 
       def save_rates
-        raise InvalidCache unless cache && File.exist?(cache)
+        raise InvalidCache unless cache
         open(cache, 'w').write(open(OER_URL).read)
+      rescue Errno::ENOENT
+        raise InvalidCache
       end
 
       def exchange(cents, from_currency, to_currency)
