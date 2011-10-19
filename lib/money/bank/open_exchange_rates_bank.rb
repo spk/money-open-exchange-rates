@@ -23,7 +23,7 @@ class Money
       end
 
       def save_rates
-        raise InvalidCache unless cache
+        raise InvalidCache unless cache && File.exist?(cache)
         open(cache, 'w').write(open(OER_URL).read)
       end
 
@@ -43,8 +43,16 @@ class Money
 
       protected
 
+      def find_rates_source
+        if !!cache && File.exist?(cache)
+          @rates_source = cache
+        else
+          OER_URL
+        end
+      end
+
       def exchange_rates
-        @rates_source = !!cache ? cache : OER_URL
+        @rates_source = find_rates_source
         @doc = Yajl::Parser.parse(open(rates_source).read)
         @oer_rates = @doc['rates']
         @doc['rates']

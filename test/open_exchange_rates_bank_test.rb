@@ -73,4 +73,22 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
   end
 
+  describe 'no valid file for cache' do
+    include RR::Adapters::TestUnit
+    before do
+      @bank = Money::Bank::OpenExchangeRatesBank.new
+      @bank.cache = "space_dir#{rand(999999999)}/out_space_file.json"
+    end
+
+    it 'should get from url' do
+      stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
+      @bank.update_rates
+      @bank.rates_source.must_equal Money::Bank::OpenExchangeRatesBank::OER_URL
+    end
+
+    it 'should raise an error if invalid path is given to save_rates' do
+      proc { @bank.save_rates }.must_raise Money::Bank::InvalidCache
+    end
+  end
+
 end
