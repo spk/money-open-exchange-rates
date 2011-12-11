@@ -9,7 +9,7 @@ class Money
 
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
 
-      OER_URL = 'http://openexchangerates.org/latest.php'
+      OER_URL = 'http://openexchangerates.org/latest.json'
 
       attr_accessor :cache
       attr_reader :doc, :oer_rates, :rates_source
@@ -18,6 +18,7 @@ class Money
         exchange_rates.each do |exchange_rate|
           rate = exchange_rate.last
           currency = exchange_rate.first
+          next unless Money::Currency.find(currency)
           set_rate('USD', currency, rate)
         end
       end

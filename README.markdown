@@ -12,6 +12,10 @@ moe.cache = 'path/to/file/cache'
 Money.default_bank = moe
 ```
 
+## Tests
+
+  bundle exec ruby test/open_exchange_rates_bank_test.rb
+
 ## Refs
 
 * https://github.com/currencybot/open-exchange-rates

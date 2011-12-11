@@ -14,6 +14,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     it "should update itself with exchange rates from OpenExchangeRates" do
       @bank.oer_rates.keys.each do |currency|
+        next unless Money::Currency.find(currency)
         @bank.get_rate("USD", currency).must_be :>, 0
       end
     end
@@ -21,6 +22,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     it "should return the correct oer rates using oer" do
       @bank.update_rates
       @bank.oer_rates.keys.each do |currency|
+        next unless Money::Currency.find(currency)
         subunit = Money::Currency.wrap(currency).subunit_to_unit
         @bank.exchange(100, "USD", currency).cents.must_equal (@bank.oer_rates[currency].to_f * subunit).round
       end
@@ -29,11 +31,12 @@ describe Money::Bank::OpenExchangeRatesBank do
     it "should return the correct oer rates using exchange_with" do
       @bank.update_rates
       @bank.oer_rates.keys.each do |currency|
+        next unless Money::Currency.find(currency)
         subunit = Money::Currency.wrap(currency).subunit_to_unit
         @bank.exchange_with(Money.new(100, "USD"), currency).cents.must_equal (@bank.oer_rates[currency].to_f * subunit).round
         @bank.exchange_with(1.to_money("USD"), currency).cents.must_equal (@bank.oer_rates[currency].to_f * subunit).round
       end
-      @bank.exchange_with(5000.to_money('JPY'), 'USD').cents.must_equal 6517
+      @bank.exchange_with(5000.to_money('JPY'), 'USD').cents.must_equal 6441
     end
 
     # in response to #4
