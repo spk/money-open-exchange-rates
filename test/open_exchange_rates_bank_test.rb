@@ -94,4 +94,27 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
   end
 
+  describe 'save rates' do
+    include RR::Adapters::TestUnit
+
+    before do
+      @bank = Money::Bank::OpenExchangeRatesBank.new
+      @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
+      @bank.cache = @temp_cache_path
+      stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
+      @bank.save_rates
+    end
+
+    it 'should allow update after save' do
+      begin
+        @bank.update_rates
+      rescue
+        assert false, "Should allow updating after saving"
+      end
+    end
+
+    after do
+      File.delete @temp_cache_path
+    end
+  end
 end
