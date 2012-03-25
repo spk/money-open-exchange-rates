@@ -25,7 +25,9 @@ class Money
 
       def save_rates
         raise InvalidCache unless cache
-        open(cache, 'w').write(open(OER_URL).read)
+        open(cache, 'w') do |f|
+          f.write(open(OER_URL).read)
+        end
       rescue Errno::ENOENT
         raise InvalidCache
       end
