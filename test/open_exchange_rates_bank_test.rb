@@ -51,7 +51,7 @@ describe Money::Bank::OpenExchangeRatesBank do
         :separator => ".",
         :delimiter => ","
       }
-      Money::Currency::STRINGIFIED_KEYS = Money::Currency::TABLE.keys.map{|k| k.to_s.downcase }
+      Money::Currency::STRINGIFIED_KEYS << 'btc'
       @bank.add_rate("USD", "BTC", 1 / 13.7603)
       @bank.add_rate("BTC", "USD", 13.7603)
       @bank.exchange(100, "BTC", "USD").cents.must_equal 138
