@@ -39,6 +39,22 @@ describe Money::Bank::OpenExchangeRatesBank do
       @bank.exchange_with(5000.to_money('JPY'), 'USD').cents.must_equal 6441
     end
 
+    it "should not return 0 with integer rate" do
+      Money::Currency::TABLE[:wtf] = {
+        :priority => 1,
+        :iso_code => "WTF",
+        :name => "WTF",
+        :symbol => "WTF",
+        :subunit => "Cent",
+        :subunit_to_unit => 1000,
+        :separator => ".",
+        :delimiter => ","
+      }
+      Money::Currency::STRINGIFIED_KEYS << 'wtf'
+      @bank.add_rate("USD", "WTF", 2)
+      @bank.exchange_with(5000.to_money('WTF'), 'USD').cents.wont_equal 0
+    end
+
     # in response to #4
     it "should exchange btc" do
       Money::Currency::TABLE[:btc] = {

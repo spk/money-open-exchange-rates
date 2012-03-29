@@ -41,7 +41,7 @@ class Money
         unless rate
           from_base_rate = get_rate("USD", from.currency)
           to_base_rate = get_rate("USD", to_currency)
-          rate = to_base_rate / from_base_rate
+          rate = to_base_rate.to_f / from_base_rate.to_f
         end
         Money.new(((Money::Currency.wrap(to_currency).subunit_to_unit.to_f / from.currency.subunit_to_unit.to_f) * from.cents * rate).round, to_currency)
       end
