@@ -39,6 +39,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       @bank.exchange_with(5000.to_money('JPY'), 'USD').cents.must_equal 6441
     end
 
+    it "should not return 0 with integer rate" do
+      @bank.update_rates
+      @bank.exchange_with(5000.to_money('BBD'), 'USD').cents.wont_equal 0
+    end
+
     # in response to #4
     it "should exchange btc" do
       Money::Currency::TABLE[:btc] = {
