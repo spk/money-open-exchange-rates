@@ -28,7 +28,10 @@ class Money
       end
 
       def has_valid_rates?(text)
-        text && text.size > 0 && Yajl::Parser.parse(text).has_key?('rates')
+        parsed = Yajl::Parser.parse(text)
+        parsed && parsed.has_key?('rates')
+      rescue Yajl::ParseError
+        false
       end
 
 
