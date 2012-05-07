@@ -23,10 +23,17 @@ class Money
         end
       end
 
+      def read_from_url
+        open(OER_URL).read
+      end
+
       def save_rates
         raise InvalidCache unless cache
-        open(cache, 'w') do |f|
-          f.write(open(OER_URL).read)
+        new_text = read_from_url
+        if new_text && new_text.size != 0
+          open(cache, 'w') do |f|
+            f.write(new_text)
+          end
         end
       rescue Errno::ENOENT
         raise InvalidCache

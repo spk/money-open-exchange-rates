@@ -130,6 +130,13 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
     end
 
+    it "should not break an existing file if save fails to read" do
+      initial_size = File.read(@temp_cache_path).size
+      stub(@bank).read_from_url {""}
+      @bank.save_rates
+      File.open(@temp_cache_path).read.size.must_equal initial_size
+    end
+
     after do
       File.delete @temp_cache_path
     end
