@@ -31,7 +31,6 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it "should return the correct oer rates using oer" do
-      @bank.update_rates
       @bank.oer_rates.keys.each do |currency|
         next unless Money::Currency.find(currency)
         subunit = Money::Currency.wrap(currency).subunit_to_unit
@@ -40,7 +39,6 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it "should return the correct oer rates using exchange_with" do
-      @bank.update_rates
       @bank.oer_rates.keys.each do |currency|
         next unless Money::Currency.find(currency)
         subunit = Money::Currency.wrap(currency).subunit_to_unit
@@ -51,7 +49,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it "should not return 0 with integer rate" do
-      Money::Currency::TABLE[:wtf] = {
+      wtf = {
         :priority => 1,
         :iso_code => "WTF",
         :name => "WTF",
@@ -61,14 +59,14 @@ describe Money::Bank::OpenExchangeRatesBank do
         :separator => ".",
         :delimiter => ","
       }
-      Money::Currency::STRINGIFIED_KEYS << 'wtf'
+      Money::Currency.register(wtf)
       @bank.add_rate("USD", "WTF", 2)
       @bank.exchange_with(5000.to_money('WTF'), 'USD').cents.wont_equal 0
     end
 
     # in response to #4
     it "should exchange btc" do
-      Money::Currency::TABLE[:btc] = {
+      btc = {
         :priority => 1,
         :iso_code => "BTC",
         :name => "Bitcoin",
@@ -78,7 +76,7 @@ describe Money::Bank::OpenExchangeRatesBank do
         :separator => ".",
         :delimiter => ","
       }
-      Money::Currency::STRINGIFIED_KEYS << 'btc'
+      Money::Currency.register(btc)
       @bank.add_rate("USD", "BTC", 1 / 13.7603)
       @bank.add_rate("BTC", "USD", 13.7603)
       @bank.exchange(100, "BTC", "USD").cents.must_equal 138
@@ -150,7 +148,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     it "should not break an existing file if save returns json without rates" do
       initial_size = File.read(@temp_cache_path).size
-      stub(@bank).read_from_url {{:error => "An error"}.to_json}
+      stub(@bank).read_from_url { %Q({"error": "An error"}) }
       @bank.save_rates
       File.open(@temp_cache_path).read.size.must_equal initial_size
     end
