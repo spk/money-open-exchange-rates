@@ -49,7 +49,7 @@ class Money
       end
 
       def exchange_with(from, to_currency)
-        return from if from.currency.to_s == to_currency.to_s
+        return from if same_currency?(from.currency, to_currency)
         rate = get_rate(from.currency, to_currency)
         unless rate
           from_base_rate = get_rate("USD", from.currency)

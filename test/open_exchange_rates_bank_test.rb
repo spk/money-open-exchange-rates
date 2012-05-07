@@ -5,8 +5,14 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'exchange' do
+    include RR::Adapters::TestUnit
+
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
+      @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
+      @bank.cache = @temp_cache_path
+      stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
+      @bank.save_rates
     end
 
     it "should be able to exchange a money to its own currency even without rates" do
