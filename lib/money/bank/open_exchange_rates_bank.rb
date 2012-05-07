@@ -27,10 +27,15 @@ class Money
         open(OER_URL).read
       end
 
+      def has_valid_rates?(text)
+        text && text.size > 0 && Yajl::Parser.parse(text).has_key?('rates')
+      end
+
+
       def save_rates
         raise InvalidCache unless cache
         new_text = read_from_url
-        if new_text && new_text.size != 0
+        if has_valid_rates?(new_text)
           open(cache, 'w') do |f|
             f.write(new_text)
           end

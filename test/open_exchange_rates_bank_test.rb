@@ -148,6 +148,13 @@ describe Money::Bank::OpenExchangeRatesBank do
       File.open(@temp_cache_path).read.size.must_equal initial_size
     end
 
+    it "should not break an existing file if save returns json without rates" do
+      initial_size = File.read(@temp_cache_path).size
+      stub(@bank).read_from_url {{:error => "An error"}.to_json}
+      @bank.save_rates
+      File.open(@temp_cache_path).read.size.must_equal initial_size
+    end
+
     after do
       File.delete @temp_cache_path
     end
