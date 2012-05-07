@@ -23,10 +23,22 @@ class Money
         end
       end
 
+      def read_from_url
+        open(OER_URL).read
+      end
+
+      def has_valid_rates?(text)
+        text && text.size > 0 && Yajl::Parser.parse(text).has_key?('rates')
+      end
+
+
       def save_rates
         raise InvalidCache unless cache
-        open(cache, 'w') do |f|
-          f.write(open(OER_URL).read)
+        new_text = read_from_url
+        if has_valid_rates?(new_text)
+          open(cache, 'w') do |f|
+            f.write(new_text)
+          end
         end
       rescue Errno::ENOENT
         raise InvalidCache
@@ -37,6 +49,7 @@ class Money
       end
 
       def exchange_with(from, to_currency)
+        return from if from.currency.to_s == to_currency.to_s
         rate = get_rate(from.currency, to_currency)
         unless rate
           from_base_rate = get_rate("USD", from.currency)

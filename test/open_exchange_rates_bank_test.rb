@@ -4,6 +4,17 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 describe Money::Bank::OpenExchangeRatesBank do
 
+  describe 'exchange' do
+    before do
+      @bank = Money::Bank::OpenExchangeRatesBank.new
+    end
+
+    it "should be able to exchange a money to its own currency even without rates" do
+      money = Money.new(0, "USD");
+      @bank.exchange_with(money, "USD").must_equal money
+    end
+  end
+
   describe 'update_rates' do
     before do
       @cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'latest.json'))
@@ -128,6 +139,20 @@ describe Money::Bank::OpenExchangeRatesBank do
       rescue
         assert false, "Should allow updating after saving"
       end
+    end
+
+    it "should not break an existing file if save fails to read" do
+      initial_size = File.read(@temp_cache_path).size
+      stub(@bank).read_from_url {""}
+      @bank.save_rates
+      File.open(@temp_cache_path).read.size.must_equal initial_size
+    end
+
+    it "should not break an existing file if save returns json without rates" do
+      initial_size = File.read(@temp_cache_path).size
+      stub(@bank).read_from_url {{:error => "An error"}.to_json}
+      @bank.save_rates
+      File.open(@temp_cache_path).read.size.must_equal initial_size
     end
 
     after do
