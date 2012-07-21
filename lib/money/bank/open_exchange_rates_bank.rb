@@ -57,6 +57,7 @@ class Money
         unless rate
           from_base_rate = get_rate("USD", from.currency)
           to_base_rate = get_rate("USD", to_currency)
+          raise(Money::Bank::UnknownRateFormat, "No conversion rate known for '#{from.currency.iso_code}' -> '#{to_currency}'") if from_base_rate.nil? || to_base_rate.nil?
           rate = to_base_rate.to_f / from_base_rate.to_f
         end
         Money.new(((Money::Currency.wrap(to_currency).subunit_to_unit.to_f / from.currency.subunit_to_unit.to_f) * from.cents * rate).round, to_currency)
