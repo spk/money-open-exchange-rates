@@ -8,6 +8,7 @@ A gem that calculates the exchange rate using published rates from [open-exchang
 require 'money/bank/open_exchange_rates_bank'
 moe = Money::Bank::OpenExchangeRatesBank.new
 moe.cache = 'path/to/file/cache'
+moe.update_rates
 
 Money.default_bank = moe
 ```

@@ -19,6 +19,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       money = Money.new(0, "USD");
       @bank.exchange_with(money, "USD").must_equal money
     end
+
+    it "should raise if it can't find an exchange rate" do
+      money = Money.new(0, "USD");
+      assert_raises(Money::Bank::UnknownRateFormat){ @bank.exchange_with(money, "AUD") }
+    end
   end
 
   describe 'update_rates' do
