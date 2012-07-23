@@ -24,7 +24,14 @@ Money.default_bank = moe
 * https://github.com/RubyMoney/eu_central_bank
 * https://github.com/RubyMoney/google_currency
 
+## Contributors
+
+* [Wayne See](https://github.com/weynsee)
+* [Julien Boyer](https://github.com/chatgris)
+* [Kevin Ball](https://github.com/kball)
+* [Michael Morris](https://github.com/mtcmorris)
+
 ## License
 The MIT License
 
-Copyright © 2011 Laurent Arnoud <laurent@spkdev.net>
+Copyright © 2012 Laurent Arnoud <laurent@spkdev.net>
