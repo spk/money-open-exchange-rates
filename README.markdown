@@ -8,6 +8,7 @@ A gem that calculates the exchange rate using published rates from [open-exchang
 require 'money/bank/open_exchange_rates_bank'
 moe = Money::Bank::OpenExchangeRatesBank.new
 moe.cache = 'path/to/file/cache'
+moe.app_id = 'your app id from https://openexchangerates.org/signup'
 moe.update_rates
 
 Money.default_bank = moe
@@ -15,7 +16,9 @@ Money.default_bank = moe
 
 ## Tests
 
-  bundle exec ruby test/open_exchange_rates_bank_test.rb
+As of the end of August 2012 all requests to the Open Exchange Rates API must have a valid app_id. You can place your own key at the top of test/open_exchange_rates_bank_test.rb in TEST_APP_ID and then run:
+
+  ```bundle exec ruby test/open_exchange_rates_bank_test.rb```
 
 ## Refs
 

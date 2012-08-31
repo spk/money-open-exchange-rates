@@ -1,5 +1,8 @@
 # encoding: UTF-8
 
+TEST_APP_ID = ''
+raise "Please add a valid TEST_APP_ID to #{__FILE__}" if TEST_APP_ID.nil? || TEST_APP_ID == ""
+
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 describe Money::Bank::OpenExchangeRatesBank do
@@ -9,6 +12,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
+      @bank.app_id = TEST_APP_ID
       @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
       @bank.cache = @temp_cache_path
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
@@ -30,6 +34,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       @cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'latest.json'))
       @bank = Money::Bank::OpenExchangeRatesBank.new
+      @bank.app_id = TEST_APP_ID
       @bank.cache = @cache_path
       @bank.update_rates
     end
@@ -94,12 +99,32 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
   end
 
+begin
+  describe 'App ID' do
+    include RR::Adapters::TestUnit
+    
+    before do
+      @bank = Money::Bank::OpenExchangeRatesBank.new
+      @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
+      @bank.cache = @temp_cache_path
+      stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
+    end
+    
+    it 'should raise an error if no App ID is set' do
+      proc {@bank.save_rates}.must_raise Money::Bank::NoAppId
+    end
+    
+    #TODO: As App IDs are compulsory soon, need to add more tests handle app_id-specific errors from https://openexchangerates.org/documentation#errors    
+  end
+end
+
   describe 'no cache' do
     include RR::Adapters::TestUnit
 
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
       @bank.cache = nil
+      @bank.app_id = TEST_APP_ID
     end
 
     it 'should get from url' do
@@ -118,6 +143,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
       @bank.cache = "space_dir#{rand(999999999)}/out_space_file.json"
+      @bank.app_id = TEST_APP_ID
     end
 
     it 'should get from url' do
@@ -136,6 +162,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
+      @bank.app_id = "temp-e091fc14b3884a516d6cc2c299a"
       @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
       @bank.cache = @temp_cache_path
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
