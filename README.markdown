@@ -18,7 +18,7 @@ Money.default_bank = moe
 
 As of the end of August 2012 all requests to the Open Exchange Rates API must have a valid app_id. You can place your own key at the top of test/open_exchange_rates_bank_test.rb in TEST_APP_ID and then run:
 
-  bundle exec ruby test/open_exchange_rates_bank_test.rb
+  ```bundle exec ruby test/open_exchange_rates_bank_test.rb```
 
 ## Refs
 
