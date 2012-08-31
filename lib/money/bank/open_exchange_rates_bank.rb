@@ -6,12 +6,14 @@ require 'money'
 class Money
   module Bank
     class InvalidCache < StandardError ; end
+    
+    class NoAppId < StandardError ; end
 
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
 
       OER_URL = 'http://openexchangerates.org/latest.json'
 
-      attr_accessor :cache
+      attr_accessor :cache, :app_id
       attr_reader :doc, :oer_rates, :rates_source
 
       def update_rates
@@ -24,7 +26,8 @@ class Money
       end
 
       def read_from_url
-        open(OER_URL).read
+        raise NoAppId if app_id.nil? || app_id == ""
+        open(OER_URL + "?app_id=" + app_id).read
       end
 
       def has_valid_rates?(text)
