@@ -1,11 +1,15 @@
 # encoding: UTF-8
 
-TEST_APP_ID = ''
-raise "Please add a valid TEST_APP_ID to #{__FILE__}" if TEST_APP_ID.nil? || TEST_APP_ID == ""
+TEST_APP_ID = ENV['TEST_APP_ID'] || File.read(File.join(File.dirname(__FILE__), '../TEST_APP_ID'))
+raise "Please add a valid app id to file #{File.dirname(__FILE__)}/../TEST_APP_ID or to TEST_APP_ID environment" if TEST_APP_ID.nil? || TEST_APP_ID == ""
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 describe Money::Bank::OpenExchangeRatesBank do
+
+  before do
+    @cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'latest.json'))
+  end
 
   describe 'exchange' do
     include RR::Adapters::TestUnit
@@ -32,7 +36,6 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'update_rates' do
     before do
-      @cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'latest.json'))
       @bank = Money::Bank::OpenExchangeRatesBank.new
       @bank.app_id = TEST_APP_ID
       @bank.cache = @cache_path
@@ -130,7 +133,7 @@ end
     it 'should get from url' do
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
       @bank.update_rates
-      @bank.rates_source.must_equal Money::Bank::OpenExchangeRatesBank::OER_URL
+      @bank.oer_rates.wont_be_empty
     end
 
     it 'should raise an error if invalid path is given to save_rates' do
@@ -149,12 +152,45 @@ end
     it 'should get from url' do
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
       @bank.update_rates
-      @bank.rates_source.must_equal Money::Bank::OpenExchangeRatesBank::OER_URL
+      @bank.oer_rates.wont_be_empty
     end
 
     it 'should raise an error if invalid path is given to save_rates' do
       proc { @bank.save_rates }.must_raise Money::Bank::InvalidCache
     end
+  end
+
+  describe 'using proc for cache' do
+    include RR::Adapters::TestUnit
+
+    before :each do
+      $global_rates = nil
+      @bank = Money::Bank::OpenExchangeRatesBank.new
+      @bank.cache = Proc.new {|v|
+        if v
+          $global_rates = v
+        else
+          $global_rates
+        end
+      }
+      @bank.app_id = TEST_APP_ID
+    end
+
+    it 'should get from url normally' do
+      stub(@bank).source_url() { @cache_path }
+      @bank.update_rates
+      @bank.oer_rates.wont_be_empty
+    end
+
+    it 'should save from url and get from cache' do
+      stub(@bank).source_url { @cache_path }
+      @bank.save_rates
+      $global_rates.wont_be_empty
+      dont_allow(@bank).source_url
+      @bank.update_rates
+      @bank.oer_rates.wont_be_empty
+    end
+
   end
 
   describe 'save rates' do

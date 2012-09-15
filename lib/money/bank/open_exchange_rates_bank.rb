@@ -1,12 +1,12 @@
 # encoding: UTF-8
 require 'open-uri'
-require 'yajl'
+require 'multi_json'
 require 'money'
 
 class Money
   module Bank
     class InvalidCache < StandardError ; end
-    
+
     class NoAppId < StandardError ; end
 
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
@@ -14,7 +14,7 @@ class Money
       OER_URL = 'http://openexchangerates.org/latest.json'
 
       attr_accessor :cache, :app_id
-      attr_reader :doc, :oer_rates, :rates_source
+      attr_reader :doc, :oer_rates
 
       def update_rates
         exchange_rates.each do |exchange_rate|
@@ -25,26 +25,11 @@ class Money
         end
       end
 
-      def read_from_url
-        raise NoAppId if app_id.nil? || app_id == ""
-        open(OER_URL + "?app_id=" + app_id).read
-      end
-
-      def has_valid_rates?(text)
-        parsed = Yajl::Parser.parse(text)
-        parsed && parsed.has_key?('rates')
-      rescue Yajl::ParseError
-        false
-      end
-
-
       def save_rates
         raise InvalidCache unless cache
-        new_text = read_from_url
-        if has_valid_rates?(new_text)
-          open(cache, 'w') do |f|
-            f.write(new_text)
-          end
+        text = read_from_url
+        if has_valid_rates?(text)
+          store_in_cache(text)
         end
       rescue Errno::ENOENT
         raise InvalidCache
@@ -68,17 +53,48 @@ class Money
 
       protected
 
-      def find_rates_source
-        if !!cache && File.exist?(cache)
-          @rates_source = cache
+      # Store the provided text data by calling the proc method provided
+      # for the cache, or write to the cache file.
+      def store_in_cache(text)
+        if cache.is_a?(Proc)
+          cache.call(text)
+        elsif cache.is_a?(String)
+          open(cache, 'w') do |f|
+            f.write(text)
+          end
         else
-          OER_URL
+          nil
         end
       end
 
+      def read_from_cache
+        if cache.is_a?(Proc)
+          cache.call(nil)
+        elsif cache.is_a?(String) && File.exist?(cache)
+          open(cache).read
+        else
+          nil
+        end
+      end
+
+      def source_url
+        raise NoAppId if app_id.nil? || app_id == ""
+        "#{OER_URL}?app_id=#{app_id}"
+      end
+
+      def read_from_url
+        open(source_url).read
+      end
+
+      def has_valid_rates?(text)
+        parsed = MultiJson.decode(text)
+        parsed && parsed.has_key?('rates')
+      rescue MultiJson::DecodeError
+        false
+      end
+
       def exchange_rates
-        @rates_source = find_rates_source
-        @doc = Yajl::Parser.parse(open(rates_source).read)
+        @doc = MultiJson.decode(read_from_cache || read_from_url)
         @oer_rates = @doc['rates']
         @doc['rates']
       end

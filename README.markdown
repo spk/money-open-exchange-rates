@@ -14,6 +14,20 @@ moe.update_rates
 Money.default_bank = moe
 ```
 
+You can also provide a Proc as a cache to provide your own caching mechanism
+perhaps with Redis or just a thread safe `Hash` (global). For example:
+
+```ruby
+moe.cache = Proc.new do |v|
+  key = 'money:exchange_rates']
+  if v
+    Thread.current[key] = v
+  else
+    Thread.current[key]
+  end
+end
+```
+
 ## Tests
 
 As of the end of August 2012 all requests to the Open Exchange Rates API must have a valid app_id. You can place your own key at the top of test/open_exchange_rates_bank_test.rb in TEST_APP_ID and then run:

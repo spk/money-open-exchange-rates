@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
   s.name = "money-open-exchange-rates"
-  s.version = "0.0.7"
+  s.version = "0.1.0"
   s.date = Time.now.utc.strftime("%Y-%m-%d")
   s.homepage = "http://github.com/spk/#{s.name}"
-  s.authors = "Laurent Arnoud"
+  s.authors = ["Laurent Arnoud", "Sam Lown"]
   s.email = "laurent@spkdev.net"
   s.description = "A gem that calculates the exchange rate using published rates from open-exchange-rates. Compatible with the money gem."
   s.summary = "A gem that calculates the exchange rate using published rates from open-exchange-rates."
@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir.glob("test/*_test.rb")
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
-  s.add_dependency "yajl-ruby", ">=0.8.3"
+  s.add_dependency "multi_json", "~> 1.0"
   s.add_dependency "money", ">=3.7.1"
   s.add_development_dependency "minitest", ">=2.0"
   s.add_development_dependency "rr", ">=1.0.4"
