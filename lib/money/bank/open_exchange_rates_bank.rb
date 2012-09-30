@@ -78,7 +78,7 @@ class Money
       end
 
       def source_url
-        raise NoAppId if app_id.nil? || app_id == ""
+        raise NoAppId if app_id.nil? || app_id.empty?
         "#{OER_URL}?app_id=#{app_id}"
       end
 

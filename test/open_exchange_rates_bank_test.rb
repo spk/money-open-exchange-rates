@@ -1,7 +1,8 @@
 # encoding: UTF-8
 
-TEST_APP_ID = ENV['TEST_APP_ID'] || File.read(File.join(File.dirname(__FILE__), '../TEST_APP_ID'))
-raise "Please add a valid app id to file #{File.dirname(__FILE__)}/../TEST_APP_ID or to TEST_APP_ID environment" if TEST_APP_ID.nil? || TEST_APP_ID == ""
+TEST_APP_ID_PATH = File.join(File.dirname(__FILE__), '..', 'TEST_APP_ID')
+TEST_APP_ID = ENV['TEST_APP_ID'] || File.read(TEST_APP_ID_PATH)
+raise "Please add a valid app id to file #{TEST_APP_ID_PATH} or to TEST_APP_ID environment" if TEST_APP_ID.nil? || TEST_APP_ID.empty?
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
