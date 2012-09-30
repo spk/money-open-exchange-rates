@@ -1,9 +1,5 @@
 # encoding: UTF-8
 
-TEST_APP_ID_PATH = File.join(File.dirname(__FILE__), '..', 'TEST_APP_ID')
-TEST_APP_ID = ENV['TEST_APP_ID'] || File.read(TEST_APP_ID_PATH)
-raise "Please add a valid app id to file #{TEST_APP_ID_PATH} or to TEST_APP_ID environment" if TEST_APP_ID.nil? || TEST_APP_ID.empty?
-
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 describe Money::Bank::OpenExchangeRatesBank do
@@ -25,12 +21,12 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it "should be able to exchange a money to its own currency even without rates" do
-      money = Money.new(0, "USD");
+      money = Money.new(0, "USD")
       @bank.exchange_with(money, "USD").must_equal money
     end
 
     it "should raise if it can't find an exchange rate" do
-      money = Money.new(0, "USD");
+      money = Money.new(0, "USD")
       assert_raises(Money::Bank::UnknownRateFormat){ @bank.exchange_with(money, "AUD") }
     end
   end
@@ -54,7 +50,8 @@ describe Money::Bank::OpenExchangeRatesBank do
       @bank.oer_rates.keys.each do |currency|
         next unless Money::Currency.find(currency)
         subunit = Money::Currency.wrap(currency).subunit_to_unit
-        @bank.exchange(100, "USD", currency).cents.must_equal((@bank.oer_rates[currency].to_f * subunit).round)
+        @bank.exchange(100, "USD", currency).cents.
+          must_equal((@bank.oer_rates[currency].to_f * subunit).round)
       end
     end
 
@@ -62,8 +59,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       @bank.oer_rates.keys.each do |currency|
         next unless Money::Currency.find(currency)
         subunit = Money::Currency.wrap(currency).subunit_to_unit
-        @bank.exchange_with(Money.new(100, "USD"), currency).cents.must_equal((@bank.oer_rates[currency].to_f * subunit).round)
-        @bank.exchange_with(1.to_money("USD"), currency).cents.must_equal((@bank.oer_rates[currency].to_f * subunit).round)
+        @bank.exchange_with(Money.new(100, "USD"), currency).cents.
+          must_equal((@bank.oer_rates[currency].to_f * subunit).round)
+
+        @bank.exchange_with(1.to_money("USD"), currency).cents.
+          must_equal((@bank.oer_rates[currency].to_f * subunit).round)
       end
       @bank.exchange_with(5000.to_money('JPY'), 'USD').cents.must_equal 6441
     end
@@ -103,24 +103,24 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
   end
 
-begin
   describe 'App ID' do
     include RR::Adapters::TestUnit
-    
+
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
       @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
       @bank.cache = @temp_cache_path
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
     end
-    
+
     it 'should raise an error if no App ID is set' do
       proc {@bank.save_rates}.must_raise Money::Bank::NoAppId
     end
-    
-    #TODO: As App IDs are compulsory soon, need to add more tests handle app_id-specific errors from https://openexchangerates.org/documentation#errors    
+
+    #TODO: As App IDs are compulsory soon, need to add more tests handle
+    # app_id-specific errors from
+    # https://openexchangerates.org/documentation#errors
   end
-end
 
   describe 'no cache' do
     include RR::Adapters::TestUnit
