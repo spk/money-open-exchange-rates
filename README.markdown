@@ -1,6 +1,7 @@
 # Money Open Exchange Rates
 
-A gem that calculates the exchange rate using published rates from [open-exchange-rates](http://josscrowcroft.github.com/open-exchange-rates/)
+A gem that calculates the exchange rate using published rates from
+[open-exchange-rates](http://josscrowcroft.github.com/open-exchange-rates/)
 
 ## Usage
 
@@ -30,7 +31,9 @@ end
 
 ## Tests
 
-As of the end of August 2012 all requests to the Open Exchange Rates API must have a valid app_id. You can place your own key at the top of test/open_exchange_rates_bank_test.rb in TEST_APP_ID and then run:
+As of the end of August 2012 all requests to the Open Exchange Rates API must
+have a valid app_id. You can place your own key on a file named TEST_APP_ID and
+then run:
 
   ```bundle exec ruby test/open_exchange_rates_bank_test.rb```
 
@@ -47,6 +50,7 @@ As of the end of August 2012 all requests to the Open Exchange Rates API must ha
 * [Julien Boyer](https://github.com/chatgris)
 * [Kevin Ball](https://github.com/kball)
 * [Michael Morris](https://github.com/mtcmorris)
+
 
 ## License
 The MIT License
