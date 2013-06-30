@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'open-uri'
-require 'multi_json'
 require 'money'
+require 'json'
 
 class Money
   module Bank
@@ -87,14 +87,14 @@ class Money
       end
 
       def has_valid_rates?(text)
-        parsed = MultiJson.decode(text)
+        parsed = JSON.parse(text)
         parsed && parsed.has_key?('rates')
-      rescue MultiJson::DecodeError
+      rescue JSON::ParserError
         false
       end
 
       def exchange_rates
-        @doc = MultiJson.decode(read_from_cache || read_from_url)
+        @doc = JSON.parse(read_from_cache || read_from_url)
         @oer_rates = @doc['rates']
         @doc['rates']
       end
