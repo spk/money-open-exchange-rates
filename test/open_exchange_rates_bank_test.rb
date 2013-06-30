@@ -199,7 +199,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
-      @bank.app_id = "temp-e091fc14b3884a516d6cc2c299a"
+      @bank.app_id = TEST_APP_ID
       @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
       @bank.cache = @temp_cache_path
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
