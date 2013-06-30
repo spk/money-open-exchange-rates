@@ -11,9 +11,10 @@ Gem::Specification.new do |s|
   s.files = Dir["LICENSE", "README.markdown", "Gemfile", "lib/**/*.rb", 'test/**/*']
   s.test_files = Dir.glob("test/*_test.rb")
   s.require_paths = ["lib"]
+  s.required_ruby_version = ">= 1.9.2"
   s.rubygems_version = %q{1.3.7}
-  s.add_dependency "multi_json", "~> 1.0"
   s.add_dependency "money", ">=3.7.1"
   s.add_development_dependency "minitest", ">=2.0"
   s.add_development_dependency "rr", ">=1.0.4"
+  s.add_dependency "json", ">= 1.7"
 end
