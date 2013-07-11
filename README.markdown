@@ -35,7 +35,9 @@ As of the end of August 2012 all requests to the Open Exchange Rates API must
 have a valid app_id. You can place your own key on a file named TEST_APP_ID and
 then run:
 
-  ```bundle exec ruby test/open_exchange_rates_bank_test.rb```
+```
+bundle exec rake
+```
 
 ## Refs
 
