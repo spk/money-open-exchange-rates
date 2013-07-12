@@ -20,7 +20,7 @@ perhaps with Redis or just a thread safe `Hash` (global). For example:
 
 ```ruby
 moe.cache = Proc.new do |v|
-  key = 'money:exchange_rates']
+  key = 'money:exchange_rates'
   if v
     Thread.current[key] = v
   else
