@@ -9,6 +9,7 @@ Gem::Specification.new do |s|
   s.summary = "A gem that calculates the exchange rate using published rates from open-exchange-rates."
   s.extra_rdoc_files = %w(README.markdown)
   s.files = Dir["LICENSE", "README.markdown", "Gemfile", "lib/**/*.rb", 'test/**/*']
+  s.license = 'MIT'
   s.test_files = Dir.glob("test/*_test.rb")
   s.require_paths = ["lib"]
   s.required_ruby_version = ">= 1.9.2"
