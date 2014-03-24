@@ -261,7 +261,7 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.get_rate('EUR', 'RUB').must_equal eur_to_rub_cross_rate
       end
 
-      it 'raises Money::Bank::UnknownRateFormat' do
+      it 'raises Money::Bank::UnknownRateFormat if no cross rates found' do
         ->{ subject.get_rate('ZAR', 'ZMK') }.must_raise Money::Bank::UnknownRateFormat
       end
 
