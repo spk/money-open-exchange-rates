@@ -229,4 +229,43 @@ describe Money::Bank::OpenExchangeRatesBank do
       File.delete @temp_cache_path
     end
   end
+
+  describe 'get rate' do
+    subject { Money::Bank::OpenExchangeRatesBank.new }
+
+    before do
+      # some kind of stubbing base class
+      Money::Bank::VariableExchange.class_eval do
+        def get_rate(from, to)
+          if from == 'LVL' && to == 'LTL'
+            5
+          elsif from == 'USD' && to == 'RUB'
+            50
+          elsif from == 'USD' && to == 'EUR'
+            1.3
+          else
+            nil
+          end
+        end
+      end
+    end
+
+    it 'returns rate if Money::Bank::VariableExchange#get_rate returns rate' do
+      subject.get_rate('LVL','LTL').must_equal 5
+    end
+
+    describe 'calculate cross rate using "USD" rate value if no data was returned by Money::Bank::VariableExchange#get_rate' do
+
+      it 'returns cross rate if "USD" rates for provided currencies exist' do
+        eur_to_rub_cross_rate = 50 / 1.3
+        subject.get_rate('EUR', 'RUB').must_equal eur_to_rub_cross_rate
+      end
+
+      it 'raises Money::Bank::UnknownRateFormat' do
+        ->{ subject.get_rate('ZAR', 'ZMK') }.must_raise Money::Bank::UnknownRateFormat
+      end
+
+    end
+
+  end
 end
