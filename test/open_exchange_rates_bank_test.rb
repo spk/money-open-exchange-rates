@@ -9,8 +9,6 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'exchange' do
-    include RR::Adapters::TestUnit
-
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
       @bank.app_id = TEST_APP_ID
@@ -104,7 +102,6 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'App ID' do
-    include RR::Adapters::TestUnit
 
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
@@ -123,8 +120,6 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'no cache' do
-    include RR::Adapters::TestUnit
-
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
       @bank.cache = nil
@@ -143,7 +138,6 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'no valid file for cache' do
-    include RR::Adapters::TestUnit
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
       @bank.cache = "space_dir#{rand(999999999)}/out_space_file.json"
@@ -162,8 +156,6 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'using proc for cache' do
-    include RR::Adapters::TestUnit
-
     before :each do
       $global_rates = nil
       @bank = Money::Bank::OpenExchangeRatesBank.new
@@ -195,8 +187,6 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'save rates' do
-    include RR::Adapters::TestUnit
-
     before do
       @bank = Money::Bank::OpenExchangeRatesBank.new
       @bank.app_id = TEST_APP_ID
