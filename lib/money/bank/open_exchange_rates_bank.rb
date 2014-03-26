@@ -42,13 +42,16 @@ class Money
       def exchange_with(from, to_currency)
         return from if same_currency?(from.currency, to_currency)
         rate = get_rate(from.currency, to_currency)
-        unless rate
-          from_base_rate = get_rate("USD", from.currency)
-          to_base_rate = get_rate("USD", to_currency)
-          raise(Money::Bank::UnknownRateFormat, "No conversion rate known for '#{from.currency.iso_code}' -> '#{to_currency}'") if from_base_rate.nil? || to_base_rate.nil?
-          rate = to_base_rate.to_f / from_base_rate.to_f
-        end
         Money.new(((Money::Currency.wrap(to_currency).subunit_to_unit.to_f / from.currency.subunit_to_unit.to_f) * from.cents * rate).round, to_currency)
+      end
+
+      def get_rate(from_currency, to_currency)
+        super(from_currency, to_currency) || begin
+          from_base_rate = super("USD", from_currency)
+          to_base_rate = super("USD", to_currency)
+          raise(Money::Bank::UnknownRateFormat, "No conversion rate known for '#{from_currency}' -> '#{to_currency}'") if from_base_rate.nil? || to_base_rate.nil?
+          to_base_rate.to_f / from_base_rate.to_f
+        end
       end
 
       protected
