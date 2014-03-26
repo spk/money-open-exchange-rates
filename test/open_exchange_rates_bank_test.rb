@@ -232,17 +232,20 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'get rate' do
     subject { Money::Bank::OpenExchangeRatesBank.new }
+    LVL_TO_LTL =  5
+    USD_TO_RUB = 50
+    USD_TO_EUR = 1.3
 
     before do
       # some kind of stubbing base class
       Money::Bank::VariableExchange.class_eval do
         def get_rate(from, to)
           if from == 'LVL' && to == 'LTL'
-            5
+            LVL_TO_LTL
           elsif from == 'USD' && to == 'RUB'
-            50
+            USD_TO_RUB
           elsif from == 'USD' && to == 'EUR'
-            1.3
+            USD_TO_EUR
           else
             nil
           end
@@ -251,13 +254,13 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'returns rate if Money::Bank::VariableExchange#get_rate returns rate' do
-      subject.get_rate('LVL','LTL').must_equal 5
+      subject.get_rate('LVL','LTL').must_equal LVL_TO_LTL
     end
 
     describe 'calculate cross rate using "USD" rate value if no data was returned by Money::Bank::VariableExchange#get_rate' do
 
       it 'returns cross rate if "USD" rates for provided currencies exist' do
-        eur_to_rub_cross_rate = 50 / 1.3
+        eur_to_rub_cross_rate = USD_TO_RUB / USD_TO_EUR
         subject.get_rate('EUR', 'RUB').must_equal eur_to_rub_cross_rate
       end
 
