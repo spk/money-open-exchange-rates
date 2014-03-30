@@ -18,5 +18,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "minitest", ">=2.0"
   s.add_development_dependency "rr", ">=1.0.4"
   s.add_development_dependency "rake"
+  s.add_development_dependency "timecop"
   s.add_dependency "json", ">= 1.7"
 end

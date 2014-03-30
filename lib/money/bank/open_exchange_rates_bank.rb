@@ -14,7 +14,12 @@ class Money
       OER_URL = 'http://openexchangerates.org/latest.json'
 
       attr_accessor :cache, :app_id
-      attr_reader :doc, :oer_rates
+      attr_reader :doc, :oer_rates, :rates_expiration, :ttl_in_seconds
+
+      def ttl_in_seconds=(value)
+        @ttl_in_seconds = value
+        refresh_rates_expiration if ttl_in_seconds
+      end
 
       def update_rates
         exchange_rates.each do |exchange_rate|
@@ -46,11 +51,22 @@ class Money
       end
 
       def get_rate(from_currency, to_currency)
+        expire_rates
         super(from_currency, to_currency) || begin
           from_base_rate = super("USD", from_currency)
           to_base_rate = super("USD", to_currency)
           raise(Money::Bank::UnknownRateFormat, "No conversion rate known for '#{from_currency}' -> '#{to_currency}'") if from_base_rate.nil? || to_base_rate.nil?
           to_base_rate.to_f / from_base_rate.to_f
+        end
+      end
+
+      def expire_rates
+        if ttl_in_seconds && rates_expiration <= Time.now
+          update_rates
+          refresh_rates_expiration
+          true
+        else
+          false
         end
       end
 
@@ -100,6 +116,10 @@ class Money
         @doc = JSON.parse(read_from_cache || read_from_url)
         @oer_rates = @doc['rates']
         @doc['rates']
+      end
+
+      def refresh_rates_expiration
+        @rates_expiration = Time.now + ttl_in_seconds
       end
     end
   end

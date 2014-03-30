@@ -12,6 +12,11 @@ moe.cache = 'path/to/file/cache'
 moe.app_id = 'your app id from https://openexchangerates.org/signup'
 moe.update_rates
 
+# (optional)
+# set the seconds after than the current rates are automatically expired
+# by default, they never expire
+moe.ttl_in_seconds = 86400
+
 Money.default_bank = moe
 ```
 

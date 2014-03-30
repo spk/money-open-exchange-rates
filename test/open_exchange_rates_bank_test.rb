@@ -270,5 +270,46 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     end
 
+    it 'should try to expire the rates' do
+      stub(subject).expire_rates { throw(StandardError) }
+
+      assert_throws(StandardError, 'Expected expire_rates method to be called'){ subject.get_rate('EUR', 'RUB') }
+    end
+  end
+
+  describe '#expire_rates' do
+    before do
+      @bank = Money::Bank::OpenExchangeRatesBank.new
+      @bank.app_id = TEST_APP_ID
+      @bank.ttl_in_seconds = 1000
+    end
+
+    describe 'when the ttl has expired' do
+      before do
+        new_time = Time.now + 1001
+        Timecop.freeze(new_time)
+      end
+
+      it 'should update the rates' do
+        stub(@bank).update_rates { throw(StandardError) }
+
+        assert_throws(StandardError, 'Expected update_rates method to be called'){ @bank.expire_rates }
+      end
+
+      it 'updates the next expiration time' do
+        exp_time = Time.now + 1000
+
+        @bank.expire_rates
+        @bank.rates_expiration.must_equal exp_time
+      end
+    end
+
+    describe 'when the ttl has not expired' do
+      it 'not should update the rates' do
+        stub(@bank).update_rates { throw(StandardError) }
+
+        @bank.expire_rates
+      end
+    end
   end
 end
