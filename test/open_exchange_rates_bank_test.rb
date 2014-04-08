@@ -267,13 +267,6 @@ describe Money::Bank::OpenExchangeRatesBank do
       it 'raises Money::Bank::UnknownRateFormat if no cross rates found' do
         ->{ subject.get_rate('ZAR', 'ZMK') }.must_raise Money::Bank::UnknownRateFormat
       end
-
-    end
-
-    it 'should try to expire the rates' do
-      stub(subject).expire_rates { throw(StandardError) }
-
-      assert_throws(StandardError, 'Expected expire_rates method to be called'){ subject.get_rate('EUR', 'RUB') }
     end
   end
 
@@ -282,6 +275,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       @bank = Money::Bank::OpenExchangeRatesBank.new
       @bank.app_id = TEST_APP_ID
       @bank.ttl_in_seconds = 1000
+      @usd_eur_rate = 0.655
+      @bank.add_rate('USD', 'EUR', @usd_eur_rate)
+      @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
+      @bank.cache = @temp_cache_path
+      stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
     end
 
     describe 'when the ttl has expired' do
@@ -290,10 +288,13 @@ describe Money::Bank::OpenExchangeRatesBank do
         Timecop.freeze(new_time)
       end
 
-      it 'should update the rates' do
-        stub(@bank).update_rates { throw(StandardError) }
+      after do
+        Timecop.return
+      end
 
-        assert_throws(StandardError, 'Expected update_rates method to be called'){ @bank.expire_rates }
+      it 'should update the rates' do
+        @bank.update_rates
+        @bank.get_rate('USD', 'EUR').wont_equal @usd_eur_rate
       end
 
       it 'updates the next expiration time' do
@@ -306,9 +307,9 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     describe 'when the ttl has not expired' do
       it 'not should update the rates' do
-        stub(@bank).update_rates { throw(StandardError) }
-
+        exp_time = @bank.rates_expiration
         @bank.expire_rates
+        @bank.rates_expiration.must_equal exp_time
       end
     end
   end
