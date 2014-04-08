@@ -64,9 +64,6 @@ class Money
         if ttl_in_seconds && rates_expiration <= Time.now
           update_rates
           refresh_rates_expiration
-          true
-        else
-          false
         end
       end
 
