@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.7}
   s.add_dependency "money", ">=3.7.1"
   s.add_development_dependency "minitest", ">=2.0"
+  s.add_development_dependency 'pry'
   s.add_development_dependency "rr", ">=1.0.4"
   s.add_development_dependency "rake"
   s.add_development_dependency "timecop"
