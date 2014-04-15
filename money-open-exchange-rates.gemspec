@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "money-open-exchange-rates"
-  s.version = "0.1.5"
+  s.version = "0.1.7"
   s.date = Time.now.utc.strftime("%Y-%m-%d")
   s.homepage = "http://github.com/spk/#{s.name}"
   s.authors = ["Laurent Arnoud", "Sam Lown"]
