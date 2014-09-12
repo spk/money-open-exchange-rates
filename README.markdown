@@ -53,10 +53,14 @@ bundle exec rake
 
 ## Contributors
 
-* [Wayne See](https://github.com/weynsee)
-* [Julien Boyer](https://github.com/chatgris)
-* [Kevin Ball](https://github.com/kball)
-* [Michael Morris](https://github.com/mtcmorris)
+Wayne See (8)
+Kevin Ball (3)
+Paul Robinson (2)
+Michael Morris (2)
+Dmitry Dedov (2)
+chatgris (2)
+Sam Lown (1)
+Fabio Cantoni (1)
 
 ## License
 

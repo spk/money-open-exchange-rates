@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.version = "0.1.7"
   s.date = Time.now.utc.strftime("%Y-%m-%d")
   s.homepage = "http://github.com/spk/#{s.name}"
-  s.authors = ["Laurent Arnoud", "Sam Lown"]
+  s.authors = ["Laurent Arnoud"]
   s.email = "laurent@spkdev.net"
   s.description = "A gem that calculates the exchange rate using published rates from open-exchange-rates. Compatible with the money gem."
   s.summary = "A gem that calculates the exchange rate using published rates from open-exchange-rates."
