@@ -3,6 +3,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 describe Money::Bank::OpenExchangeRatesBank do
+  subject { Money::Bank::OpenExchangeRatesBank.new }
 
   before do
     @cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'latest.json'))
@@ -10,60 +11,58 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'exchange' do
     before do
-      @bank = Money::Bank::OpenExchangeRatesBank.new
-      @bank.app_id = TEST_APP_ID
+      subject.app_id = TEST_APP_ID
       @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
-      @bank.cache = @temp_cache_path
+      subject.cache = @temp_cache_path
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
-      @bank.save_rates
+      subject.save_rates
     end
 
     it "should be able to exchange a money to its own currency even without rates" do
       money = Money.new(0, "USD")
-      @bank.exchange_with(money, "USD").must_equal money
+      subject.exchange_with(money, "USD").must_equal money
     end
 
     it "should raise if it can't find an exchange rate" do
       money = Money.new(0, "USD")
-      assert_raises(Money::Bank::UnknownRateFormat){ @bank.exchange_with(money, "AUD") }
+      assert_raises(Money::Bank::UnknownRateFormat){ subject.exchange_with(money, "AUD") }
     end
   end
 
   describe 'update_rates' do
     before do
-      @bank = Money::Bank::OpenExchangeRatesBank.new
-      @bank.app_id = TEST_APP_ID
-      @bank.cache = @cache_path
-      @bank.update_rates
+      subject.app_id = TEST_APP_ID
+      subject.cache = @cache_path
+      subject.update_rates
     end
 
     it "should update itself with exchange rates from OpenExchangeRates" do
-      @bank.oer_rates.keys.each do |currency|
+      subject.oer_rates.keys.each do |currency|
         next unless Money::Currency.find(currency)
-        @bank.get_rate("USD", currency).must_be :>, 0
+        subject.get_rate("USD", currency).must_be :>, 0
       end
     end
 
     it "should return the correct oer rates using oer" do
-      @bank.oer_rates.keys.each do |currency|
+      subject.oer_rates.keys.each do |currency|
         next unless Money::Currency.find(currency)
         subunit = Money::Currency.wrap(currency).subunit_to_unit
-        @bank.exchange(100, "USD", currency).cents.
-          must_equal((@bank.oer_rates[currency].to_f * subunit).round)
+        subject.exchange(100, "USD", currency).cents.
+          must_equal((subject.oer_rates[currency].to_f * subunit).round)
       end
     end
 
     it "should return the correct oer rates using exchange_with" do
-      @bank.oer_rates.keys.each do |currency|
+      subject.oer_rates.keys.each do |currency|
         next unless Money::Currency.find(currency)
         subunit = Money::Currency.wrap(currency).subunit_to_unit
-        @bank.exchange_with(Money.new(100, "USD"), currency).cents.
-          must_equal((@bank.oer_rates[currency].to_f * subunit).round)
+        subject.exchange_with(Money.new(100, "USD"), currency).cents.
+          must_equal((subject.oer_rates[currency].to_f * subunit).round)
 
-        @bank.exchange_with(1.to_money("USD"), currency).cents.
-          must_equal((@bank.oer_rates[currency].to_f * subunit).round)
+        subject.exchange_with(1.to_money("USD"), currency).cents.
+          must_equal((subject.oer_rates[currency].to_f * subunit).round)
       end
-      @bank.exchange_with(5000.to_money('JPY'), 'USD').cents.must_equal 6441
+      subject.exchange_with(5000.to_money('JPY'), 'USD').cents.must_equal 6441
     end
 
     it "should not return 0 with integer rate" do
@@ -78,8 +77,8 @@ describe Money::Bank::OpenExchangeRatesBank do
         :delimiter => ","
       }
       Money::Currency.register(wtf)
-      @bank.add_rate("USD", "WTF", 2)
-      @bank.exchange_with(5000.to_money('WTF'), 'USD').cents.wont_equal 0
+      subject.add_rate("USD", "WTF", 2)
+      subject.exchange_with(5000.to_money('WTF'), 'USD').cents.wont_equal 0
     end
 
     # in response to #4
@@ -95,23 +94,22 @@ describe Money::Bank::OpenExchangeRatesBank do
         :delimiter => ","
       }
       Money::Currency.register(btc)
-      @bank.add_rate("USD", "BTC", 1 / 13.7603)
-      @bank.add_rate("BTC", "USD", 13.7603)
-      @bank.exchange(100, "BTC", "USD").cents.must_equal 138
+      subject.add_rate("USD", "BTC", 1 / 13.7603)
+      subject.add_rate("BTC", "USD", 13.7603)
+      subject.exchange(100, "BTC", "USD").cents.must_equal 138
     end
   end
 
   describe 'App ID' do
 
     before do
-      @bank = Money::Bank::OpenExchangeRatesBank.new
       @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
-      @bank.cache = @temp_cache_path
+      subject.cache = @temp_cache_path
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
     end
 
     it 'should raise an error if no App ID is set' do
-      proc {@bank.save_rates}.must_raise Money::Bank::NoAppId
+      proc {subject.save_rates}.must_raise Money::Bank::NoAppId
     end
 
     #TODO: As App IDs are compulsory soon, need to add more tests handle
@@ -121,84 +119,80 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'no cache' do
     before do
-      @bank = Money::Bank::OpenExchangeRatesBank.new
-      @bank.cache = nil
-      @bank.app_id = TEST_APP_ID
+      subject.cache = nil
+      subject.app_id = TEST_APP_ID
     end
 
     it 'should get from url' do
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
-      @bank.update_rates
-      @bank.oer_rates.wont_be_empty
+      subject.update_rates
+      subject.oer_rates.wont_be_empty
     end
 
     it 'should raise an error if invalid path is given to save_rates' do
-      proc { @bank.save_rates }.must_raise Money::Bank::InvalidCache
+      proc { subject.save_rates }.must_raise Money::Bank::InvalidCache
     end
   end
 
   describe 'no valid file for cache' do
     before do
-      @bank = Money::Bank::OpenExchangeRatesBank.new
-      @bank.cache = "space_dir#{rand(999999999)}/out_space_file.json"
-      @bank.app_id = TEST_APP_ID
+      subject.cache = "space_dir#{rand(999999999)}/out_space_file.json"
+      subject.app_id = TEST_APP_ID
     end
 
     it 'should get from url' do
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
-      @bank.update_rates
-      @bank.oer_rates.wont_be_empty
+      subject.update_rates
+      subject.oer_rates.wont_be_empty
     end
 
     it 'should raise an error if invalid path is given to save_rates' do
-      proc { @bank.save_rates }.must_raise Money::Bank::InvalidCache
+      proc { subject.save_rates }.must_raise Money::Bank::InvalidCache
     end
   end
 
   describe 'using proc for cache' do
     before :each do
       $global_rates = nil
-      @bank = Money::Bank::OpenExchangeRatesBank.new
-      @bank.cache = Proc.new {|v|
+      subject.cache = Proc.new {|v|
         if v
           $global_rates = v
         else
           $global_rates
         end
       }
-      @bank.app_id = TEST_APP_ID
+      subject.app_id = TEST_APP_ID
     end
 
     it 'should get from url normally' do
-      stub(@bank).source_url() { @cache_path }
-      @bank.update_rates
-      @bank.oer_rates.wont_be_empty
+      stub(subject).source_url() { @cache_path }
+      subject.update_rates
+      subject.oer_rates.wont_be_empty
     end
 
     it 'should save from url and get from cache' do
-      stub(@bank).source_url { @cache_path }
-      @bank.save_rates
+      stub(subject).source_url { @cache_path }
+      subject.save_rates
       $global_rates.wont_be_empty
-      dont_allow(@bank).source_url
-      @bank.update_rates
-      @bank.oer_rates.wont_be_empty
+      dont_allow(subject).source_url
+      subject.update_rates
+      subject.oer_rates.wont_be_empty
     end
 
   end
 
   describe 'save rates' do
     before do
-      @bank = Money::Bank::OpenExchangeRatesBank.new
-      @bank.app_id = TEST_APP_ID
+      subject.app_id = TEST_APP_ID
       @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
-      @bank.cache = @temp_cache_path
+      subject.cache = @temp_cache_path
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
-      @bank.save_rates
+      subject.save_rates
     end
 
     it 'should allow update after save' do
       begin
-        @bank.update_rates
+        subject.update_rates
       rescue
         assert false, "Should allow updating after saving"
       end
@@ -206,22 +200,22 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     it "should not break an existing file if save fails to read" do
       initial_size = File.read(@temp_cache_path).size
-      stub(@bank).read_from_url {""}
-      @bank.save_rates
+      stub(subject).read_from_url {""}
+      subject.save_rates
       File.open(@temp_cache_path).read.size.must_equal initial_size
     end
 
     it "should not break an existing file if save returns json without rates" do
       initial_size = File.read(@temp_cache_path).size
-      stub(@bank).read_from_url { %Q({"error": "An error"}) }
-      @bank.save_rates
+      stub(subject).read_from_url { %Q({"error": "An error"}) }
+      subject.save_rates
       File.open(@temp_cache_path).read.size.must_equal initial_size
     end
 
     it "should not break an existing file if save returns a invalid json" do
       initial_size = File.read(@temp_cache_path).size
-      stub(@bank).read_from_url { %Q({invalid_json: "An error"}) }
-      @bank.save_rates
+      stub(subject).read_from_url { %Q({invalid_json: "An error"}) }
+      subject.save_rates
       File.open(@temp_cache_path).read.size.must_equal initial_size
     end
 
@@ -231,7 +225,6 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'get rate' do
-    subject { Money::Bank::OpenExchangeRatesBank.new }
     LVL_TO_LTL =  5
     USD_TO_RUB = 50
     USD_TO_EUR = 1.3
@@ -272,13 +265,12 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe '#expire_rates' do
     before do
-      @bank = Money::Bank::OpenExchangeRatesBank.new
-      @bank.app_id = TEST_APP_ID
-      @bank.ttl_in_seconds = 1000
+      subject.app_id = TEST_APP_ID
+      subject.ttl_in_seconds = 1000
       @usd_eur_rate = 0.655
-      @bank.add_rate('USD', 'EUR', @usd_eur_rate)
+      subject.add_rate('USD', 'EUR', @usd_eur_rate)
       @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
-      @bank.cache = @temp_cache_path
+      subject.cache = @temp_cache_path
       stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
     end
 
@@ -293,23 +285,23 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should update the rates' do
-        @bank.update_rates
-        @bank.get_rate('USD', 'EUR').wont_equal @usd_eur_rate
+        subject.update_rates
+        subject.get_rate('USD', 'EUR').wont_equal @usd_eur_rate
       end
 
       it 'updates the next expiration time' do
         exp_time = Time.now + 1000
 
-        @bank.expire_rates
-        @bank.rates_expiration.must_equal exp_time
+        subject.expire_rates
+        subject.rates_expiration.must_equal exp_time
       end
     end
 
     describe 'when the ttl has not expired' do
       it 'not should update the rates' do
-        exp_time = @bank.rates_expiration
-        @bank.expire_rates
-        @bank.rates_expiration.must_equal exp_time
+        exp_time = subject.rates_expiration
+        subject.expire_rates
+        subject.rates_expiration.must_equal exp_time
       end
     end
   end
