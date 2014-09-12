@@ -67,3 +67,8 @@ Fabio Cantoni (1)
 The MIT License
 
 Copyright © 2014 Laurent Arnoud <laurent@spkdev.net>
+
+---
+[![Gem Version](https://badge.fury.io/rb/money-open-exchange-rates.svg)](https://rubygems.org/gems/money-open-exchange-rates)
+[![Build Status](https://secure.travis-ci.org/spk/money-open-exchange-rates.svg?branch=master)](https://travis-ci.org/spk/money-open-exchange-rates)
+[![Code Climate](http://img.shields.io/codeclimate/github/spk/money-open-exchange-rates.svg)](https://codeclimate.com/github/spk/money-open-exchange-rates)
