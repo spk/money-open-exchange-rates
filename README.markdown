@@ -1,11 +1,11 @@
 # Money Open Exchange Rates
 
 A gem that calculates the exchange rate using published rates from
-[open-exchange-rates](http://josscrowcroft.github.com/open-exchange-rates/)
+[open-exchange-rates](https://openexchangerates.org/)
 
 ## Usage
 
-```ruby
+~~~ ruby
 require 'money/bank/open_exchange_rates_bank'
 moe = Money::Bank::OpenExchangeRatesBank.new
 moe.cache = 'path/to/file/cache'
@@ -18,12 +18,12 @@ moe.update_rates
 moe.ttl_in_seconds = 86400
 
 Money.default_bank = moe
-```
+~~~
 
 You can also provide a Proc as a cache to provide your own caching mechanism
 perhaps with Redis or just a thread safe `Hash` (global). For example:
 
-```ruby
+~~~ ruby
 moe.cache = Proc.new do |v|
   key = 'money:exchange_rates'
   if v
@@ -32,17 +32,17 @@ moe.cache = Proc.new do |v|
     Thread.current[key]
   end
 end
-```
+~~~
 
 ## Tests
 
 As of the end of August 2012 all requests to the Open Exchange Rates API must
-have a valid app_id. You can place your own key on a file named TEST_APP_ID and
-then run:
+have a valid app_id. You can place your own key on a file or environment
+variable named TEST_APP_ID and then run:
 
-```
+~~~
 bundle exec rake
-```
+~~~
 
 ## Refs
 
@@ -58,8 +58,8 @@ bundle exec rake
 * [Kevin Ball](https://github.com/kball)
 * [Michael Morris](https://github.com/mtcmorris)
 
-
 ## License
+
 The MIT License
 
-Copyright © 2012 Laurent Arnoud <laurent@spkdev.net>
+Copyright © 2014 Laurent Arnoud <laurent@spkdev.net>
