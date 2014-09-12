@@ -25,7 +25,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     it "should raise if it can't find an exchange rate" do
       money = Money.new(0, "USD")
-      assert_raises(Money::Bank::UnknownRateFormat){ subject.exchange_with(money, "AUD") }
+      proc { subject.exchange_with(money, "AUD") }.must_raise Money::Bank::UnknownRateFormat
     end
   end
 
@@ -109,7 +109,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should raise an error if no App ID is set' do
-      proc {subject.save_rates}.must_raise Money::Bank::NoAppId
+      proc { subject.save_rates }.must_raise Money::Bank::NoAppId
     end
 
     #TODO: As App IDs are compulsory soon, need to add more tests handle
@@ -258,7 +258,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'raises Money::Bank::UnknownRateFormat if no cross rates found' do
-        ->{ subject.get_rate('ZAR', 'ZMK') }.must_raise Money::Bank::UnknownRateFormat
+        proc { subject.get_rate('ZAR', 'ZMK') }.must_raise Money::Bank::UnknownRateFormat
       end
     end
   end
