@@ -40,24 +40,9 @@ class Money
         raise InvalidCache
       end
 
-      def exchange(cents, from_currency, to_currency)
-        exchange_with(Money.new(cents, from_currency), to_currency)
-      end
-
-      def exchange_with(from, to_currency)
-        return from if same_currency?(from.currency, to_currency)
-        rate = get_rate(from.currency, to_currency)
-        Money.new(((Money::Currency.wrap(to_currency).subunit_to_unit.to_f / from.currency.subunit_to_unit.to_f) * from.cents * rate).round, to_currency)
-      end
-
-      def get_rate(from_currency, to_currency)
+      def get_rate(from_currency, to_currency, opts = {})
         expire_rates
-        super(from_currency, to_currency) || begin
-          from_base_rate = super("USD", from_currency)
-          to_base_rate = super("USD", to_currency)
-          raise(Money::Bank::UnknownRateFormat, "No conversion rate known for '#{from_currency}' -> '#{to_currency}'") if from_base_rate.nil? || to_base_rate.nil?
-          to_base_rate.to_f / from_base_rate.to_f
-        end
+        super
       end
 
       def expire_rates

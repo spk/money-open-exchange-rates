@@ -25,7 +25,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     it "should raise if it can't find an exchange rate" do
       money = Money.new(0, "USD")
-      proc { subject.exchange_with(money, "AUD") }.must_raise Money::Bank::UnknownRateFormat
+      proc { subject.exchange_with(money, "AUD") }.must_raise Money::Bank::UnknownRate
     end
   end
 
@@ -43,28 +43,6 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
     end
 
-    it "should return the correct oer rates using oer" do
-      subject.oer_rates.keys.each do |currency|
-        next unless Money::Currency.find(currency)
-        subunit = Money::Currency.wrap(currency).subunit_to_unit
-        subject.exchange(100, "USD", currency).cents.
-          must_equal((subject.oer_rates[currency].to_f * subunit).round)
-      end
-    end
-
-    it "should return the correct oer rates using exchange_with" do
-      subject.oer_rates.keys.each do |currency|
-        next unless Money::Currency.find(currency)
-        subunit = Money::Currency.wrap(currency).subunit_to_unit
-        subject.exchange_with(Money.new(100, "USD"), currency).cents.
-          must_equal((subject.oer_rates[currency].to_f * subunit).round)
-
-        subject.exchange_with(1.to_money("USD"), currency).cents.
-          must_equal((subject.oer_rates[currency].to_f * subunit).round)
-      end
-      subject.exchange_with(5000.to_money('JPY'), 'USD').cents.must_equal 6441
-    end
-
     it "should not return 0 with integer rate" do
       wtf = {
         :priority => 1,
@@ -78,6 +56,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       }
       Money::Currency.register(wtf)
       subject.add_rate("USD", "WTF", 2)
+      subject.add_rate("WTF", "USD", 2)
       subject.exchange_with(5000.to_money('WTF'), 'USD').cents.wont_equal 0
     end
 
@@ -94,9 +73,10 @@ describe Money::Bank::OpenExchangeRatesBank do
         :delimiter => ","
       }
       Money::Currency.register(btc)
+      rate = 13.7603
       subject.add_rate("USD", "BTC", 1 / 13.7603)
-      subject.add_rate("BTC", "USD", 13.7603)
-      subject.exchange(100, "BTC", "USD").cents.must_equal 138
+      subject.add_rate("BTC", "USD", rate)
+      subject.exchange_with(100.to_money("BTC"), 'USD').cents.must_equal 137603
     end
   end
 
@@ -221,45 +201,6 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     after do
       File.delete @temp_cache_path
-    end
-  end
-
-  describe 'get rate' do
-    LVL_TO_LTL =  5
-    USD_TO_RUB = 50
-    USD_TO_EUR = 1.3
-
-    before do
-      # some kind of stubbing base class
-      Money::Bank::VariableExchange.class_eval do
-        def get_rate(from, to)
-          if from == 'LVL' && to == 'LTL'
-            LVL_TO_LTL
-          elsif from == 'USD' && to == 'RUB'
-            USD_TO_RUB
-          elsif from == 'USD' && to == 'EUR'
-            USD_TO_EUR
-          else
-            nil
-          end
-        end
-      end
-    end
-
-    it 'returns rate if Money::Bank::VariableExchange#get_rate returns rate' do
-      subject.get_rate('LVL','LTL').must_equal LVL_TO_LTL
-    end
-
-    describe 'calculate cross rate using "USD" rate value if no data was returned by Money::Bank::VariableExchange#get_rate' do
-
-      it 'returns cross rate if "USD" rates for provided currencies exist' do
-        eur_to_rub_cross_rate = USD_TO_RUB / USD_TO_EUR
-        subject.get_rate('EUR', 'RUB').must_equal eur_to_rub_cross_rate
-      end
-
-      it 'raises Money::Bank::UnknownRateFormat if no cross rates found' do
-        proc { subject.get_rate('ZAR', 'ZMK') }.must_raise Money::Bank::UnknownRateFormat
-      end
     end
   end
 
