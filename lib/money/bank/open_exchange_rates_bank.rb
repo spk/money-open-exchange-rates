@@ -27,6 +27,7 @@ class Money
           currency = exchange_rate.first
           next unless Money::Currency.find(currency)
           set_rate('USD', currency, rate)
+          set_rate(currency, 'USD', 1.0/rate)
         end
       end
 

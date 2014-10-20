@@ -14,19 +14,47 @@ describe Money::Bank::OpenExchangeRatesBank do
       subject.app_id = TEST_APP_ID
       @temp_cache_path = File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
       subject.cache = @temp_cache_path
-      stub(OpenURI::OpenRead).open(Money::Bank::OpenExchangeRatesBank::OER_URL) { File.read @cache_path }
+      stub(subject).read_from_url { File.read @cache_path }
       subject.save_rates
     end
 
-    it "should be able to exchange a money to its own currency even without rates" do
-      money = Money.new(0, "USD")
-      subject.exchange_with(money, "USD").must_equal money
+    after do
+      File.unlink(@temp_cache_path)
     end
 
-    it "should raise if it can't find an exchange rate" do
-      money = Money.new(0, "USD")
-      proc { subject.exchange_with(money, "AUD") }.must_raise Money::Bank::UnknownRate
+    describe "without rates" do
+      it "should be able to exchange a money to its own currency even without rates" do
+        money = Money.new(0, "USD")
+        subject.exchange_with(money, "USD").must_equal money
+      end
+
+      it "should raise if it can't find an exchange rate" do
+        money = Money.new(0, "USD")
+        proc { subject.exchange_with(money, "WTF") }.must_raise Money::Bank::UnknownRate
+      end
     end
+
+    describe "with rates" do
+      before do 
+        subject.update_rates
+      end
+
+      it "should be able to exchange money from USD to a known exchange rate" do
+        money = Money.new(100, "USD")
+        subject.exchange_with(money, "AFN").must_equal Money.new(4300, 'AFN') # line 8 of latest.json test file
+      end
+
+      it "should be able to exchange money from a known exchange rate to USD" do
+        money = Money.new(4300, "AFN")
+        subject.exchange_with(money, "USD").must_equal Money.new(100, 'USD') # line 8 of latest.json test file
+      end
+
+      it "should raise if it can't find an exchange rate" do
+        money = Money.new(0, "USD")
+        proc { subject.exchange_with(money, "WTF") }.must_raise Money::Bank::UnknownRate
+      end
+    end
+
   end
 
   describe 'update_rates' do
