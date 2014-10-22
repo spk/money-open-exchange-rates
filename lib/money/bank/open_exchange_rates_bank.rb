@@ -64,8 +64,6 @@ class Money
           open(cache, 'w') do |f|
             f.write(text)
           end
-        else
-          nil
         end
       end
 
@@ -74,8 +72,6 @@ class Money
           cache.call(nil)
         elsif cache.is_a?(String) && File.exist?(cache)
           open(cache).read
-        else
-          nil
         end
       end
 

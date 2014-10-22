@@ -16,6 +16,8 @@ moe.update_rates
 # set the seconds after than the current rates are automatically expired
 # by default, they never expire
 moe.ttl_in_seconds = 86400
+# Store in cache
+moe.save_rates
 
 Money.default_bank = moe
 ~~~
