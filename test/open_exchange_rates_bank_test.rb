@@ -30,7 +30,8 @@ describe Money::Bank::OpenExchangeRatesBank do
 
       it "should raise if it can't find an exchange rate" do
         money = Money.new(0, "USD")
-        proc { subject.exchange_with(money, "WTF") }.must_raise Money::Bank::UnknownRate
+        # AED has intentionally been removed from test/latest.json
+        proc { subject.exchange_with(money, "AED") }.must_raise Money::Bank::UnknownRate
       end
     end
 
@@ -51,7 +52,8 @@ describe Money::Bank::OpenExchangeRatesBank do
 
       it "should raise if it can't find an exchange rate" do
         money = Money.new(0, "USD")
-        proc { subject.exchange_with(money, "WTF") }.must_raise Money::Bank::UnknownRate
+        # AED has intentionally been removed from test/latest.json
+        proc { subject.exchange_with(money, "AED") }.must_raise Money::Bank::UnknownRate
       end
     end
 
