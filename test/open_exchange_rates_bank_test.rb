@@ -30,8 +30,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
       it "should raise if it can't find an exchange rate" do
         money = Money.new(0, "USD")
-        # AED has intentionally been removed from test/latest.json
-        proc { subject.exchange_with(money, "AED") }.must_raise Money::Bank::UnknownRate
+        proc { subject.exchange_with(money, "SSP") }.must_raise Money::Bank::UnknownRate
       end
     end
 
@@ -42,18 +41,17 @@ describe Money::Bank::OpenExchangeRatesBank do
 
       it "should be able to exchange money from USD to a known exchange rate" do
         money = Money.new(100, "USD")
-        subject.exchange_with(money, "AFN").must_equal Money.new(4300, 'AFN') # line 8 of latest.json test file
+        subject.exchange_with(money, "BBD").must_equal Money.new(200, 'BBD')
       end
 
       it "should be able to exchange money from a known exchange rate to USD" do
-        money = Money.new(4300, "AFN")
-        subject.exchange_with(money, "USD").must_equal Money.new(100, 'USD') # line 8 of latest.json test file
+        money = Money.new(200, "BBD")
+        subject.exchange_with(money, "USD").must_equal Money.new(100, 'USD')
       end
 
       it "should raise if it can't find an exchange rate" do
         money = Money.new(0, "USD")
-        # AED has intentionally been removed from test/latest.json
-        proc { subject.exchange_with(money, "AED") }.must_raise Money::Bank::UnknownRate
+        proc { subject.exchange_with(money, "SSP") }.must_raise Money::Bank::UnknownRate
       end
     end
 
