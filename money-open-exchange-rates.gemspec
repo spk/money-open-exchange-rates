@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "money-open-exchange-rates"
-  s.version = "0.2.0"
+  s.version = "0.2.3"
   s.date = Time.now.utc.strftime("%Y-%m-%d")
   s.homepage = "http://github.com/spk/#{s.name}"
   s.authors = ["Laurent Arnoud"]
@@ -14,12 +14,12 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.required_ruby_version = ">= 1.9.2"
   s.rubygems_version = %q{1.3.7}
-  s.add_dependency "money", "~> 6.5.0"
-  s.add_dependency "monetize", "~> 1.1.0"
-  s.add_development_dependency "minitest", ">=2.0"
-  s.add_development_dependency 'pry'
-  s.add_development_dependency "rr", ">=1.0.4"
-  s.add_development_dependency "rake"
-  s.add_development_dependency "timecop"
-  s.add_dependency "json", ">= 1.7"
+  s.add_dependency "money", "~> 6.5"
+  s.add_dependency "monetize", "~> 1.1"
+  s.add_dependency "json", "~> 1.8"
+  s.add_development_dependency "minitest", "~> 5.5"
+  s.add_development_dependency 'pry', '~> 0'
+  s.add_development_dependency "rr", "~> 1.1"
+  s.add_development_dependency "rake", '~> 0'
+  s.add_development_dependency "timecop", '~> 0'
 end
