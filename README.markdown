@@ -16,6 +16,10 @@ moe.update_rates
 # set the seconds after than the current rates are automatically expired
 # by default, they never expire
 moe.ttl_in_seconds = 86400
+# (optional)
+# use https to fetch rates from Open Exchange Rates
+# disabled by default to support free-tier users
+moe.secure_connection = true
 # Store in cache
 moe.save_rates
 
@@ -63,6 +67,7 @@ Dmitry Dedov (2)
 chatgris (2)
 Sam Lown (1)
 Fabio Cantoni (1)
+shpupti (1)
 
 ## License
 
