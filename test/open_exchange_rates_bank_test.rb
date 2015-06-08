@@ -142,6 +142,26 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
   end
 
+  describe 'secure_connection' do
+    it "should use the default non-secure http url if secure_connection isn't set" do
+      subject.secure_connection = nil
+      subject.app_id = TEST_APP_ID
+      subject.source_url.must_equal "#{Money::Bank::OpenExchangeRatesBank::OER_URL}?app_id=#{TEST_APP_ID}"
+    end
+
+    it "should use the default non-secure http url if secure_connection is set to false" do
+      subject.secure_connection = false
+      subject.app_id = TEST_APP_ID
+      subject.source_url.must_equal "#{Money::Bank::OpenExchangeRatesBank::OER_URL}?app_id=#{TEST_APP_ID}"
+    end
+
+    it "should use the secure https url if secure_connection is set to true" do
+      subject.secure_connection = true
+      subject.app_id = TEST_APP_ID
+      subject.source_url.must_equal "#{Money::Bank::OpenExchangeRatesBank::SECURE_OER_URL}?app_id=#{TEST_APP_ID}"
+    end
+  end
+
   describe 'no valid file for cache' do
     before do
       subject.cache = "space_dir#{rand(999999999)}/out_space_file.json"

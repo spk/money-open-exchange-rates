@@ -54,6 +54,15 @@ class Money
         end
       end
 
+      def source_url
+        raise NoAppId if app_id.nil? || app_id.empty?
+        oer_url = OER_URL
+        if secure_connection
+          oer_url = SECURE_OER_URL
+        end
+        "#{oer_url}?app_id=#{app_id}"
+      end
+
       protected
 
       # Store the provided text data by calling the proc method provided
@@ -76,14 +85,7 @@ class Money
         end
       end
 
-      def source_url
-        raise NoAppId if app_id.nil? || app_id.empty?
-        oer_url = OER_URL
-        if secure_connection
-          oer_url = SECURE_OER_URL
-        end
-        "#{oer_url}?app_id=#{app_id}"
-      end
+
 
       def read_from_url
         open(source_url).read
