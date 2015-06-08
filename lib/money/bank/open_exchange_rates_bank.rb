@@ -12,8 +12,9 @@ class Money
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
 
       OER_URL = 'http://openexchangerates.org/latest.json'
+      SECURE_OER_URL = OER_URL.gsub(/http:/, "https:")
 
-      attr_accessor :cache, :app_id
+      attr_accessor :cache, :app_id, :secure_connection
       attr_reader :doc, :oer_rates, :rates_expiration, :ttl_in_seconds
 
       def ttl_in_seconds=(value)
@@ -53,6 +54,15 @@ class Money
         end
       end
 
+      def source_url
+        raise NoAppId if app_id.nil? || app_id.empty?
+        oer_url = OER_URL
+        if secure_connection
+          oer_url = SECURE_OER_URL
+        end
+        "#{oer_url}?app_id=#{app_id}"
+      end
+
       protected
 
       # Store the provided text data by calling the proc method provided
@@ -75,10 +85,7 @@ class Money
         end
       end
 
-      def source_url
-        raise NoAppId if app_id.nil? || app_id.empty?
-        "#{OER_URL}?app_id=#{app_id}"
-      end
+
 
       def read_from_url
         open(source_url).read
