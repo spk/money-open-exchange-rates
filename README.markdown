@@ -73,7 +73,7 @@ shpupti (1)
 
 The MIT License
 
-Copyright © 2014 Laurent Arnoud <laurent@spkdev.net>
+Copyright © 2014-2015 Laurent Arnoud <laurent@spkdev.net>
 
 ---
 [![Gem Version](https://badge.fury.io/rb/money-open-exchange-rates.svg)](https://rubygems.org/gems/money-open-exchange-rates)
