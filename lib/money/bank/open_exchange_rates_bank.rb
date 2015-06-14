@@ -12,7 +12,7 @@ class Money
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
 
       OER_URL = 'http://openexchangerates.org/latest.json'
-      SECURE_OER_URL = OER_URL.gsub(/http:/, "https:")
+      SECURE_OER_URL = OER_URL.tr('http:', 'https:')
 
       attr_accessor :cache, :app_id, :secure_connection
       attr_reader :doc, :oer_rates, :rates_expiration, :ttl_in_seconds
@@ -84,8 +84,6 @@ class Money
           open(cache).read
         end
       end
-
-
 
       def read_from_url
         open(source_url).read
