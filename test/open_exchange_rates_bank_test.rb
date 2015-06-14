@@ -275,7 +275,6 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should update the rates' do
-        subject.update_rates
         subject.get_rate('USD', 'EUR').wont_equal @usd_eur_rate
       end
 
