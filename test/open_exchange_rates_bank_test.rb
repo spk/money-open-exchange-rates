@@ -256,34 +256,34 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       subject.app_id = TEST_APP_ID
       subject.ttl_in_seconds = 1000
-      @usd_eur_rate = 0.655
-      subject.add_rate('USD', 'EUR', @usd_eur_rate)
+      @old_usd_eur_rate = 0.655
+      # see test/latest.json +52
+      @new_usd_eur_rate = 0.79085
+      subject.add_rate('USD', 'EUR', @old_usd_eur_rate)
       subject.cache = temp_cache_path
-      stub(OpenURI::OpenRead).open(url) do
-        File.read cache_path
-      end
+      stub(subject).read_from_url { File.read cache_path }
+      subject.save_rates
+    end
+
+    after do
+      File.delete temp_cache_path
     end
 
     describe 'when the ttl has expired' do
-      before do
-        new_time = Time.now + 1001
-        Timecop.freeze(new_time)
-      end
-
-      after do
-        Timecop.return
-      end
-
       it 'should update the rates' do
-        subject.update_rates
-        subject.get_rate('USD', 'EUR').wont_equal @usd_eur_rate
+        subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+        Timecop.freeze(Time.now + 1001) do
+          subject.get_rate('USD', 'EUR').wont_equal @old_usd_eur_rate
+          subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
+        end
       end
 
       it 'updates the next expiration time' do
-        exp_time = Time.now + 1000
-
-        subject.expire_rates
-        subject.rates_expiration.must_equal exp_time
+        Timecop.freeze(Time.now + 1001) do
+          exp_time = Time.now + 1000
+          subject.expire_rates
+          subject.rates_expiration.must_equal exp_time
+        end
       end
     end
 
