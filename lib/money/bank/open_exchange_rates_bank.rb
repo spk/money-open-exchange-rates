@@ -5,12 +5,12 @@ require 'json'
 
 class Money
   module Bank
-    class InvalidCache < StandardError ; end
+    class InvalidCache < StandardError; end
 
-    class NoAppId < StandardError ; end
+    class NoAppId < StandardError; end
 
+    # OpenExchangeRatesBank base class
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
-
       OER_URL = 'http://openexchangerates.org/latest.json'
       SECURE_OER_URL = OER_URL.tr('http:', 'https:')
 
@@ -28,16 +28,14 @@ class Money
           currency = exchange_rate.first
           next unless Money::Currency.find(currency)
           set_rate('USD', currency, rate)
-          set_rate(currency, 'USD', 1.0/rate)
+          set_rate(currency, 'USD', 1.0 / rate)
         end
       end
 
       def save_rates
-        raise InvalidCache unless cache
+        fail InvalidCache unless cache
         text = read_from_url
-        if has_valid_rates?(text)
-          store_in_cache(text)
-        end
+        store_in_cache(text) if valid_rates?(text)
       rescue Errno::ENOENT
         raise InvalidCache
       end
@@ -48,18 +46,16 @@ class Money
       end
 
       def expire_rates
-        if ttl_in_seconds && rates_expiration <= Time.now
-          update_rates
-          refresh_rates_expiration
-        end
+        return unless ttl_in_seconds
+        return if rates_expiration > Time.now
+        update_rates
+        refresh_rates_expiration
       end
 
       def source_url
-        raise NoAppId if app_id.nil? || app_id.empty?
+        fail NoAppId if app_id.nil? || app_id.empty?
         oer_url = OER_URL
-        if secure_connection
-          oer_url = SECURE_OER_URL
-        end
+        oer_url = SECURE_OER_URL if secure_connection
         "#{oer_url}?app_id=#{app_id}"
       end
 
@@ -89,9 +85,9 @@ class Money
         open(source_url).read
       end
 
-      def has_valid_rates?(text)
+      def valid_rates?(text)
         parsed = JSON.parse(text)
-        parsed && parsed.has_key?('rates')
+        parsed && parsed.key?('rates')
       rescue JSON::ParserError
         false
       end
