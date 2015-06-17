@@ -161,7 +161,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       subject.secure_connection = true
       subject.app_id = TEST_APP_ID
       subject.source_url.must_equal "#{secure_url}?app_id=#{TEST_APP_ID}"
-      subject.source_url.must_include "https://"
+      subject.source_url.must_include 'https://'
     end
   end
 
