@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
     'rates from open-exchange-rates. Compatible with the money gem.'
   s.summary = 'A gem that calculates the exchange rate using published rates ' \
     'from open-exchange-rates.'
-  s.extra_rdoc_files = %w(README.markdown)
-  s.files = Dir['LICENSE', 'README.markdown', 'Gemfile', 'lib/**/*.rb',
+  s.extra_rdoc_files = %w(README.md)
+  s.files = Dir['LICENSE', 'README.md', 'Gemfile', 'lib/**/*.rb',
                 'test/**/*']
   s.license = 'MIT'
   s.test_files = Dir.glob('test/*_test.rb')
