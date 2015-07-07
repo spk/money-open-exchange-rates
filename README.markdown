@@ -52,22 +52,14 @@ bundle exec rake
 
 ## Refs
 
-* https://github.com/currencybot/open-exchange-rates
-* https://github.com/RubyMoney/money
-* https://github.com/RubyMoney/eu_central_bank
-* https://github.com/RubyMoney/google_currency
+* <https://github.com/currencybot/open-exchange-rates>
+* <https://github.com/RubyMoney/money>
+* <https://github.com/RubyMoney/eu_central_bank>
+* <https://github.com/RubyMoney/google_currency>
 
 ## Contributors
 
-Wayne See (8)
-Kevin Ball (3)
-Paul Robinson (2)
-Michael Morris (2)
-Dmitry Dedov (2)
-chatgris (2)
-Sam Lown (1)
-Fabio Cantoni (1)
-shpupti (1)
+See [GitHub](https://github.com/spk/money-open-exchange-rates/graphs/contributors).
 
 ## License
 
