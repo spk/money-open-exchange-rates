@@ -17,11 +17,16 @@ class Money
       attr_accessor :cache, :app_id, :secure_connection
       attr_reader :doc, :oer_rates, :rates_expiration, :ttl_in_seconds
 
+      # Set the seconds after than the current rates are automatically expired
+      # by default, they never expire
+      # @param [Integer] TTL in seconds
       def ttl_in_seconds=(value)
         @ttl_in_seconds = value
         refresh_rates_expiration if ttl_in_seconds
       end
 
+      # Update all rates from openexchangerates JSON
+      # @return [Array] Array of exchange rates
       def update_rates
         exchange_rates.each do |exchange_rate|
           rate = exchange_rate.last
@@ -32,6 +37,8 @@ class Money
         end
       end
 
+      # Save rates on cache
+      # Can raise InvalidCache, return a Proc or a File.
       def save_rates
         fail InvalidCache unless cache
         text = read_from_url
@@ -40,11 +47,13 @@ class Money
         raise InvalidCache
       end
 
+      # Override Money `get_rate` method for caching
       def get_rate(from_currency, to_currency, opts = {})
         expire_rates
         super
       end
 
+      # Expire rates when expired
       def expire_rates
         return unless ttl_in_seconds
         return if rates_expiration > Time.now
@@ -52,6 +61,8 @@ class Money
         refresh_rates_expiration
       end
 
+      # Source url of openexchangerates
+      # defined with app_id and secure_connection
       def source_url
         fail NoAppId if app_id.nil? || app_id.empty?
         oer_url = OER_URL
@@ -73,6 +84,7 @@ class Money
         end
       end
 
+      # Read from cache when exist
       def read_from_cache
         if cache.is_a?(Proc)
           cache.call(nil)
@@ -81,10 +93,16 @@ class Money
         end
       end
 
+      # Read from url
+      # @return [String] JSON content
       def read_from_url
         open(source_url).read
       end
 
+      # Check validity of rates response only for store in cache
+      #
+      # @param [String] JSON content
+      # @return [Boolean] valid or not
       def valid_rates?(text)
         parsed = JSON.parse(text)
         parsed && parsed.key?('rates')
@@ -92,12 +110,16 @@ class Money
         false
       end
 
+      # Get expire rates, first from cache and then from url
+      # @return [Hash] key is country code (ISO 3166-1 alpha-3) value Float
       def exchange_rates
         @doc = JSON.parse(read_from_cache || read_from_url)
         @oer_rates = @doc['rates']
         @doc['rates']
       end
 
+      # Refresh expiration from now
+      # return [Time] new expiration time
       def refresh_rates_expiration
         @rates_expiration = Time.now + ttl_in_seconds
       end
