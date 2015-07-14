@@ -23,4 +23,4 @@ notifications:
     on_failure: always
 script:
   - bundle exec rake
-  - bundle exec rubocop
+  - bundle exec rake rubocop
