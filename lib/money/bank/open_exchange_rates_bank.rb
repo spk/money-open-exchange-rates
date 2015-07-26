@@ -43,9 +43,10 @@ class Money
       # Set the seconds after than the current rates are automatically expired
       # by default, they never expire.
       #
-      # Example: Set to 86400 will expire the rates in one day.
+      # @example
+      #   ttl_in_seconds = 86400 # will expire the rates in one day
       #
-      # @param [Integer] Time to live in seconds
+      # @param value [Integer] Time to live in seconds
       #
       # @return [Integer] Setted time to live in seconds
       def ttl_in_seconds=(value)
@@ -67,7 +68,9 @@ class Money
       end
 
       # Save rates on cache
-      # Can raise InvalidCache, return a Proc or a File.
+      # Can raise InvalidCache
+      #
+      # @return [Proc,File]
       def save_rates
         fail InvalidCache unless cache
         text = read_from_url
@@ -107,6 +110,12 @@ class Money
 
       # Store the provided text data by calling the proc method provided
       # for the cache, or write to the cache file.
+      #
+      # @example
+      #   store_in_cache("{\"rates\": {\"AED\": 3.67304}}")
+      #
+      # @param text [String] String to cache
+      # @return [String,Integer]
       def store_in_cache(text)
         if cache.is_a?(Proc)
           cache.call(text)
