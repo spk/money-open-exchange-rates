@@ -3,7 +3,9 @@ require 'open-uri'
 require 'money'
 require 'json'
 
+# Money gem class
 class Money
+  # https://github.com/RubyMoney/money#exchange-rate-stores
   module Bank
     # Invalid cache, file not found or cache empty
     class InvalidCache < StandardError; end
@@ -32,10 +34,16 @@ class Money
       # Rates expiration Time
       attr_reader :rates_expiration
 
-      attr_reader :oer_rates, :ttl_in_seconds
+      # Parsed OpenExchangeRates result as Hash
+      attr_reader :oer_rates
+
+      # Seconds after than the current rates are automatically expired
+      attr_reader :ttl_in_seconds
 
       # Set the seconds after than the current rates are automatically expired
-      # by default, they never expire
+      # by default, they never expire.
+      #
+      # Example: Set to 86400 will expire the rates in one day.
       #
       # @param [Integer] Time to live in seconds
       #

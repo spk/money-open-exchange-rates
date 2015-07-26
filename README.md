@@ -14,7 +14,7 @@ moe.update_rates
 
 # (optional)
 # set the seconds after than the current rates are automatically expired
-# by default, they never expire
+# by default, they never expire, in this example 1 day.
 moe.ttl_in_seconds = 86400
 # (optional)
 # use https to fetch rates from Open Exchange Rates
