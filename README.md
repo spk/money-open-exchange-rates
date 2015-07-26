@@ -72,3 +72,4 @@ Copyright © 2011-2015 Laurent Arnoud <laurent@spkdev.net>
 [![Build Status](https://secure.travis-ci.org/spk/money-open-exchange-rates.svg?branch=master)](https://travis-ci.org/spk/money-open-exchange-rates)
 [![Code Climate](http://img.shields.io/codeclimate/github/spk/money-open-exchange-rates.svg)](https://codeclimate.com/github/spk/money-open-exchange-rates)
 [![Inline docs](http://inch-ci.org/github/spk/money-open-exchange-rates.svg?branch=master)](http://inch-ci.org/github/spk/money-open-exchange-rates)
+[![License](https://img.shields.io/github/license/spk/money-open-exchange-rates.svg)](http://opensource.org/licenses/MIT)
