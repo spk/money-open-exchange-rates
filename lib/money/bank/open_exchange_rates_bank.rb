@@ -32,7 +32,7 @@ class Money
       # Rates expiration Time
       attr_reader :rates_expiration
 
-      attr_reader :doc, :oer_rates, :ttl_in_seconds
+      attr_reader :oer_rates, :ttl_in_seconds
 
       # Set the seconds after than the current rates are automatically expired
       # by default, they never expire
@@ -138,9 +138,8 @@ class Money
       # Get expire rates, first from cache and then from url
       # @return [Hash] key is country code (ISO 3166-1 alpha-3) value Float
       def exchange_rates
-        @doc = JSON.parse(read_from_cache || read_from_url)
-        @oer_rates = @doc['rates']
-        @doc['rates']
+        doc = JSON.parse(read_from_cache || read_from_url)
+        @oer_rates = doc['rates']
       end
 
       # Refresh expiration from now
