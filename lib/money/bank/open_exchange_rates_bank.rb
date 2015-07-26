@@ -5,24 +5,45 @@ require 'json'
 
 class Money
   module Bank
+    # Invalid cache, file not found or cache empty
     class InvalidCache < StandardError; end
 
+    # APP_ID not set error
     class NoAppId < StandardError; end
 
     # OpenExchangeRatesBank base class
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
+      # OpenExchangeRates url
       OER_URL = 'http://openexchangerates.org/latest.json'
+      # OpenExchangeRates secure url
       SECURE_OER_URL = OER_URL.gsub('http:', 'https:')
 
-      attr_accessor :cache, :app_id, :secure_connection
-      attr_reader :doc, :oer_rates, :rates_expiration, :ttl_in_seconds
+      # use https to fetch rates from Open Exchange Rates
+      # disabled by default to support free-tier users
+      attr_accessor :secure_connection
+
+      # As of the end of August 2012 all requests to the Open Exchange Rates
+      # API must have a valid app_id
+      attr_accessor :app_id
+
+      # Cache accessor, can be a String or a Proc
+      attr_accessor :cache
+
+      # Rates expiration Time
+      attr_reader :rates_expiration
+
+      attr_reader :doc, :oer_rates, :ttl_in_seconds
 
       # Set the seconds after than the current rates are automatically expired
       # by default, they never expire
-      # @param [Integer] TTL in seconds
+      #
+      # @param [Integer] Time to live in seconds
+      #
+      # @return [Integer] Setted time to live in seconds
       def ttl_in_seconds=(value)
         @ttl_in_seconds = value
         refresh_rates_expiration if ttl_in_seconds
+        @ttl_in_seconds
       end
 
       # Update all rates from openexchangerates JSON
@@ -48,6 +69,10 @@ class Money
       end
 
       # Override Money `get_rate` method for caching
+      # @param [String] from_currency Currency ISO code. ex. 'USD'
+      # @param [String] to_currency Currency ISO code. ex. 'CAD'
+      #
+      # @return [Numeric] rate.
       def get_rate(from_currency, to_currency, opts = {})
         expire_rates
         super
