@@ -143,7 +143,10 @@ class Money
 
       # Check validity of rates response only for store in cache
       #
-      # @param [String] JSON content
+      # @example
+      #   valid_rates?("{\"rates\": {\"AED\": 3.67304}}")
+      #
+      # @param [String] text is JSON content
       # @return [Boolean] valid or not
       def valid_rates?(text)
         parsed = JSON.parse(text)
