@@ -10,5 +10,6 @@ task spec: :test
 
 desc 'Execute rubocop'
 RuboCop::RakeTask.new(:rubocop) do |t|
-  t.options = ['-D'] # display cop name
+  t.options = ['--display-cop-names', '--display-style-guide']
+  t.fail_on_error = true
 end
