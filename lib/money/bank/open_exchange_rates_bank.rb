@@ -2,6 +2,7 @@
 require 'open-uri'
 require 'money'
 require 'json'
+require File.expand_path('../open_exchange_rates_bank/version', __FILE__)
 
 # Money gem class
 class Money
