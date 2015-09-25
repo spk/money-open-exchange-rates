@@ -6,18 +6,19 @@ describe Money::Bank::OpenExchangeRatesBank do
   subject { Money::Bank::OpenExchangeRatesBank.new }
   let(:url) { Money::Bank::OpenExchangeRatesBank::OER_URL }
   let(:secure_url) { Money::Bank::OpenExchangeRatesBank::SECURE_OER_URL }
+
   let(:temp_cache_path) do
     File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
   end
-  let(:cache_path) do
+  let(:oer_latest_path) do
     File.expand_path(File.join(File.dirname(__FILE__), 'latest.json'))
   end
 
   describe 'exchange' do
     before do
+      stub(subject).read_from_url { File.read oer_latest_path }
       subject.app_id = TEST_APP_ID
       subject.cache = temp_cache_path
-      stub(subject).read_from_url { File.read cache_path }
       subject.save_rates
     end
 
@@ -64,7 +65,7 @@ describe Money::Bank::OpenExchangeRatesBank do
   describe 'update_rates' do
     before do
       subject.app_id = TEST_APP_ID
-      subject.cache = cache_path
+      subject.cache = oer_latest_path
       subject.update_rates
     end
 
@@ -114,8 +115,8 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'App ID' do
     before do
+      stub(OpenURI::OpenRead).open(url) { File.read oer_latest_path }
       subject.cache = temp_cache_path
-      stub(OpenURI::OpenRead).open(url) { File.read cache_path }
     end
 
     it 'should raise an error if no App ID is set' do
@@ -134,7 +135,6 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should get from url' do
-      stub(OpenURI::OpenRead).open(url) { File.read cache_path }
       subject.update_rates
       subject.oer_rates.wont_be_empty
     end
@@ -172,7 +172,6 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should get from url' do
-      stub(OpenURI::OpenRead).open(url) { File.read cache_path }
       subject.update_rates
       subject.oer_rates.wont_be_empty
     end
@@ -196,13 +195,11 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should get from url normally' do
-      stub(subject).source_url { cache_path }
       subject.update_rates
       subject.oer_rates.wont_be_empty
     end
 
     it 'should save from url and get from cache' do
-      stub(subject).source_url { cache_path }
       subject.save_rates
       @global_rates.wont_be_empty
       dont_allow(subject).source_url
@@ -215,8 +212,11 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       subject.app_id = TEST_APP_ID
       subject.cache = temp_cache_path
-      stub(OpenURI::OpenRead).open(url) { File.read cache_path }
       subject.save_rates
+    end
+
+    after do
+      File.unlink(temp_cache_path)
     end
 
     it 'should allow update after save' do
@@ -247,14 +247,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       subject.save_rates
       File.open(temp_cache_path).read.size.must_equal initial_size
     end
-
-    after do
-      File.delete temp_cache_path
-    end
   end
 
   describe '#expire_rates' do
     before do
+      stub(subject).read_from_url { File.read oer_latest_path }
       subject.app_id = TEST_APP_ID
       subject.ttl_in_seconds = 1000
       @old_usd_eur_rate = 0.655
@@ -262,12 +259,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       @new_usd_eur_rate = 0.79085
       subject.add_rate('USD', 'EUR', @old_usd_eur_rate)
       subject.cache = temp_cache_path
-      stub(subject).read_from_url { File.read cache_path }
       subject.save_rates
     end
 
     after do
-      File.delete temp_cache_path
+      File.unlink(temp_cache_path)
     end
 
     describe 'when the ttl has expired' do
