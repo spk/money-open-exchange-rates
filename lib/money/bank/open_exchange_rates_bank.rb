@@ -2,7 +2,7 @@
 require 'open-uri'
 require 'money'
 require 'json'
-require File.expand_path('../open_exchange_rates_bank/version', __FILE__)
+require File.expand_path('../../../open_exchange_rates_bank/version', __FILE__)
 
 # Money gem class
 class Money
@@ -16,6 +16,7 @@ class Money
 
     # OpenExchangeRatesBank base class
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
+      VERSION = ::OpenExchangeRatesBank::VERSION
       # OpenExchangeRates url
       OER_URL = 'http://openexchangerates.org/latest.json'
       # OpenExchangeRates secure url

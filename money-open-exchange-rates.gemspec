@@ -1,10 +1,10 @@
-version_file = 'lib/money/bank/open_exchange_rates_bank/version'
+version_file = 'lib/open_exchange_rates_bank/version'
 require File.expand_path("../#{version_file}", __FILE__)
 
 Gem::Specification.new do |s|
   s.name = 'money-open-exchange-rates'
   s.date = Time.now.utc.strftime('%Y-%m-%d')
-  s.version = Money::Bank::OpenExchangeRatesBank::VERSION
+  s.version = OpenExchangeRatesBank::VERSION
   s.homepage = "http://github.com/spk/#{s.name}"
   s.authors = ['Laurent Arnoud']
   s.email = 'laurent@spkdev.net'
