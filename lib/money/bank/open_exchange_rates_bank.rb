@@ -16,10 +16,12 @@ class Money
     # OpenExchangeRatesBank base class
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
       VERSION = ::OpenExchangeRatesBank::VERSION
-      # OpenExchangeRates url
+      # OpenExchangeRates urls
       OER_URL = 'http://openexchangerates.org/latest.json'
+      OER_HISTORICAL_URL = 'http://openexchangerates.org/historical/%s.json'
       # OpenExchangeRates secure url
       SECURE_OER_URL = OER_URL.gsub('http:', 'https:')
+      SECURE_OER_HISTORICAL_URL = OER_URL.gsub('http:', 'https:')
 
       # use https to fetch rates from Open Exchange Rates
       # disabled by default to support free-tier users
@@ -31,6 +33,10 @@ class Money
 
       # Cache accessor, can be a String or a Proc
       attr_accessor :cache
+
+      # Date for historical api
+      # see https://openexchangerates.org/documentation#historical-data
+      attr_accessor :date
 
       # Rates expiration Time
       attr_reader :rates_expiration
@@ -100,14 +106,37 @@ class Money
 
       # Source url of openexchangerates
       # defined with app_id and secure_connection
+      # @return [String] URL
       def source_url
-        fail NoAppId if app_id.nil? || app_id.empty?
-        oer_url = OER_URL
-        oer_url = SECURE_OER_URL if secure_connection
         "#{oer_url}?app_id=#{app_id}"
       end
 
       protected
+
+      # Latest url if no date given
+      # @return [String] URL
+      def oer_url
+        if date
+          historical_url
+        else
+          latest_url
+        end
+      end
+
+      # Historical url generated from `date` attr_accessor
+      # @return [String] URL
+      def historical_url
+        url = OER_HISTORICAL_URL
+        url = SECURE_OER_HISTORICAL_URL if secure_connection
+        url % date
+      end
+
+      # Latest url
+      # @return [String] URL
+      def latest_url
+        return SECURE_OER_URL if secure_connection
+        OER_URL
+      end
 
       # Store the provided text data by calling the proc method provided
       # for the cache, or write to the cache file.
@@ -139,6 +168,7 @@ class Money
       # Read from url
       # @return [String] JSON content
       def read_from_url
+        fail NoAppId if app_id.nil? || app_id.empty?
         open(source_url).read
       end
 

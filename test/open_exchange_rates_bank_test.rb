@@ -3,6 +3,9 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 describe Money::Bank::OpenExchangeRatesBank do
   subject { Money::Bank::OpenExchangeRatesBank.new }
   let(:oer_url) { Money::Bank::OpenExchangeRatesBank::OER_URL }
+  let(:oer_historical_url) do
+    Money::Bank::OpenExchangeRatesBank::OER_HISTORICAL_URL
+  end
   let(:oer_secure_url) { Money::Bank::OpenExchangeRatesBank::SECURE_OER_URL }
 
   let(:temp_cache_path) do
@@ -11,11 +14,15 @@ describe Money::Bank::OpenExchangeRatesBank do
   let(:oer_latest_path) do
     File.expand_path(File.join(File.dirname(__FILE__), 'latest.json'))
   end
+  let(:oer_historical_path) do
+    File.expand_path(File.join(File.dirname(__FILE__), '2015-01-01.json'))
+  end
 
   describe 'exchange' do
     before do
-      stub(subject).read_from_url { File.read oer_latest_path }
       subject.app_id = TEST_APP_ID
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_latest_path))
       subject.cache = temp_cache_path
       subject.save_rates
     end
@@ -113,7 +120,6 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'App ID' do
     before do
-      stub(OpenURI::OpenRead).open(oer_url) { File.read oer_latest_path }
       subject.cache = temp_cache_path
     end
 
@@ -130,6 +136,8 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       subject.cache = nil
       subject.app_id = TEST_APP_ID
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_latest_path))
     end
 
     it 'should get from url' do
@@ -170,6 +178,8 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       subject.cache = "space_dir#{rand(999_999_999)}/out_space_file.json"
       subject.app_id = TEST_APP_ID
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_latest_path))
     end
 
     it 'should get from url' do
@@ -183,7 +193,7 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'using proc for cache' do
-    before :each do
+    before do
       @global_rates = nil
       subject.cache = proc {|v|
         if v
@@ -193,6 +203,8 @@ describe Money::Bank::OpenExchangeRatesBank do
         end
       }
       subject.app_id = TEST_APP_ID
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_latest_path))
     end
 
     it 'should get from url normally' do
@@ -212,6 +224,8 @@ describe Money::Bank::OpenExchangeRatesBank do
   describe 'save rates' do
     before do
       subject.app_id = TEST_APP_ID
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_latest_path))
       subject.cache = temp_cache_path
       subject.save_rates
     end
@@ -252,8 +266,9 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe '#expire_rates' do
     before do
-      stub(subject).read_from_url { File.read oer_latest_path }
       subject.app_id = TEST_APP_ID
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_latest_path))
       subject.ttl_in_seconds = 1000
       @old_usd_eur_rate = 0.655
       # see test/latest.json +52
@@ -291,6 +306,28 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.expire_rates
         subject.rates_expiration.must_equal exp_time
       end
+    end
+  end
+
+  describe 'historical' do
+    before do
+      subject.app_id = TEST_APP_ID
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_latest_path))
+      # see test/latest.json +52
+      @latest_usd_eur_rate = 0.79085
+      # see test/2015-01-01.json +52
+      @old_usd_eur_rate = 0.830151
+      subject.update_rates
+    end
+
+    it 'should be different than the latest' do
+      subject.get_rate('USD', 'EUR').must_equal @latest_usd_eur_rate
+      subject.date = '2015-01-01'
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_historical_path))
+      subject.update_rates
+      subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
     end
   end
 end

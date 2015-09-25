@@ -1,12 +1,13 @@
 require 'minitest/autorun'
 require 'rr'
+require 'webmock/minitest'
 require 'money/bank/open_exchange_rates_bank'
 require 'monetize'
 require 'timecop'
 require 'pry'
 
 TEST_APP_ID_PATH = File.join(File.dirname(__FILE__), '..', 'TEST_APP_ID')
-TEST_APP_ID = ENV['TEST_APP_ID'] || File.read(TEST_APP_ID_PATH)
+TEST_APP_ID = ENV['TEST_APP_ID'] || File.read(TEST_APP_ID_PATH).chomp
 
 if TEST_APP_ID.nil? || TEST_APP_ID.empty?
   fail "Please add a valid app id to file #{TEST_APP_ID_PATH} or to " \

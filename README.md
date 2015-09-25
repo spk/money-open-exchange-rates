@@ -19,7 +19,12 @@ moe.ttl_in_seconds = 86400
 # (optional)
 # use https to fetch rates from Open Exchange Rates
 # disabled by default to support free-tier users
+# see https://openexchangerates.org/documentation#https
 moe.secure_connection = true
+# (optional)
+# set historical date of the rate
+# see https://openexchangerates.org/documentation#historical-data
+moe.date = '2015-01-01'
 # Store in cache
 moe.save_rates
 
