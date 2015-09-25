@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'open-uri'
 require 'money'
 require 'json'
