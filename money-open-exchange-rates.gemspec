@@ -26,9 +26,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest', '~> 5.6'
   s.add_development_dependency 'minitest-line', '~> 0.6'
   s.add_development_dependency 'timecop', '~> 0.8'
+  s.add_development_dependency 'inch', '~> 0.7'
   s.add_development_dependency 'rr', '~> 1.1'
   s.add_development_dependency 'pry', '~> 0'
   s.add_development_dependency 'rake', '~> 0'
   s.add_development_dependency 'rubocop', '~> 0'
-  s.add_development_dependency 'inch', '~> 0'
 end
