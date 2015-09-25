@@ -4,6 +4,10 @@ Changelog
 v0.4.0 (unreleased)
 ------------------------
 
+- No need for TEST_APP_ID with webmock. [Laurent Arnoud]
+
+- Add ChangeLog. [Laurent Arnoud]
+
 - Support historical data endpoint with date. [Laurent Arnoud]
 
 - Move version into a module not depending on money. [Tim 'S.D.Eagle'
