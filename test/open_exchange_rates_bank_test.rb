@@ -4,8 +4,8 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 describe Money::Bank::OpenExchangeRatesBank do
   subject { Money::Bank::OpenExchangeRatesBank.new }
-  let(:url) { Money::Bank::OpenExchangeRatesBank::OER_URL }
-  let(:secure_url) { Money::Bank::OpenExchangeRatesBank::SECURE_OER_URL }
+  let(:oer_url) { Money::Bank::OpenExchangeRatesBank::OER_URL }
+  let(:oer_secure_url) { Money::Bank::OpenExchangeRatesBank::SECURE_OER_URL }
 
   let(:temp_cache_path) do
     File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
@@ -115,7 +115,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'App ID' do
     before do
-      stub(OpenURI::OpenRead).open(url) { File.read oer_latest_path }
+      stub(OpenURI::OpenRead).open(oer_url) { File.read oer_latest_path }
       subject.cache = temp_cache_path
     end
 
@@ -145,22 +145,25 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'secure_connection' do
+    before do
+      subject.app_id = TEST_APP_ID
+    end
+
     it "should use the non-secure http url if secure_connection isn't set" do
       subject.secure_connection = nil
-      subject.app_id = TEST_APP_ID
-      subject.source_url.must_equal "#{url}?app_id=#{TEST_APP_ID}"
+      subject.source_url.must_equal "#{oer_url}?app_id=#{TEST_APP_ID}"
+      subject.source_url.must_include 'http://'
     end
 
     it 'should use the non-secure http url if secure_connection is false' do
       subject.secure_connection = false
-      subject.app_id = TEST_APP_ID
-      subject.source_url.must_equal "#{url}?app_id=#{TEST_APP_ID}"
+      subject.source_url.must_equal "#{oer_url}?app_id=#{TEST_APP_ID}"
+      subject.source_url.must_include 'http://'
     end
 
     it 'should use the secure https url if secure_connection is set to true' do
       subject.secure_connection = true
-      subject.app_id = TEST_APP_ID
-      subject.source_url.must_equal "#{secure_url}?app_id=#{TEST_APP_ID}"
+      subject.source_url.must_equal "#{oer_secure_url}?app_id=#{TEST_APP_ID}"
       subject.source_url.must_include 'https://'
     end
   end
