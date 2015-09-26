@@ -9,20 +9,18 @@ describe Money::Bank::OpenExchangeRatesBank do
   let(:oer_secure_url) { Money::Bank::OpenExchangeRatesBank::SECURE_OER_URL }
 
   let(:temp_cache_path) do
-    File.expand_path(File.join(File.dirname(__FILE__), 'tmp.json'))
+    data_file('tmp.json')
   end
   let(:oer_latest_path) do
-    File.expand_path(File.join(File.dirname(__FILE__), 'latest.json'))
+    data_file('latest.json')
   end
   let(:oer_historical_path) do
-    File.expand_path(File.join(File.dirname(__FILE__), '2015-01-01.json'))
+    data_file('2015-01-01.json')
   end
 
   describe 'exchange' do
     before do
-      subject.app_id = TEST_APP_ID
-      stub_request(:get, subject.source_url)
-        .to_return(status: 200, body: File.read(oer_latest_path))
+      add_to_webmock(subject)
       subject.cache = temp_cache_path
       subject.save_rates
     end
@@ -135,9 +133,7 @@ describe Money::Bank::OpenExchangeRatesBank do
   describe 'no cache' do
     before do
       subject.cache = nil
-      subject.app_id = TEST_APP_ID
-      stub_request(:get, subject.source_url)
-        .to_return(status: 200, body: File.read(oer_latest_path))
+      add_to_webmock(subject)
     end
 
     it 'should get from url' do
@@ -177,9 +173,7 @@ describe Money::Bank::OpenExchangeRatesBank do
   describe 'no valid file for cache' do
     before do
       subject.cache = "space_dir#{rand(999_999_999)}/out_space_file.json"
-      subject.app_id = TEST_APP_ID
-      stub_request(:get, subject.source_url)
-        .to_return(status: 200, body: File.read(oer_latest_path))
+      add_to_webmock(subject)
     end
 
     it 'should get from url' do
@@ -202,9 +196,7 @@ describe Money::Bank::OpenExchangeRatesBank do
           @global_rates
         end
       }
-      subject.app_id = TEST_APP_ID
-      stub_request(:get, subject.source_url)
-        .to_return(status: 200, body: File.read(oer_latest_path))
+      add_to_webmock(subject)
     end
 
     it 'should get from url normally' do
@@ -223,9 +215,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'save rates' do
     before do
-      subject.app_id = TEST_APP_ID
-      stub_request(:get, subject.source_url)
-        .to_return(status: 200, body: File.read(oer_latest_path))
+      add_to_webmock(subject)
       subject.cache = temp_cache_path
       subject.save_rates
     end
@@ -266,9 +256,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe '#expire_rates' do
     before do
-      subject.app_id = TEST_APP_ID
-      stub_request(:get, subject.source_url)
-        .to_return(status: 200, body: File.read(oer_latest_path))
+      add_to_webmock(subject)
       subject.ttl_in_seconds = 1000
       @old_usd_eur_rate = 0.655
       # see test/latest.json +52
@@ -311,9 +299,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'historical' do
     before do
-      subject.app_id = TEST_APP_ID
-      stub_request(:get, subject.source_url)
-        .to_return(status: 200, body: File.read(oer_latest_path))
+      add_to_webmock(subject)
       # see test/latest.json +52
       @latest_usd_eur_rate = 0.79085
       # see test/2015-01-01.json +52
@@ -324,8 +310,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     it 'should be different than the latest' do
       subject.get_rate('USD', 'EUR').must_equal @latest_usd_eur_rate
       subject.date = '2015-01-01'
-      stub_request(:get, subject.source_url)
-        .to_return(status: 200, body: File.read(oer_historical_path))
+      add_to_webmock(subject, oer_historical_path)
       subject.update_rates
       subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
     end
