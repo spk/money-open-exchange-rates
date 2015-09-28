@@ -1,8 +1,10 @@
 Changelog
 =========
 
-v0.4.0 (unreleased)
+v0.4.0
 ------------------------
+
+- Add webmock helpers for tests. [Laurent Arnoud]
 
 - No need for TEST_APP_ID with webmock. [Laurent Arnoud]
 
