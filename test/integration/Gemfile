@@ -1,0 +1,2 @@
+gem 'money'
+gem 'money-open-exchange-rates'

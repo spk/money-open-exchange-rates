@@ -24,3 +24,5 @@ notifications:
     on_failure: always
 script:
   - bundle exec rake
+  - cd test/integration && bundle install
+  - ruby -e "require 'money/bank/open_exchange_rates_bank'; puts Money::Bank::OpenExchangeRatesBank::VERSION"
