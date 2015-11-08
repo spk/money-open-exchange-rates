@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.summary = 'A gem that calculates the exchange rate using published rates ' \
     'from open-exchange-rates.'
   s.extra_rdoc_files = %w(README.md)
-  s.files = Dir['LICENSE', 'README.md', 'Gemfile', 'lib/**/*.rb',
+  s.files = Dir['LICENSE', 'README.md', 'History.md', 'Gemfile', 'lib/**/*.rb',
                 'test/**/*']
   s.license = 'MIT'
   s.test_files = Dir.glob('test/*_test.rb')
