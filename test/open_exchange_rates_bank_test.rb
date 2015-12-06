@@ -7,6 +7,9 @@ describe Money::Bank::OpenExchangeRatesBank do
     Money::Bank::OpenExchangeRatesBank::OER_HISTORICAL_URL
   end
   let(:oer_secure_url) { Money::Bank::OpenExchangeRatesBank::SECURE_OER_URL }
+  let(:oer_historical_secure_url) do
+    Money::Bank::OpenExchangeRatesBank::SECURE_OER_HISTORICAL_URL
+  end
 
   let(:temp_cache_path) do
     data_file('tmp.json')
@@ -151,22 +154,72 @@ describe Money::Bank::OpenExchangeRatesBank do
       subject.app_id = TEST_APP_ID
     end
 
-    it "should use the non-secure http url if secure_connection isn't set" do
-      subject.secure_connection = nil
-      subject.source_url.must_equal "#{oer_url}?app_id=#{TEST_APP_ID}"
-      subject.source_url.must_include 'http://'
+    describe 'historical' do
+      before do
+        subject.date = '2015-01-01'
+      end
+
+      def historical_url
+        format("#{oer_historical_url}?app_id=#{TEST_APP_ID}",
+               subject.date)
+      end
+
+      def historical_secure_url
+        format("#{oer_historical_secure_url}?app_id=#{TEST_APP_ID}",
+               subject.date)
+      end
+
+      it 'should use the non-secure http url if secure_connection is nil' do
+        subject.secure_connection = nil
+        subject.source_url.must_equal historical_url
+        subject.source_url.must_include 'http://'
+        subject.source_url.must_include 'historical'
+      end
+
+      it 'should use the non-secure http url if secure_connection is false' do
+        subject.secure_connection = false
+        subject.source_url.must_equal historical_url
+        subject.source_url.must_include 'http://'
+        subject.source_url.must_include 'historical'
+      end
+
+      it 'should use the secure https url if secure_connection is true' do
+        subject.secure_connection = true
+        subject.source_url.must_equal historical_secure_url
+        subject.source_url.must_include 'https://'
+        subject.source_url.must_include 'historical'
+      end
     end
 
-    it 'should use the non-secure http url if secure_connection is false' do
-      subject.secure_connection = false
-      subject.source_url.must_equal "#{oer_url}?app_id=#{TEST_APP_ID}"
-      subject.source_url.must_include 'http://'
-    end
+    describe 'latest' do
+      def source_url
+        "#{oer_url}?app_id=#{TEST_APP_ID}"
+      end
 
-    it 'should use the secure https url if secure_connection is set to true' do
-      subject.secure_connection = true
-      subject.source_url.must_equal "#{oer_secure_url}?app_id=#{TEST_APP_ID}"
-      subject.source_url.must_include 'https://'
+      def source_secure_url
+        "#{oer_secure_url}?app_id=#{TEST_APP_ID}"
+      end
+
+      it 'should use the non-secure http url if secure_connection is nil' do
+        subject.secure_connection = nil
+        subject.source_url.must_equal source_url
+        subject.source_url.must_include 'http://'
+        subject.source_url.must_include 'latest'
+      end
+
+      it 'should use the non-secure http url if secure_connection is false' do
+        subject.secure_connection = false
+        subject.source_url.must_equal source_url
+        subject.source_url.must_include 'http://'
+        subject.source_url.must_include 'latest'
+      end
+
+      it 'should use the secure https url if secure_connection is true' do
+        subject.secure_connection = true
+        subject.source_url.must_equal source_secure_url
+        subject.source_url.must_include 'https://'
+        subject.source_url.must_include 'latest'
+      end
     end
   end
 
