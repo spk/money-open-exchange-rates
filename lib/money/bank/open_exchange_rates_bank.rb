@@ -21,7 +21,7 @@ class Money
       OER_HISTORICAL_URL = 'http://openexchangerates.org/historical/%s.json'
       # OpenExchangeRates secure url
       SECURE_OER_URL = OER_URL.gsub('http:', 'https:')
-      SECURE_OER_HISTORICAL_URL = OER_URL.gsub('http:', 'https:')
+      SECURE_OER_HISTORICAL_URL = OER_HISTORICAL_URL.gsub('http:', 'https:')
 
       # use https to fetch rates from Open Exchange Rates
       # disabled by default to support free-tier users
