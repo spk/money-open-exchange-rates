@@ -1,9 +1,9 @@
 
-n.n.n / 2015-11-08
+v0.4.1 / 2015-12-06
 ==================
 
-  * Add bundle exec for require test
-  * Test require version as integration on travis
+  * Add more test for latest and historical urls
+  * used the correct URL for secure historical
 
 v0.4.0 / 2015-09-28
 ===================
