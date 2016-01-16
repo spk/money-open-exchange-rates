@@ -27,6 +27,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'timecop', '~> 0.8'
   s.add_development_dependency 'rr', '~> 1.1'
   s.add_development_dependency 'webmock', '~> 1.21'
-  s.add_development_dependency 'rubocop', '~> 0.34'
+  s.add_development_dependency 'rubocop', '~> 0.36'
   s.add_development_dependency 'rake', '~> 10'
 end

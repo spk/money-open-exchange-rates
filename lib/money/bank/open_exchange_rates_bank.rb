@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'open-uri'
 require 'money'
 require 'json'
@@ -18,8 +19,8 @@ class Money
       VERSION = ::OpenExchangeRatesBank::VERSION
       BASE_URL = 'http://openexchangerates.org'.freeze
       # OpenExchangeRates urls
-      OER_URL = File.join(BASE_URL, 'latest.json').freeze
-      OER_HISTORICAL_URL = File.join(BASE_URL, 'historical', '%s.json').freeze
+      OER_URL = File.join(BASE_URL, 'latest.json')
+      OER_HISTORICAL_URL = File.join(BASE_URL, 'historical', '%s.json')
       # OpenExchangeRates secure url
       SECURE_OER_URL = OER_URL.gsub('http:', 'https:')
       SECURE_OER_HISTORICAL_URL = OER_HISTORICAL_URL.gsub('http:', 'https:')
