@@ -81,7 +81,7 @@ class Money
       #
       # @return [Proc,File]
       def save_rates
-        fail InvalidCache unless cache
+        raise InvalidCache unless cache
         text = read_from_url
         store_in_cache(text) if valid_rates?(text)
       rescue Errno::ENOENT
@@ -170,7 +170,7 @@ class Money
       # Read from url
       # @return [String] JSON content
       def read_from_url
-        fail NoAppId if app_id.nil? || app_id.empty?
+        raise NoAppId if app_id.nil? || app_id.empty?
         open(source_url).read
       end
 
