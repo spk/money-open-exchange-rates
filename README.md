@@ -3,6 +3,26 @@
 A gem that calculates the exchange rate using published rates from
 [open-exchange-rates](https://openexchangerates.org/)
 
+## Installation
+
+Add this line to your application's Gemfile:
+
+~~~ ruby
+gem 'money-open-exchange-rates'
+~~~
+
+And then execute:
+
+~~~
+bundle
+~~~
+
+Or install it yourself as:
+
+~~~
+gem install money-open-exchange-rates
+~~~
+
 ## Usage
 
 ~~~ ruby
