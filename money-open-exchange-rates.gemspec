@@ -23,10 +23,10 @@ Gem::Specification.new do |s|
   s.add_dependency 'money', '~> 6.7'
   s.add_dependency 'monetize', '~> 1.4'
   s.add_dependency 'json', '~> 1.8'
-  s.add_development_dependency 'rake', '~> 10'
+  s.add_development_dependency 'rake', '~> 11'
   s.add_development_dependency 'minitest', '~> 5'
   s.add_development_dependency 'timecop', '~> 0.8'
   s.add_development_dependency 'rr', '~> 1.1'
   s.add_development_dependency 'webmock', '~> 1'
-  s.add_development_dependency 'rubocop', '~> 0.38'
+  s.add_development_dependency 'rubocop', '~> 0.41'
 end
