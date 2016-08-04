@@ -5,6 +5,7 @@ require 'json'
 require File.expand_path('../../../open_exchange_rates_bank/version', __FILE__)
 
 # Money gem class
+# rubocop:disable ClassLength
 class Money
   # https://github.com/RubyMoney/money#exchange-rate-stores
   module Bank
@@ -24,6 +25,9 @@ class Money
       # OpenExchangeRates secure url
       SECURE_OER_URL = OER_URL.gsub('http:', 'https:')
       SECURE_OER_HISTORICAL_URL = OER_HISTORICAL_URL.gsub('http:', 'https:')
+
+      # Default base currency "base": "USD"
+      OE_SOURCE = 'USD'.freeze
 
       # use https to fetch rates from Open Exchange Rates
       # disabled by default to support free-tier users
@@ -64,15 +68,38 @@ class Money
         @ttl_in_seconds
       end
 
+      # Set the base currency for all rates. By default, USD is used.
+      # OpenExchangeRates only allows USD as base currency
+      # for the free plan users.
+      #
+      # @example
+      #   source = 'USD'
+      #
+      # @param value [String] Currency code, ISO 3166-1 alpha-3
+      #
+      # @return [String] chosen base currency
+      def source=(value)
+        @source = Money::Currency.find(value.to_s).try(:iso_code) || OE_SOURCE
+      end
+
+      # Get the base currency for all rates. By default, USD is used.
+      # @return [String] base currency
+      def source
+        @source ||= OE_SOURCE
+      end
+
       # Update all rates from openexchangerates JSON
+      #
+      # @param force_update [Boolean] Force update from server
+      #
       # @return [Array] Array of exchange rates
-      def update_rates
-        exchange_rates.each do |exchange_rate|
+      def update_rates(force_update = false)
+        exchange_rates(force_update).each do |exchange_rate|
           rate = exchange_rate.last
           currency = exchange_rate.first
           next unless Money::Currency.find(currency)
-          set_rate('USD', currency, rate)
-          set_rate(currency, 'USD', 1.0 / rate)
+          set_rate(source, currency, rate)
+          set_rate(currency, source, 1.0 / rate)
         end
       end
 
@@ -93,9 +120,38 @@ class Money
       # @param [String] to_currency Currency ISO code. ex. 'CAD'
       #
       # @return [Numeric] rate.
-      def get_rate(from_currency, to_currency, opts = {})
+      def get_rate(from_currency, to_currency, opts = {}) # rubocop:disable all
         expire_rates
-        super
+        rate = get_rate_or_calc_inverse(from_currency, to_currency, opts)
+        unless rate
+          # Tries to calculate a pair rate using base currency rate
+          from_base_rate = get_rate_or_calc_inverse(source, from_currency, opts)
+          to_base_rate = get_rate_or_calc_inverse(source, to_currency, opts)
+          if to_base_rate && from_base_rate
+            rate = to_base_rate.to_f / from_base_rate
+            add_rate(from_currency, to_currency, rate)
+          end
+        end
+        rate
+      end
+
+      # Get rate or calculate it as inverse rate
+      # @param [String] from_currency Currency ISO code. ex. 'USD'
+      # @param [String] to_currency Currency ISO code. ex. 'CAD'
+      #
+      # @return [Numeric] rate or rate calculated as inverse rate.
+      def get_rate_or_calc_inverse(from_currency, to_currency, opts = {})
+        super_get_rate = method(:get_rate).super_method
+        rate = super_get_rate.call(from_currency, to_currency, opts)
+        unless rate
+          # Tries to calculate an inverse rate
+          inverse_rate = super_get_rate.call(to_currency, from_currency, opts)
+          if inverse_rate
+            rate = 1.0 / inverse_rate
+            add_rate(from_currency, to_currency, rate)
+          end
+        end
+        rate
       end
 
       # Expire rates when expired
@@ -110,7 +166,7 @@ class Money
       # defined with app_id and secure_connection
       # @return [String] URL
       def source_url
-        "#{oer_url}?app_id=#{app_id}"
+        "#{oer_url}?app_id=#{app_id}&base=#{source}"
       end
 
       protected
@@ -190,8 +246,9 @@ class Money
 
       # Get expire rates, first from cache and then from url
       # @return [Hash] key is country code (ISO 3166-1 alpha-3) value Float
-      def exchange_rates
-        doc = JSON.parse(read_from_cache || read_from_url)
+      def exchange_rates(force_update)
+        json = force_update ? read_from_url : (read_from_cache || read_from_url)
+        doc = JSON.parse(json)
         @oer_rates = doc['rates']
       end
 

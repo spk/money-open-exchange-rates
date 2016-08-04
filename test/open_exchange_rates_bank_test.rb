@@ -60,6 +60,11 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.exchange_with(money, 'USD').must_equal Money.new(100, 'USD')
       end
 
+      it 'should be able to exchange money when direct rate is unknown' do
+        money = Money.new(100, 'BBD')
+        subject.exchange_with(money, 'BMD').must_equal Money.new(50, 'BMD')
+      end
+
       it "should raise if it can't find an exchange rate" do
         money = Money.new(0, 'USD')
         proc { subject.exchange_with(money, 'SSP') }
@@ -160,12 +165,12 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       def historical_url
-        format("#{oer_historical_url}?app_id=#{TEST_APP_ID}",
+        format("#{oer_historical_url}?app_id=#{TEST_APP_ID}&base=USD",
                subject.date)
       end
 
       def historical_secure_url
-        format("#{oer_historical_secure_url}?app_id=#{TEST_APP_ID}",
+        format("#{oer_historical_secure_url}?app_id=#{TEST_APP_ID}&base=USD",
                subject.date)
       end
 
@@ -193,11 +198,11 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     describe 'latest' do
       def source_url
-        "#{oer_url}?app_id=#{TEST_APP_ID}"
+        "#{oer_url}?app_id=#{TEST_APP_ID}&base=USD"
       end
 
       def source_secure_url
-        "#{oer_secure_url}?app_id=#{TEST_APP_ID}"
+        "#{oer_secure_url}?app_id=#{TEST_APP_ID}&base=USD"
       end
 
       it 'should use the non-secure http url if secure_connection is nil' do
