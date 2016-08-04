@@ -65,9 +65,12 @@ class Money
       end
 
       # Update all rates from openexchangerates JSON
+      #
+      # @param force_update [Boolean] Force update from server
+      #
       # @return [Array] Array of exchange rates
-      def update_rates
-        exchange_rates.each do |exchange_rate|
+      def update_rates(force_update = false)
+        exchange_rates(force_update).each do |exchange_rate|
           rate = exchange_rate.last
           currency = exchange_rate.first
           next unless Money::Currency.find(currency)
@@ -190,8 +193,9 @@ class Money
 
       # Get expire rates, first from cache and then from url
       # @return [Hash] key is country code (ISO 3166-1 alpha-3) value Float
-      def exchange_rates
-        doc = JSON.parse(read_from_cache || read_from_url)
+      def exchange_rates(force_update)
+        json = force_update ? read_from_url : (read_from_cache || read_from_url)
+        doc = JSON.parse(json)
         @oer_rates = doc['rates']
       end
 
