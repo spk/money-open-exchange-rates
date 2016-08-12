@@ -17,7 +17,7 @@ class Money
     # OpenExchangeRatesBank base class
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
       VERSION = ::OpenExchangeRatesBank::VERSION
-      BASE_URL = 'http://openexchangerates.org'.freeze
+      BASE_URL = 'http://openexchangerates.org/api'.freeze
       # OpenExchangeRates urls
       OER_URL = File.join(BASE_URL, 'latest.json')
       OER_HISTORICAL_URL = File.join(BASE_URL, 'historical', '%s.json')
