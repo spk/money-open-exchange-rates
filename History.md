@@ -1,6 +1,25 @@
 
+v0.5.0 / 2016-08-12
+===================
+
+  * Changed base api url
+  * Fix rubocop to 0.41.2 for Ruby 1.9 support
+  * Update rake to 11 and rubocop to 0.41
+  * README add Installation
+  * Update rubocop to 0.38
+  * Always use raise to signal exceptions
+  * Use last rubinius binary on travis
+  * Update year
+  * Update README badges
+  * Update jruby to 9.0.4.0
+  * Update rubocop and add frozen_string_literal
+  * Add Ruby 2.3 and rbx-2 to CI
+  * Remove inch from dev tools for ruby 1.9
+  * Update money deps
+  * Update deps and freeze strings constants
+
 v0.4.1 / 2015-12-06
-==================
+===================
 
   * Add more test for latest and historical urls
   * used the correct URL for secure historical
