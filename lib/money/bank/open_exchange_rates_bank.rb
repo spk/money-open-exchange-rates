@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'uri'
 require 'open-uri'
 require 'money'
 require 'json'
@@ -19,11 +20,13 @@ class Money
       VERSION = ::OpenExchangeRatesBank::VERSION
       BASE_URL = 'http://openexchangerates.org/api'.freeze
       # OpenExchangeRates urls
-      OER_URL = File.join(BASE_URL, 'latest.json')
-      OER_HISTORICAL_URL = File.join(BASE_URL, 'historical', '%s.json')
+      OER_URL = URI.join(BASE_URL, 'latest.json')
+      OER_HISTORICAL_URL = URI.join(BASE_URL, '/historical/')
       # OpenExchangeRates secure url
-      SECURE_OER_URL = OER_URL.gsub('http:', 'https:')
-      SECURE_OER_HISTORICAL_URL = OER_HISTORICAL_URL.gsub('http:', 'https:')
+      SECURE_OER_URL = OER_URL.clone
+      SECURE_OER_URL.scheme = 'https'
+      SECURE_OER_HISTORICAL_URL = OER_HISTORICAL_URL.clone
+      SECURE_OER_HISTORICAL_URL.scheme = 'https'
 
       # use https to fetch rates from Open Exchange Rates
       # disabled by default to support free-tier users
@@ -130,7 +133,7 @@ class Money
       def historical_url
         url = OER_HISTORICAL_URL
         url = SECURE_OER_HISTORICAL_URL if secure_connection
-        url % date
+        URI.join(url, "#{date}.json")
       end
 
       # Latest url

@@ -160,13 +160,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       def historical_url
-        format("#{oer_historical_url}?app_id=#{TEST_APP_ID}",
-               subject.date)
+        "#{oer_historical_url}#{subject.date}.json?app_id=#{TEST_APP_ID}"
       end
 
       def historical_secure_url
-        format("#{oer_historical_secure_url}?app_id=#{TEST_APP_ID}",
-               subject.date)
+        "#{oer_historical_secure_url}#{subject.date}.json?app_id=#{TEST_APP_ID}"
       end
 
       it 'should use the non-secure http url if secure_connection is nil' do
