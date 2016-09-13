@@ -65,7 +65,8 @@ moe.cache = Proc.new do |v|
 end
 ~~~
 
-Unknown pair rates are transparently calculated: using inverse rate (if known), or using base currency rate to both currencies forming the pair.
+Unknown pair rates are transparently calculated: using inverse rate (if known),
+or using base currency rate to both currencies forming the pair.
 
 ## Tests
 

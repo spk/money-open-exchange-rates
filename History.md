@@ -1,4 +1,12 @@
 
+v0.6.0 / 2016-09-13
+==================
+
+  * Merge pull request #29 from @xsve / pairrates
+    * Implemented rate calculation for any pair of currencies via base currency
+  * Update travis ruby list
+  * Fix usage of URI.join instead of File.join
+
 v0.5.0 / 2016-08-12
 ===================
 
