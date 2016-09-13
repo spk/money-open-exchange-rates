@@ -6,6 +6,7 @@ require 'json'
 require File.expand_path('../../../open_exchange_rates_bank/version', __FILE__)
 
 # Money gem class
+# rubocop:disable ClassLength
 class Money
   # https://github.com/RubyMoney/money#exchange-rate-stores
   module Bank
@@ -27,6 +28,9 @@ class Money
       SECURE_OER_URL.scheme = 'https'
       SECURE_OER_HISTORICAL_URL = OER_HISTORICAL_URL.clone
       SECURE_OER_HISTORICAL_URL.scheme = 'https'
+
+      # Default base currency "base": "USD"
+      OE_SOURCE = 'USD'.freeze
 
       # use https to fetch rates from Open Exchange Rates
       # disabled by default to support free-tier users
@@ -67,6 +71,28 @@ class Money
         @ttl_in_seconds
       end
 
+      # Set the base currency for all rates. By default, USD is used.
+      # OpenExchangeRates only allows USD as base currency
+      # for the free plan users.
+      #
+      # @example
+      #   source = 'USD'
+      #
+      # @param value [String] Currency code, ISO 3166-1 alpha-3
+      #
+      # @return [String] chosen base currency
+      def source=(value)
+        @source = Money::Currency.find(value.to_s).iso_code
+      rescue
+        @source = OE_SOURCE
+      end
+
+      # Get the base currency for all rates. By default, USD is used.
+      # @return [String] base currency
+      def source
+        @source ||= OE_SOURCE
+      end
+
       # Update all rates from openexchangerates JSON
       # @return [Array] Array of exchange rates
       def update_rates
@@ -74,8 +100,8 @@ class Money
           rate = exchange_rate.last
           currency = exchange_rate.first
           next unless Money::Currency.find(currency)
-          set_rate('USD', currency, rate)
-          set_rate(currency, 'USD', 1.0 / rate)
+          set_rate(source, currency, rate)
+          set_rate(currency, source, 1.0 / rate)
         end
       end
 
@@ -91,14 +117,19 @@ class Money
         raise InvalidCache
       end
 
+      # Alias super method
+      alias super_get_rate get_rate
+
       # Override Money `get_rate` method for caching
       # @param [String] from_currency Currency ISO code. ex. 'USD'
       # @param [String] to_currency Currency ISO code. ex. 'CAD'
       #
       # @return [Numeric] rate.
       def get_rate(from_currency, to_currency, opts = {})
+        super if opts[:call_super]
         expire_rates
-        super
+        rate = get_rate_or_calc_inverse(from_currency, to_currency, opts)
+        rate || calc_pair_rate_using_base(from_currency, to_currency, opts)
       end
 
       # Expire rates when expired
@@ -113,7 +144,11 @@ class Money
       # defined with app_id and secure_connection
       # @return [String] URL
       def source_url
-        "#{oer_url}?app_id=#{app_id}"
+        if source == OE_SOURCE
+          "#{oer_url}?app_id=#{app_id}"
+        else
+          "#{oer_url}?app_id=#{app_id}&base=#{source}"
+        end
       end
 
       protected
@@ -202,6 +237,40 @@ class Money
       # return [Time] new expiration time
       def refresh_rates_expiration
         @rates_expiration = Time.now + ttl_in_seconds
+      end
+
+      # Get rate or calculate it as inverse rate
+      # @param [String] from_currency Currency ISO code. ex. 'USD'
+      # @param [String] to_currency Currency ISO code. ex. 'CAD'
+      #
+      # @return [Numeric] rate or rate calculated as inverse rate.
+      def get_rate_or_calc_inverse(from_currency, to_currency, opts = {})
+        rate = super_get_rate(from_currency, to_currency, opts)
+        unless rate
+          # Tries to calculate an inverse rate
+          inverse_rate = super_get_rate(to_currency, from_currency, opts)
+          if inverse_rate
+            rate = 1.0 / inverse_rate
+            add_rate(from_currency, to_currency, rate)
+          end
+        end
+        rate
+      end
+
+      # Tries to calculate a pair rate using base currency rate
+      # @param [String] from_currency Currency ISO code. ex. 'USD'
+      # @param [String] to_currency Currency ISO code. ex. 'CAD'
+      #
+      # @return [Numeric] rate or nil if cannot calculate rate.
+      def calc_pair_rate_using_base(from_currency, to_currency, opts)
+        from_base_rate = get_rate_or_calc_inverse(source, from_currency, opts)
+        to_base_rate   = get_rate_or_calc_inverse(source, to_currency, opts)
+        if to_base_rate && from_base_rate
+          rate = to_base_rate.to_f / from_base_rate
+          add_rate(from_currency, to_currency, rate)
+          return rate
+        end
+        nil
       end
     end
   end

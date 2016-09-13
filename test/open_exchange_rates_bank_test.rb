@@ -60,6 +60,11 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.exchange_with(money, 'USD').must_equal Money.new(100, 'USD')
       end
 
+      it 'should be able to exchange money when direct rate is unknown' do
+        money = Money.new(100, 'BBD')
+        subject.exchange_with(money, 'BMD').must_equal Money.new(50, 'BMD')
+      end
+
       it "should raise if it can't find an exchange rate" do
         money = Money.new(0, 'USD')
         proc { subject.exchange_with(money, 'SSP') }
@@ -364,6 +369,18 @@ describe Money::Bank::OpenExchangeRatesBank do
       add_to_webmock(subject, oer_historical_path)
       subject.update_rates
       subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+    end
+  end
+
+  describe 'source currency' do
+    it 'should be changed when a known currency is given' do
+      subject.source = 'EUR'
+      subject.source.must_equal 'EUR'
+    end
+
+    it 'should use USD when given unknown currency' do
+      subject.source = 'invalid'
+      subject.source.must_equal 'USD'
     end
   end
 end
