@@ -45,6 +45,12 @@ moe.secure_connection = true
 # set historical date of the rate
 # see https://openexchangerates.org/documentation#historical-data
 moe.date = '2015-01-01'
+# (optional)
+# Set the base currency for all rates. By default, USD is used.
+# OpenExchangeRates only allows USD as base currency
+# for the free plan users.
+moe.source = 'USD'
+
 # Store in cache
 moe.save_rates
 
