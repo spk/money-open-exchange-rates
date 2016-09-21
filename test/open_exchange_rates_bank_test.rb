@@ -176,6 +176,7 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.secure_connection = nil
         subject.source_url.must_equal historical_url
         subject.source_url.must_include 'http://'
+        subject.source_url.must_include 'api'
         subject.source_url.must_include 'historical'
       end
 
@@ -183,6 +184,7 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.secure_connection = false
         subject.source_url.must_equal historical_url
         subject.source_url.must_include 'http://'
+        subject.source_url.must_include 'api'
         subject.source_url.must_include 'historical'
       end
 
@@ -190,6 +192,7 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.secure_connection = true
         subject.source_url.must_equal historical_secure_url
         subject.source_url.must_include 'https://'
+        subject.source_url.must_include 'api'
         subject.source_url.must_include 'historical'
       end
     end
@@ -207,6 +210,7 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.secure_connection = nil
         subject.source_url.must_equal source_url
         subject.source_url.must_include 'http://'
+        subject.source_url.must_include 'api'
         subject.source_url.must_include 'latest'
       end
 
@@ -214,6 +218,7 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.secure_connection = false
         subject.source_url.must_equal source_url
         subject.source_url.must_include 'http://'
+        subject.source_url.must_include 'api'
         subject.source_url.must_include 'latest'
       end
 
@@ -221,6 +226,7 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.secure_connection = true
         subject.source_url.must_equal source_secure_url
         subject.source_url.must_include 'https://'
+        subject.source_url.must_include 'api'
         subject.source_url.must_include 'latest'
       end
     end
