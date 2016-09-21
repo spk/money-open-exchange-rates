@@ -22,7 +22,7 @@ class Money
       BASE_URL = 'http://openexchangerates.org/api/'.freeze
       # OpenExchangeRates urls
       OER_URL = URI.join(BASE_URL, 'latest.json')
-      OER_HISTORICAL_URL = URI.join(BASE_URL, '/historical/')
+      OER_HISTORICAL_URL = URI.join(BASE_URL, 'historical/')
       # OpenExchangeRates secure url
       SECURE_OER_URL = OER_URL.clone
       SECURE_OER_URL.scheme = 'https'
