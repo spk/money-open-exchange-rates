@@ -1,4 +1,11 @@
 
+v0.6.1 / 2016-09-21
+===================
+
+  * fix: Ensure correct url for historical api calls
+  * fix: Ensure correct url for api calls
+  * Add failing test for source_url
+
 v0.6.0 / 2016-09-13
 ==================
 
