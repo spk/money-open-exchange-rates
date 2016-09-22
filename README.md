@@ -95,7 +95,7 @@ bundle exec rake
 
 ## Refs
 
-* <https://github.com/currencybot/open-exchange-rates>
+* <https://github.com/josscrowcroft/open-exchange-rates>
 * <https://github.com/RubyMoney/money>
 * <https://github.com/RubyMoney/eu_central_bank>
 * <https://github.com/RubyMoney/google_currency>
