@@ -7,7 +7,7 @@ to_currency = 'CAD'
 app_id = ENV['OXR_APP_ID']
 
 if app_id.nil? || app_id.empty?
-  puts "OXR_APP_ID env var not set skipping integration tests"
+  puts 'OXR_APP_ID env var not set skipping integration tests'
   exit 0
 end
 
