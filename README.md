@@ -27,41 +27,43 @@ gem install money-open-exchange-rates
 
 ~~~ ruby
 require 'money/bank/open_exchange_rates_bank'
-moe = Money::Bank::OpenExchangeRatesBank.new
-moe.cache = 'path/to/file/cache'
-moe.app_id = 'your app id from https://openexchangerates.org/signup'
-moe.update_rates
+oxr = Money::Bank::OpenExchangeRatesBank.new
+oxr.cache = 'path/to/file/cache.json'
+oxr.app_id = 'your app id from https://openexchangerates.org/signup'
+oxr.update_rates
 
 # (optional)
 # set the seconds after than the current rates are automatically expired
 # by default, they never expire, in this example 1 day.
-moe.ttl_in_seconds = 86400
+oxr.ttl_in_seconds = 86400
 # (optional)
 # use https to fetch rates from Open Exchange Rates
 # disabled by default to support free-tier users
 # see https://openexchangerates.org/documentation#https
-moe.secure_connection = true
+oxr.secure_connection = true
 # (optional)
 # set historical date of the rate
 # see https://openexchangerates.org/documentation#historical-data
-moe.date = '2015-01-01'
+oxr.date = '2015-01-01'
 # (optional)
 # Set the base currency for all rates. By default, USD is used.
 # OpenExchangeRates only allows USD as base currency
 # for the free plan users.
-moe.source = 'USD'
+oxr.source = 'USD'
 
 # Store in cache
-moe.save_rates
+oxr.save_rates
 
-Money.default_bank = moe
+Money.default_bank = oxr
+
+Money.default_bank.get_rate('USD', 'CAD')
 ~~~
 
 You can also provide a Proc as a cache to provide your own caching mechanism
 perhaps with Redis or just a thread safe `Hash` (global). For example:
 
 ~~~ ruby
-moe.cache = Proc.new do |v|
+oxr.cache = Proc.new do |v|
   key = 'money:exchange_rates'
   if v
     Thread.current[key] = v

@@ -1,2 +1,2 @@
-gem 'money'
-gem 'money-open-exchange-rates'
+gem 'money', '~> 6.7'
+gem 'money-open-exchange-rates', path: '../../'
