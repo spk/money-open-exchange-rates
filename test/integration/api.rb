@@ -6,6 +6,11 @@ cache_path = '/tmp/latest.json'
 to_currency = 'CAD'
 app_id = ENV['OXR_APP_ID']
 
+if app_id.nil? || app_id.empty?
+  puts "OXR_APP_ID env var not set skipping integration tests"
+  exit 0
+end
+
 begin
   puts 'OXR version', Money::Bank::OpenExchangeRatesBank::VERSION
 
@@ -13,10 +18,9 @@ begin
   oxr.cache = cache_path
   oxr.app_id = app_id
   oxr.update_rates
+  oxr.save_rates
 
   Money.default_bank = oxr
-
-  oxr.save_rates
 
   cad_rate = Money.default_bank.get_rate('USD', to_currency)
 
