@@ -1,29 +1,56 @@
 <!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="UTF-8">
-    <title>Money-open-exchange-rates by spk</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-  </head>
-  <body>
-    <section class="page-header">
-      <h1 class="project-name">Money-open-exchange-rates</h1>
-      <h2 class="project-tagline">A gem that calculates the exchange rate using published rates from open-exchange-rates. Compatible with the money gem.</h2>
-      <a href="https://github.com/spk/money-open-exchange-rates" class="btn">View on GitHub</a>
-      <a href="https://github.com/spk/money-open-exchange-rates/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/spk/money-open-exchange-rates/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
+<html>
 
-    <section class="main-content">
-      <h1>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Money-open-exchange-rates : A gem that calculates the exchange rate using published rates from open-exchange-rates. Compatible with the money gem.">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Money-open-exchange-rates</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/spk/money-open-exchange-rates">View on GitHub</a>
+
+          <h1 id="project_title">Money-open-exchange-rates</h1>
+          <h2 id="project_tagline">A gem that calculates the exchange rate using published rates from open-exchange-rates. Compatible with the money gem.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/spk/money-open-exchange-rates/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/spk/money-open-exchange-rates/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
 <a id="money-open-exchange-rates" class="anchor" href="#money-open-exchange-rates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Money Open Exchange Rates</h1>
 
 <p>A gem that calculates the exchange rate using published rates from
 <a href="https://openexchangerates.org/">open-exchange-rates</a></p>
+
+<p>Check <a href="https://docs.openexchangerates.org/">api documentation</a></p>
+
+<ul>
+<li>
+<a href="https://docs.openexchangerates.org/docs/latest-json">Live</a> and
+<a href="https://docs.openexchangerates.org/docs/historical-json">historical</a>
+exchange rates for
+<a href="https://docs.openexchangerates.org/docs/supported-currencies">180 currencies</a>.</li>
+<li>
+<a href="https://openexchangerates.org/signup">Free plan</a> hourly updates, with USD
+base and up to 1,000 requests/month.</li>
+<li>Currency caching.</li>
+<li>Calculate pair rates.</li>
+</ul>
 
 <h2>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
@@ -46,33 +73,41 @@
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
 
 <div class="highlight highlight-source-ruby"><pre><span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>money/bank/open_exchange_rates_bank<span class="pl-pds">'</span></span>
-moe <span class="pl-k">=</span> <span class="pl-c1">Money</span>::<span class="pl-c1">Bank</span>::<span class="pl-c1">OpenExchangeRatesBank</span>.<span class="pl-k">new</span>
-moe.cache <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>path/to/file/cache<span class="pl-pds">'</span></span>
-moe.app_id <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>your app id from https://openexchangerates.org/signup<span class="pl-pds">'</span></span>
-moe.update_rates
+oxr <span class="pl-k">=</span> <span class="pl-c1">Money</span>::<span class="pl-c1">Bank</span>::<span class="pl-c1">OpenExchangeRatesBank</span>.<span class="pl-k">new</span>
+oxr.cache <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>path/to/file/cache.json<span class="pl-pds">'</span></span>
+oxr.app_id <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>your app id from https://openexchangerates.org/signup<span class="pl-pds">'</span></span>
+oxr.update_rates
 
 <span class="pl-c"># (optional)</span>
 <span class="pl-c"># set the seconds after than the current rates are automatically expired</span>
 <span class="pl-c"># by default, they never expire, in this example 1 day.</span>
-moe.ttl_in_seconds <span class="pl-k">=</span> <span class="pl-c1">86400</span>
+oxr.ttl_in_seconds <span class="pl-k">=</span> <span class="pl-c1">86400</span>
 <span class="pl-c"># (optional)</span>
 <span class="pl-c"># use https to fetch rates from Open Exchange Rates</span>
 <span class="pl-c"># disabled by default to support free-tier users</span>
 <span class="pl-c"># see https://openexchangerates.org/documentation#https</span>
-moe.secure_connection <span class="pl-k">=</span> <span class="pl-c1">true</span>
+oxr.secure_connection <span class="pl-k">=</span> <span class="pl-c1">true</span>
 <span class="pl-c"># (optional)</span>
 <span class="pl-c"># set historical date of the rate</span>
 <span class="pl-c"># see https://openexchangerates.org/documentation#historical-data</span>
-moe.date <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>2015-01-01<span class="pl-pds">'</span></span>
-<span class="pl-c"># Store in cache</span>
-moe.save_rates
+oxr.date <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>2015-01-01<span class="pl-pds">'</span></span>
+<span class="pl-c"># (optional)</span>
+<span class="pl-c"># Set the base currency for all rates. By default, USD is used.</span>
+<span class="pl-c"># OpenExchangeRates only allows USD as base currency</span>
+<span class="pl-c"># for the free plan users.</span>
+oxr.source <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>USD<span class="pl-pds">'</span></span>
 
-<span class="pl-c1">Money</span>.default_bank <span class="pl-k">=</span> moe</pre></div>
+<span class="pl-c"># Store in cache</span>
+oxr.save_rates
+
+<span class="pl-c1">Money</span>.default_bank <span class="pl-k">=</span> oxr
+
+<span class="pl-c1">Money</span>.default_bank.get_rate(<span class="pl-s"><span class="pl-pds">'</span>USD<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>CAD<span class="pl-pds">'</span></span>)</pre></div>
 
 <p>You can also provide a Proc as a cache to provide your own caching mechanism
 perhaps with Redis or just a thread safe <code>Hash</code> (global). For example:</p>
 
-<div class="highlight highlight-source-ruby"><pre>moe.cache <span class="pl-k">=</span> <span class="pl-c1">Proc</span>.<span class="pl-k">new</span> <span class="pl-k">do </span>|<span class="pl-smi">v</span>|
+<div class="highlight highlight-source-ruby"><pre>oxr.cache <span class="pl-k">=</span> <span class="pl-c1">Proc</span>.<span class="pl-k">new</span> <span class="pl-k">do </span>|<span class="pl-smi">v</span>|
   key <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>money:exchange_rates<span class="pl-pds">'</span></span>
   <span class="pl-k">if</span> v
     <span class="pl-c1">Thread</span>.current[key] <span class="pl-k">=</span> v
@@ -80,6 +115,9 @@ perhaps with Redis or just a thread safe <code>Hash</code> (global). For example
     <span class="pl-c1">Thread</span>.current[key]
   <span class="pl-k">end</span>
 <span class="pl-k">end</span></pre></div>
+
+<p>Unknown pair rates are transparently calculated: using inverse rate (if known),
+or using base currency rate to both currencies forming the pair.</p>
 
 <h2>
 <a id="tests" class="anchor" href="#tests" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tests</h2>
@@ -91,7 +129,7 @@ perhaps with Redis or just a thread safe <code>Hash</code> (global). For example
 <a id="refs" class="anchor" href="#refs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Refs</h2>
 
 <ul>
-<li><a href="https://github.com/currencybot/open-exchange-rates">https://github.com/currencybot/open-exchange-rates</a></li>
+<li><a href="https://github.com/josscrowcroft/open-exchange-rates">https://github.com/josscrowcroft/open-exchange-rates</a></li>
 <li><a href="https://github.com/RubyMoney/money">https://github.com/RubyMoney/money</a></li>
 <li><a href="https://github.com/RubyMoney/eu_central_bank">https://github.com/RubyMoney/eu_central_bank</a></li>
 <li><a href="https://github.com/RubyMoney/google_currency">https://github.com/RubyMoney/google_currency</a></li>
@@ -117,15 +155,18 @@ perhaps with Redis or just a thread safe <code>Hash</code> (global). For example
 <a href="http://opensource.org/licenses/MIT" title="MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
 <a href="https://codeclimate.com/github/spk/money-open-exchange-rates"><img src="http://img.shields.io/codeclimate/github/spk/money-open-exchange-rates.svg" alt="Code Climate"></a>
 <a href="http://inch-ci.org/github/spk/money-open-exchange-rates"><img src="http://inch-ci.org/github/spk/money-open-exchange-rates.svg?branch=master" alt="Inline docs"></a></p>
+      </section>
+    </div>
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/spk/money-open-exchange-rates">Money-open-exchange-rates</a> is maintained by <a href="https://github.com/spk">spk</a>.</span>
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Money-open-exchange-rates maintained by <a href="https://github.com/spk">spk</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
       </footer>
+    </div>
 
-    </section>
+    
 
-  
   </body>
 </html>
