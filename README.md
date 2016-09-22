@@ -3,6 +3,14 @@
 A gem that calculates the exchange rate using published rates from
 [open-exchange-rates](https://openexchangerates.org/)
 
+Check [api documentation](https://docs.openexchangerates.org/)
+
+* Live and historical exchange rates for 180 currencies (including Bitcoin).
+* [Free plan](https://openexchangerates.org/signup) hourly updates, with USD
+    base and up to 1,000 requests/month.
+* Currency caching.
+* Calculate pair rates.
+
 ## Installation
 
 Add this line to your application's Gemfile:
