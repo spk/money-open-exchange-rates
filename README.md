@@ -5,7 +5,10 @@ A gem that calculates the exchange rate using published rates from
 
 Check [api documentation](https://docs.openexchangerates.org/)
 
-* Live and historical exchange rates for 180 currencies (including Bitcoin).
+* [Live](https://docs.openexchangerates.org/docs/latest-json) and
+    [historical](https://docs.openexchangerates.org/docs/historical-json)
+    exchange rates for
+    [180 currencies](https://docs.openexchangerates.org/docs/supported-currencies).
 * [Free plan](https://openexchangerates.org/signup) hourly updates, with USD
     base and up to 1,000 requests/month.
 * Currency caching.
