@@ -36,26 +36,28 @@ class Money
       # disabled by default to support free-tier users
       #
       # @param [Boolean] true for https, false for http
-      # @return [Boolean]
+      # @return [Boolean] true for https, false for http
       attr_accessor :secure_connection
 
       # As of the end of August 2012 all requests to the Open Exchange Rates
       # API must have a valid app_id
+      # see https://docs.openexchangerates.org/docs/authentication
       #
       # @param [String] token to access OXR API
-      # @return [String]
+      # @return [String] token to access OXR API
       attr_accessor :app_id
 
       # Cache accessor
       #
       # @param [String,Proc] for a String a filepath
+      # @return [String,Proc] for a String a filepath
       attr_accessor :cache
 
       # Date for historical api
       # see https://docs.openexchangerates.org/docs/historical-json
       #
       # @param [String] The requested date in YYYY-MM-DD format
-      # @return [String]
+      # @return [String] The requested date in YYYY-MM-DD format
       attr_accessor :date
 
       # Rates expiration Time
