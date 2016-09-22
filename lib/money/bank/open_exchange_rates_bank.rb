@@ -35,6 +35,9 @@ class Money
       # use https to fetch rates from Open Exchange Rates
       # disabled by default to support free-tier users
       #
+      # @example
+      #   oxr.secure_connection = true
+      #
       # @param [Boolean] true for https, false for http
       # @return [Boolean] true for https, false for http
       attr_accessor :secure_connection
@@ -43,11 +46,17 @@ class Money
       # API must have a valid app_id
       # see https://docs.openexchangerates.org/docs/authentication
       #
+      # @example
+      #   oxr.app_id = 'YOUR_APP_APP_ID'
+      #
       # @param [String] token to access OXR API
       # @return [String] token to access OXR API
       attr_accessor :app_id
 
       # Cache accessor
+      #
+      # @example
+      #   oxr.cache = 'path/to/file/cache.json'
       #
       # @param [String,Proc] for a String a filepath
       # @return [String,Proc] for a String a filepath
@@ -55,6 +64,9 @@ class Money
 
       # Date for historical api
       # see https://docs.openexchangerates.org/docs/historical-json
+      #
+      # @example
+      #   oxr.date = '2015-01-01'
       #
       # @param [String] The requested date in YYYY-MM-DD format
       # @return [String] The requested date in YYYY-MM-DD format
@@ -95,7 +107,7 @@ class Money
       # for the free plan users.
       #
       # @example
-      #   source = 'USD'
+      #   oxr.source = 'USD'
       #
       # @param value [String] Currency code, ISO 3166-1 alpha-3
       #
@@ -210,7 +222,7 @@ class Money
       # for the cache, or write to the cache file.
       #
       # @example
-      #   store_in_cache("{\"rates\": {\"AED\": 3.67304}}")
+      #   oxr.store_in_cache("{\"rates\": {\"AED\": 3.67304}}")
       #
       # @param text [String] String to cache
       # @return [String,Integer]
@@ -246,7 +258,7 @@ class Money
       # Check validity of rates response only for store in cache
       #
       # @example
-      #   valid_rates?("{\"rates\": {\"AED\": 3.67304}}")
+      #   oxr.valid_rates?("{\"rates\": {\"AED\": 3.67304}}")
       #
       # @param [String] text is JSON content
       # @return [Boolean] valid or not
