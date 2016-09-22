@@ -34,26 +34,43 @@ class Money
 
       # use https to fetch rates from Open Exchange Rates
       # disabled by default to support free-tier users
+      #
+      # @param [Boolean] true for https, false for http
+      # @return [Boolean]
       attr_accessor :secure_connection
 
       # As of the end of August 2012 all requests to the Open Exchange Rates
       # API must have a valid app_id
+      #
+      # @param [String] token to access OXR API
+      # @return [String]
       attr_accessor :app_id
 
-      # Cache accessor, can be a String or a Proc
+      # Cache accessor
+      #
+      # @param [String,Proc] for a String a filepath
       attr_accessor :cache
 
       # Date for historical api
-      # see https://openexchangerates.org/documentation#historical-data
+      # see https://docs.openexchangerates.org/docs/historical-json
+      #
+      # @param [String] The requested date in YYYY-MM-DD format
+      # @return [String]
       attr_accessor :date
 
       # Rates expiration Time
+      #
+      # @return [Time] expiration time
       attr_reader :rates_expiration
 
       # Parsed OpenExchangeRates result as Hash
+      #
+      # @return [Hash] All rates as Hash
       attr_reader :oer_rates
 
       # Seconds after than the current rates are automatically expired
+      #
+      # @return [Integer] Setted time to live in seconds
       attr_reader :ttl_in_seconds
 
       # Set the seconds after than the current rates are automatically expired
@@ -88,12 +105,14 @@ class Money
       end
 
       # Get the base currency for all rates. By default, USD is used.
+      #
       # @return [String] base currency
       def source
         @source ||= OE_SOURCE
       end
 
       # Update all rates from openexchangerates JSON
+      #
       # @return [Array] Array of exchange rates
       def update_rates
         exchange_rates.each do |exchange_rate|
@@ -121,6 +140,7 @@ class Money
       alias super_get_rate get_rate
 
       # Override Money `get_rate` method for caching
+      #
       # @param [String] from_currency Currency ISO code. ex. 'USD'
       # @param [String] to_currency Currency ISO code. ex. 'CAD'
       #
@@ -133,6 +153,8 @@ class Money
       end
 
       # Expire rates when expired
+      #
+      # @return [NilClass, Time] nil if not expired or new expiration time
       def expire_rates
         return unless ttl_in_seconds
         return if rates_expiration > Time.now
@@ -142,6 +164,7 @@ class Money
 
       # Source url of openexchangerates
       # defined with app_id and secure_connection
+      #
       # @return [String] URL
       def source_url
         if source == OE_SOURCE
@@ -154,6 +177,7 @@ class Money
       protected
 
       # Latest url if no date given
+      #
       # @return [String] URL
       def oer_url
         if date
@@ -164,6 +188,7 @@ class Money
       end
 
       # Historical url generated from `date` attr_accessor
+      #
       # @return [String] URL
       def historical_url
         url = OER_HISTORICAL_URL
@@ -172,6 +197,7 @@ class Money
       end
 
       # Latest url
+      #
       # @return [String] URL
       def latest_url
         return SECURE_OER_URL if secure_connection
@@ -197,6 +223,8 @@ class Money
       end
 
       # Read from cache when exist
+      #
+      # @return [String] Raw string from file or cache proc
       def read_from_cache
         if cache.is_a?(Proc)
           cache.call(nil)
@@ -206,6 +234,7 @@ class Money
       end
 
       # Read from url
+      #
       # @return [String] JSON content
       def read_from_url
         raise NoAppId if app_id.nil? || app_id.empty?
@@ -227,6 +256,7 @@ class Money
       end
 
       # Get expire rates, first from cache and then from url
+      #
       # @return [Hash] key is country code (ISO 3166-1 alpha-3) value Float
       def exchange_rates
         doc = JSON.parse(read_from_cache || read_from_url)
@@ -234,12 +264,14 @@ class Money
       end
 
       # Refresh expiration from now
-      # return [Time] new expiration time
+      #
+      # @return [Time] new expiration time
       def refresh_rates_expiration
         @rates_expiration = Time.now + ttl_in_seconds
       end
 
       # Get rate or calculate it as inverse rate
+      #
       # @param [String] from_currency Currency ISO code. ex. 'USD'
       # @param [String] to_currency Currency ISO code. ex. 'CAD'
       #
@@ -258,6 +290,7 @@ class Money
       end
 
       # Tries to calculate a pair rate using base currency rate
+      #
       # @param [String] from_currency Currency ISO code. ex. 'USD'
       # @param [String] to_currency Currency ISO code. ex. 'CAD'
       #
