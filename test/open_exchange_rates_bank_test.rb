@@ -176,24 +176,21 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.secure_connection = nil
         subject.source_url.must_equal historical_url
         subject.source_url.must_include 'http://'
-        subject.source_url.must_include 'api'
-        subject.source_url.must_include 'historical'
+        subject.source_url.must_include "/api/historical/#{subject.date}.json"
       end
 
       it 'should use the non-secure http url if secure_connection is false' do
         subject.secure_connection = false
         subject.source_url.must_equal historical_url
         subject.source_url.must_include 'http://'
-        subject.source_url.must_include 'api'
-        subject.source_url.must_include 'historical'
+        subject.source_url.must_include "/api/historical/#{subject.date}.json"
       end
 
       it 'should use the secure https url if secure_connection is true' do
         subject.secure_connection = true
         subject.source_url.must_equal historical_secure_url
         subject.source_url.must_include 'https://'
-        subject.source_url.must_include 'api'
-        subject.source_url.must_include 'historical'
+        subject.source_url.must_include "/api/historical/#{subject.date}.json"
       end
     end
 
@@ -210,24 +207,21 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.secure_connection = nil
         subject.source_url.must_equal source_url
         subject.source_url.must_include 'http://'
-        subject.source_url.must_include 'api'
-        subject.source_url.must_include 'latest'
+        subject.source_url.must_include '/api/latest.json'
       end
 
       it 'should use the non-secure http url if secure_connection is false' do
         subject.secure_connection = false
         subject.source_url.must_equal source_url
         subject.source_url.must_include 'http://'
-        subject.source_url.must_include 'api'
-        subject.source_url.must_include 'latest'
+        subject.source_url.must_include '/api/latest.json'
       end
 
       it 'should use the secure https url if secure_connection is true' do
         subject.secure_connection = true
         subject.source_url.must_equal source_secure_url
         subject.source_url.must_include 'https://'
-        subject.source_url.must_include 'api'
-        subject.source_url.must_include 'latest'
+        subject.source_url.must_include '/api/latest.json'
       end
     end
   end
