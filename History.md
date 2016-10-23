@@ -1,4 +1,20 @@
 
+v0.7.0 / 2016-10-23
+===================
+
+  * Merge pull request #36 from @lautis / drop-json-gem
+    * Use bundled JSON instead of gem
+  * Better api url tests
+  * README https links
+  * Fix rubocop offense Style/StringLiterals
+  * Improve documentation from inch suggestions
+  * Skip integration test when OXR_APP_ID not present
+  * Avoid leak of api key in integration tests
+  * Update josscrowcroft/open-exchange-rates link
+  * More info about OXR
+  * Merge pull request #35 from spk/integration-test
+    * Better integration test
+
 v0.6.1 / 2016-09-21
 ===================
 
@@ -7,7 +23,7 @@ v0.6.1 / 2016-09-21
   * Add failing test for source_url
 
 v0.6.0 / 2016-09-13
-==================
+===================
 
   * Merge pull request #29 from @xsve / pairrates
     * Implemented rate calculation for any pair of currencies via base currency
