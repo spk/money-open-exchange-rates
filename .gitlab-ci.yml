@@ -6,8 +6,8 @@ before_script:
 
 rspec:
   script:
-    - bundle exec rspec
+    - bundle exec rake test
 
 rubocop:
   script:
-    - bundle exec rubocop
+    - bundle exec rake rubocop
