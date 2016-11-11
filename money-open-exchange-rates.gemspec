@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
   s.test_files = Dir.glob('test/*_test.rb')
   s.require_paths = ['lib']
-  s.required_ruby_version = '>= 1.9.3'
+  s.required_ruby_version = '>= 2.0'
   s.rubygems_version = '1.3.7'
   s.add_dependency 'money', '~> 6.7'
   s.add_dependency 'monetize', '~> 1.4'
