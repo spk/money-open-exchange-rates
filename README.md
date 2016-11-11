@@ -63,6 +63,9 @@ oxr.date = '2015-01-01'
 oxr.source = 'USD'
 
 # Store in cache
+# If you are using unicorn-worker-killer gem or on Heroku like platform,
+# you should avoid to put this on the initializer of your Rails application,
+# because will increase your OXR API usage.
 oxr.save_rates
 
 Money.default_bank = oxr
