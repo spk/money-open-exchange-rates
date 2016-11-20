@@ -3,7 +3,7 @@ bundler_args: --jobs=3 --retry=3
 language: ruby
 cache: bundler
 before_install:
-  - gem update --remote bundler
+  - gem install bundler
 rvm:
   - 2.0
   - 2.1
