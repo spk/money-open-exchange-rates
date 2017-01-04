@@ -245,13 +245,13 @@ describe Money::Bank::OpenExchangeRatesBank do
   describe 'using proc for cache' do
     before do
       @global_rates = nil
-      subject.cache = proc {|v|
+      subject.cache = proc do |v|
         if v
           @global_rates = v
         else
           @global_rates
         end
-      }
+      end
       add_to_webmock(subject)
     end
 
