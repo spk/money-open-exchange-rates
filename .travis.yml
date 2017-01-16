@@ -1,4 +1,6 @@
 ---
+dist: trusty
+group: beta
 sudo: false
 language: ruby
 cache: bundler
