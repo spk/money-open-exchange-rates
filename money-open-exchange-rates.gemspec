@@ -1,6 +1,7 @@
 version_file = 'lib/open_exchange_rates_bank/version'
 require File.expand_path("../#{version_file}", __FILE__)
 
+# rubocop:disable Metrics/BlockLength
 Gem::Specification.new do |s|
   s.name = 'money-open-exchange-rates'
   s.date = Time.now.utc.strftime('%Y-%m-%d')
@@ -12,7 +13,7 @@ Gem::Specification.new do |s|
     'rates from open-exchange-rates. Compatible with the money gem.'
   s.summary = 'A gem that calculates the exchange rate using published rates ' \
     'from open-exchange-rates.'
-  s.extra_rdoc_files = %w(README.md)
+  s.extra_rdoc_files = %w[README.md]
   s.files = Dir['LICENSE', 'README.md', 'History.md', 'Gemfile', 'lib/**/*.rb',
                 'test/**/*']
   s.license = 'MIT'
@@ -22,10 +23,10 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.7'
   s.add_dependency 'money', '~> 6.8'
   s.add_dependency 'monetize', '~> 1.5'
-  s.add_development_dependency 'rake', '~> 11'
+  s.add_development_dependency 'rake', '~> 12'
   s.add_development_dependency 'minitest', '~> 5'
   s.add_development_dependency 'timecop', '~> 0.8'
   s.add_development_dependency 'rr', '~> 1.1'
   s.add_development_dependency 'webmock', '~> 2.3'
-  s.add_development_dependency 'rubocop', '~> 0.43.0'
+  s.add_development_dependency 'rubocop', '~> 0.49.0'
 end

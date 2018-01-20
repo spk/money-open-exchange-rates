@@ -1,5 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
+# rubocop:disable Metrics/BlockLength
 describe Money::Bank::OpenExchangeRatesBank do
   subject { Money::Bank::OpenExchangeRatesBank.new }
   let(:oer_url) { Money::Bank::OpenExchangeRatesBank::OER_URL }

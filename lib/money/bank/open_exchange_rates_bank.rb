@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'uri'
 require 'open-uri'
 require 'money'
