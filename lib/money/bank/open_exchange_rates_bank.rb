@@ -20,28 +20,19 @@ class Money
     # OpenExchangeRatesBank base class
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
       VERSION = ::OpenExchangeRatesBank::VERSION
-      BASE_URL = 'http://openexchangerates.org/api/'.freeze
+      BASE_URL = 'https://openexchangerates.org/api/'.freeze
+
       # OpenExchangeRates urls
       OER_URL = URI.join(BASE_URL, 'latest.json')
       OER_HISTORICAL_URL = URI.join(BASE_URL, 'historical/')
-      # OpenExchangeRates secure url
-      SECURE_OER_URL = OER_URL.clone
-      SECURE_OER_URL.scheme = 'https'
-      SECURE_OER_HISTORICAL_URL = OER_HISTORICAL_URL.clone
-      SECURE_OER_HISTORICAL_URL.scheme = 'https'
 
       # Default base currency "base": "USD"
       OE_SOURCE = 'USD'.freeze
 
-      # use https to fetch rates from Open Exchange Rates
-      # disabled by default to support free-tier users
-      #
-      # @example
-      #   oxr.secure_connection = true
-      #
-      # @param [Boolean] true for https, false for http
-      # @return [Boolean] true for https, false for http
-      attr_accessor :secure_connection
+      # @deprecated secure_connection is deprecated and has no effect
+      def secure_connection=(*)
+        'secure_connection is deprecated and has no effect'
+      end
 
       # As of the end of August 2012 all requests to the Open Exchange Rates
       # API must have a valid app_id
@@ -178,7 +169,7 @@ class Money
       end
 
       # Source url of openexchangerates
-      # defined with app_id and secure_connection
+      # defined with app_id
       #
       # @return [String] URL
       def source_url
@@ -206,16 +197,13 @@ class Money
       #
       # @return [String] URL
       def historical_url
-        url = OER_HISTORICAL_URL
-        url = SECURE_OER_HISTORICAL_URL if secure_connection
-        URI.join(url, "#{date}.json")
+        URI.join(OER_HISTORICAL_URL, "#{date}.json")
       end
 
       # Latest url
       #
       # @return [String] URL
       def latest_url
-        return SECURE_OER_URL if secure_connection
         OER_URL
       end
 

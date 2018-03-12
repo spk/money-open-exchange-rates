@@ -48,11 +48,6 @@ oxr.update_rates
 # by default, they never expire, in this example 1 day.
 oxr.ttl_in_seconds = 86400
 # (optional)
-# use https to fetch rates from Open Exchange Rates
-# disabled by default to support free-tier users
-# see https://openexchangerates.org/documentation#https
-oxr.secure_connection = true
-# (optional)
 # set historical date of the rate
 # see https://openexchangerates.org/documentation#historical-data
 oxr.date = '2015-01-01'
