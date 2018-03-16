@@ -84,6 +84,15 @@ class Money
       # @return [Integer] Setted time to live in seconds
       attr_reader :ttl_in_seconds
 
+      # Set support for the black market and alternative digital currencies
+      # see https://docs.openexchangerates.org/docs/alternative-currencies
+      # @example
+      #   oxr.show_alternative = true
+      #
+      # @param [Boolean] if true show alternative
+      # @return [Boolean] Setted show alternative
+      attr_writer :show_alternative
+
       # Set the seconds after than the current rates are automatically expired
       # by default, they never expire.
       #
@@ -172,15 +181,24 @@ class Money
         refresh_rates_expiration
       end
 
+      # Get show alternative
+      #
+      # @return [Boolean] if true show alternative
+      def show_alternative
+        @show_alternative ||= false
+      end
+
       # Source url of openexchangerates
       # defined with app_id
       #
       # @return [String] URL
       def source_url
         if source == OE_SOURCE
-          "#{oer_url}?app_id=#{app_id}"
+          "#{oer_url}?app_id=#{app_id}" \
+          "&show_alternative=#{show_alternative}"
         else
-          "#{oer_url}?app_id=#{app_id}&base=#{source}"
+          "#{oer_url}?app_id=#{app_id}&base=#{source}" \
+          "&show_alternative=#{show_alternative}"
         end
       end
 
