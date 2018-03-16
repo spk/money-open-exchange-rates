@@ -61,6 +61,11 @@ oxr.date = '2015-01-01'
 # OpenExchangeRates only allows USD as base currency
 # for the free plan users.
 oxr.source = 'USD'
+# (optional)
+# Extend returned values with alternative, black market and digital currency
+# rates. By default, false is used
+# see: https://docs.openexchangerates.org/docs/alternative-currencies
+oxr.show_alternative = true
 
 # Store in cache
 # If you are using unicorn-worker-killer gem or on Heroku like platform,
