@@ -166,11 +166,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       def historical_url
-        "#{oer_historical_url}#{subject.date}.json?app_id=#{TEST_APP_ID}"
+        "#{oer_historical_url}#{subject.date}.json?app_id=#{TEST_APP_ID}&show_alternative=false"
       end
 
       def historical_secure_url
-        "#{oer_historical_secure_url}#{subject.date}.json?app_id=#{TEST_APP_ID}"
+        "#{oer_historical_secure_url}#{subject.date}.json?app_id=#{TEST_APP_ID}&show_alternative=false"
       end
 
       it 'should use the non-secure http url if secure_connection is nil' do
@@ -197,11 +197,11 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     describe 'latest' do
       def source_url
-        "#{oer_url}?app_id=#{TEST_APP_ID}"
+        "#{oer_url}?app_id=#{TEST_APP_ID}&show_alternative=false"
       end
 
       def source_secure_url
-        "#{oer_secure_url}?app_id=#{TEST_APP_ID}"
+        "#{oer_secure_url}?app_id=#{TEST_APP_ID}&show_alternative=false"
       end
 
       it 'should use the non-secure http url if secure_connection is nil' do
@@ -382,6 +382,37 @@ describe Money::Bank::OpenExchangeRatesBank do
     it 'should use USD when given unknown currency' do
       subject.source = 'invalid'
       subject.source.must_equal 'USD'
+    end
+  end
+
+  describe 'show alternative' do
+
+    describe 'when no value given' do
+      before do
+        subject.show_alternative = nil
+      end
+
+      it 'should return the default value' do
+        subject.show_alternative.must_equal false
+      end
+
+      it 'should include show_alternative param as false' do
+        subject.source_url.must_include "show_alternative=false"
+      end
+    end
+
+    describe 'when value is given' do
+      before do
+        subject.show_alternative = true
+      end
+
+      it 'should return the value' do
+        subject.show_alternative.must_equal true
+      end
+
+      it 'should include show_alternative param as true' do
+        subject.source_url.must_include "show_alternative=true"
+      end
     end
   end
 end
