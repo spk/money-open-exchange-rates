@@ -156,6 +156,9 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       subject.app_id = TEST_APP_ID
     end
+    let(:source_url) do
+      "#{oer_url}#{subject.date}?app_id=#{TEST_APP_ID}&show_alternative=false"
+    end
 
     describe 'historical' do
       before do
@@ -163,7 +166,8 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       let(:historical_url) do
-        "#{oer_historical_url}#{subject.date}.json?app_id=#{TEST_APP_ID}"
+        "#{oer_historical_url}#{subject.date}.json?app_id=#{TEST_APP_ID}" \
+          '&show_alternative=false'
       end
 
       it 'should use the secure https url' do
@@ -175,7 +179,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     describe 'latest' do
       it 'should use the secure https url' do
-        subject.source_url.must_equal "#{oer_url}?app_id=#{TEST_APP_ID}"
+        subject.source_url.must_equal source_url
         subject.source_url.must_include 'https://'
         subject.source_url.must_include '/api/latest.json'
       end
@@ -346,6 +350,37 @@ describe Money::Bank::OpenExchangeRatesBank do
     it 'should use USD when given unknown currency' do
       subject.source = 'invalid'
       subject.source.must_equal 'USD'
+    end
+  end
+
+  describe 'show alternative' do
+
+    describe 'when no value given' do
+      before do
+        subject.show_alternative = nil
+      end
+
+      it 'should return the default value' do
+        subject.show_alternative.must_equal false
+      end
+
+      it 'should include show_alternative param as false' do
+        subject.source_url.must_include "show_alternative=false"
+      end
+    end
+
+    describe 'when value is given' do
+      before do
+        subject.show_alternative = true
+      end
+
+      it 'should return the value' do
+        subject.show_alternative.must_equal true
+      end
+
+      it 'should include show_alternative param as true' do
+        subject.source_url.must_include "show_alternative=true"
+      end
     end
   end
 end

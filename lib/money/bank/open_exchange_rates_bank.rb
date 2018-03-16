@@ -172,15 +172,30 @@ class Money
         refresh_rates_expiration
       end
 
+      # Set unofficial support for black market and alternative digital currencies
+      #
+      # @param [Boolean] if true show alternative
+      # @return [Boolean] Setted show alternative
+      def show_alternative=(value)
+        @show_alternative = value
+      end
+
+      # Get show alternative
+      #
+      # @return [Boolean] if true show alternative
+      def show_alternative
+        @show_alternative || false
+      end
+
       # Source url of openexchangerates
       # defined with app_id
       #
       # @return [String] URL
       def source_url
         if source == OE_SOURCE
-          "#{oer_url}?app_id=#{app_id}"
+          "#{oer_url}?app_id=#{app_id}&show_alternative=#{show_alternative}"
         else
-          "#{oer_url}?app_id=#{app_id}&base=#{source}"
+          "#{oer_url}?app_id=#{app_id}&base=#{source}&show_alternative=#{show_alternative}"
         end
       end
 
