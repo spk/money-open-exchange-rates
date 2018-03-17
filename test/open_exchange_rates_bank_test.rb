@@ -354,7 +354,6 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'show alternative' do
-
     describe 'when no value given' do
       before do
         subject.show_alternative = nil
@@ -365,7 +364,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should include show_alternative param as false' do
-        subject.source_url.must_include "show_alternative=false"
+        subject.source_url.must_include 'show_alternative=false'
       end
     end
 
@@ -379,7 +378,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should include show_alternative param as true' do
-        subject.source_url.must_include "show_alternative=true"
+        subject.source_url.must_include 'show_alternative=true'
       end
     end
   end
