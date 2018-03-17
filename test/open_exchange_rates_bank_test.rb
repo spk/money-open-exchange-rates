@@ -166,11 +166,13 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       def historical_url
-        "#{oer_historical_url}#{subject.date}.json?app_id=#{TEST_APP_ID}&show_alternative=false"
+        "#{oer_historical_url}#{subject.date}.json?" \
+        "app_id=#{TEST_APP_ID}&show_alternative=false"
       end
 
       def historical_secure_url
-        "#{oer_historical_secure_url}#{subject.date}.json?app_id=#{TEST_APP_ID}&show_alternative=false"
+        "#{oer_historical_secure_url}#{subject.date}.json?" \
+        "app_id=#{TEST_APP_ID}&show_alternative=false"
       end
 
       it 'should use the non-secure http url if secure_connection is nil' do
@@ -386,7 +388,6 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'show alternative' do
-
     describe 'when no value given' do
       before do
         subject.show_alternative = nil
@@ -397,7 +398,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should include show_alternative param as false' do
-        subject.source_url.must_include "show_alternative=false"
+        subject.source_url.must_include 'show_alternative=false'
       end
     end
 
@@ -411,7 +412,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should include show_alternative param as true' do
-        subject.source_url.must_include "show_alternative=true"
+        subject.source_url.must_include 'show_alternative=true'
       end
     end
   end
