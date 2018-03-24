@@ -86,10 +86,12 @@ With `Rails` cache example:
 
 ~~~ ruby
 OXR_CACHE_KEY = 'money:exchange_rates'.freeze
-OXR_TTL = 10
+OXR_CACHE_TTL = 10
+# using same ttl with refreshing current rates and cache
+oxr.ttl_in_seconds = OXR_CACHE_TTL
 oxr.cache = Proc.new do |text|
   if text && !Rails.cache.exist?(OXR_CACHE_KEY)
-    Rails.cache.write(OXR_CACHE_KEY, text, expires_in: OXR_TTL, race_condition_ttl: 10)
+    Rails.cache.write(OXR_CACHE_KEY, text, expires_in: OXR_CACHE_TTL)
   else
     Rails.cache.read(OXR_CACHE_KEY)
   end
