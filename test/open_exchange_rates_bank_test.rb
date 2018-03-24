@@ -273,12 +273,14 @@ describe Money::Bank::OpenExchangeRatesBank do
       # see test/latest.json +52
       @new_usd_eur_rate = 0.79085
       subject.add_rate('USD', 'EUR', @old_usd_eur_rate)
-      subject.cache = temp_cache_path
-      subject.save_rates
-    end
-
-    after do
-      File.unlink(temp_cache_path)
+      @global_rates = nil
+      subject.cache = proc do |v|
+        if v
+          @global_rates = v
+        else
+          @global_rates
+        end
+      end
     end
 
     describe 'when the ttl has expired' do
@@ -287,6 +289,14 @@ describe Money::Bank::OpenExchangeRatesBank do
         Timecop.freeze(Time.now + 1001) do
           subject.get_rate('USD', 'EUR').wont_equal @old_usd_eur_rate
           subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
+        end
+      end
+
+      it 'should save rates' do
+        subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+        Timecop.freeze(Time.now + 1001) do
+          subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
+          @global_rates.wont_be_empty
         end
       end
 
@@ -302,6 +312,9 @@ describe Money::Bank::OpenExchangeRatesBank do
     describe 'when the ttl has not expired' do
       it 'not should update the rates' do
         exp_time = subject.rates_expiration
+        dont_allow(subject).update_rates
+        dont_allow(subject).save_rates
+        dont_allow(subject).refresh_rates_expiration
         subject.expire_rates
         subject.rates_expiration.must_equal exp_time
       end

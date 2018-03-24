@@ -165,6 +165,7 @@ class Money
         return unless ttl_in_seconds
         return if rates_expiration > Time.now
         update_rates
+        save_rates
         refresh_rates_expiration
       end
 

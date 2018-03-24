@@ -68,7 +68,7 @@ Money.default_bank = oxr
 Money.default_bank.get_rate('USD', 'CAD')
 ~~~
 
-You can also provide a Proc as a cache to provide your own caching mechanism
+You can also provide a `Proc` as a cache to provide your own caching mechanism
 perhaps with Redis or just a thread safe `Hash` (global). For example:
 
 ~~~ ruby
@@ -78,6 +78,20 @@ oxr.cache = Proc.new do |v|
     Thread.current[key] = v
   else
     Thread.current[key]
+  end
+end
+~~~
+
+With `Rails` cache example:
+
+~~~ ruby
+OXR_CACHE_KEY = 'money:exchange_rates'.freeze
+OXR_TTL = 10
+oxr.cache = Proc.new do |text|
+  if text && !Rails.cache.exist?(OXR_CACHE_KEY)
+    Rails.cache.write(OXR_CACHE_KEY, text, expires_in: OXR_TTL, race_condition_ttl: 10)
+  else
+    Rails.cache.read(OXR_CACHE_KEY)
   end
 end
 ~~~
