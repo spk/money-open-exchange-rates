@@ -58,6 +58,7 @@ oxr.date = '2015-01-01'
 oxr.source = 'USD'
 
 # Store in cache
+# Force rates storage in cache, this is done automaticly after TTL is expire.
 # If you are using unicorn-worker-killer gem or on Heroku like platform,
 # you should avoid to put this on the initializer of your Rails application,
 # because will increase your OXR API usage.
@@ -100,6 +101,28 @@ end
 
 Unknown pair rates are transparently calculated: using inverse rate (if known),
 or using base currency rate to both currencies forming the pair.
+
+## Example configuration initializer with Rails and cache
+
+~~~
+require 'money/bank/open_exchange_rates_bank'
+
+OXR_CACHE_KEY = 'money:exchange_rates'.freeze
+OXR_CACHE_TTL = 10
+oxr = Money::Bank::OpenExchangeRatesBank.new
+oxr.ttl_in_seconds = OXR_CACHE_TTL
+oxr.cache = Proc.new do |text|
+  if text && !Rails.cache.exist?(OXR_CACHE_KEY)
+    Rails.cache.write(OXR_CACHE_KEY, text, expires_in: OXR_CACHE_TTL)
+  else
+    Rails.cache.read(OXR_CACHE_KEY)
+  end
+end
+oxr.app_id = ENV['OXR_API_KEY']
+oxr.update_rates
+
+Money.default_bank = oxr
+~~~
 
 ## Tests
 

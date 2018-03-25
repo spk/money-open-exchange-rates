@@ -22,6 +22,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       add_to_webmock(subject)
       subject.cache = temp_cache_path
+      subject.update_rates
       subject.save_rates
     end
 
@@ -127,7 +128,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should raise an error if no App ID is set' do
-      proc { subject.save_rates }.must_raise Money::Bank::NoAppId
+      proc { subject.update_rates }.must_raise Money::Bank::NoAppId
     end
 
     # TODO: As App IDs are compulsory soon, need to add more tests handle
@@ -146,8 +147,8 @@ describe Money::Bank::OpenExchangeRatesBank do
       subject.oer_rates.wont_be_empty
     end
 
-    it 'should raise an error if invalid path is given to save_rates' do
-      proc { subject.save_rates }.must_raise Money::Bank::InvalidCache
+    it 'should return nil when cache is nil' do
+      subject.save_rates.must_equal nil
     end
   end
 
@@ -187,13 +188,8 @@ describe Money::Bank::OpenExchangeRatesBank do
       add_to_webmock(subject)
     end
 
-    it 'should get from url' do
-      subject.update_rates
-      subject.oer_rates.wont_be_empty
-    end
-
     it 'should raise an error if invalid path is given to save_rates' do
-      proc { subject.save_rates }.must_raise Money::Bank::InvalidCache
+      proc { subject.update_rates }.must_raise Money::Bank::InvalidCache
     end
   end
 
@@ -208,10 +204,10 @@ describe Money::Bank::OpenExchangeRatesBank do
         end
       end
       add_to_webmock(subject)
+      subject.update_rates
     end
 
     it 'should get from url normally' do
-      subject.update_rates
       subject.oer_rates.wont_be_empty
     end
 
@@ -228,6 +224,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       add_to_webmock(subject)
       subject.cache = temp_cache_path
+      subject.update_rates
       subject.save_rates
     end
 
