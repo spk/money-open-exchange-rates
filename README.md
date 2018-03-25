@@ -96,7 +96,7 @@ With `Rails` cache example:
 
 ~~~ ruby
 OXR_CACHE_KEY = 'money:exchange_rates'.freeze
-OXR_CACHE_TTL = 10
+OXR_CACHE_TTL = 86400
 # using same ttl with refreshing current rates and cache
 oxr.ttl_in_seconds = OXR_CACHE_TTL
 oxr.cache = Proc.new do |text|
@@ -117,7 +117,7 @@ or using base currency rate to both currencies forming the pair.
 require 'money/bank/open_exchange_rates_bank'
 
 OXR_CACHE_KEY = 'money:exchange_rates'.freeze
-OXR_CACHE_TTL = 10
+OXR_CACHE_TTL = 86400
 oxr = Money::Bank::OpenExchangeRatesBank.new
 oxr.ttl_in_seconds = OXR_CACHE_TTL
 oxr.cache = Proc.new do |text|
