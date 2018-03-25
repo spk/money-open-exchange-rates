@@ -74,6 +74,11 @@ class Money
       # @return [Hash] All rates as Hash
       attr_reader :oer_rates
 
+      # Unparsed OpenExchangeRates response as String
+      #
+      # @return [String] OpenExchangeRates json response
+      attr_reader :json_response
+
       # Seconds after than the current rates are automatically expired
       #
       # @return [Integer] Setted time to live in seconds
@@ -135,9 +140,8 @@ class Money
       #
       # @return [Proc,File]
       def save_rates
-        raise InvalidCache unless cache
-        text = read_from_url
-        store_in_cache(text) if valid_rates?(text)
+        return nil unless cache
+        store_in_cache(@json_response) if valid_rates?(@json_response)
       rescue Errno::ENOENT
         raise InvalidCache
       end
@@ -241,7 +245,9 @@ class Money
       # @return [String] JSON content
       def read_from_url
         raise NoAppId if app_id.nil? || app_id.empty?
-        open(source_url).read
+        @json_response = open(source_url).read
+        save_rates
+        @json_response
       end
 
       # Check validity of rates response only for store in cache

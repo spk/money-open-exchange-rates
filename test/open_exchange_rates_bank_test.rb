@@ -22,6 +22,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       add_to_webmock(subject)
       subject.cache = temp_cache_path
+      subject.update_rates
       subject.save_rates
     end
 
@@ -127,7 +128,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should raise an error if no App ID is set' do
-      proc { subject.save_rates }.must_raise Money::Bank::NoAppId
+      proc { subject.update_rates }.must_raise Money::Bank::NoAppId
     end
 
     # TODO: As App IDs are compulsory soon, need to add more tests handle
@@ -146,8 +147,8 @@ describe Money::Bank::OpenExchangeRatesBank do
       subject.oer_rates.wont_be_empty
     end
 
-    it 'should raise an error if invalid path is given to save_rates' do
-      proc { subject.save_rates }.must_raise Money::Bank::InvalidCache
+    it 'should return nil when cache is nil' do
+      subject.save_rates.must_equal nil
     end
   end
 
@@ -187,13 +188,8 @@ describe Money::Bank::OpenExchangeRatesBank do
       add_to_webmock(subject)
     end
 
-    it 'should get from url' do
-      subject.update_rates
-      subject.oer_rates.wont_be_empty
-    end
-
     it 'should raise an error if invalid path is given to save_rates' do
-      proc { subject.save_rates }.must_raise Money::Bank::InvalidCache
+      proc { subject.update_rates }.must_raise Money::Bank::InvalidCache
     end
   end
 
@@ -208,10 +204,10 @@ describe Money::Bank::OpenExchangeRatesBank do
         end
       end
       add_to_webmock(subject)
+      subject.update_rates
     end
 
     it 'should get from url normally' do
-      subject.update_rates
       subject.oer_rates.wont_be_empty
     end
 
@@ -228,6 +224,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       add_to_webmock(subject)
       subject.cache = temp_cache_path
+      subject.update_rates
       subject.save_rates
     end
 
@@ -273,12 +270,14 @@ describe Money::Bank::OpenExchangeRatesBank do
       # see test/latest.json +52
       @new_usd_eur_rate = 0.79085
       subject.add_rate('USD', 'EUR', @old_usd_eur_rate)
-      subject.cache = temp_cache_path
-      subject.save_rates
-    end
-
-    after do
-      File.unlink(temp_cache_path)
+      @global_rates = nil
+      subject.cache = proc do |v|
+        if v
+          @global_rates = v
+        else
+          @global_rates
+        end
+      end
     end
 
     describe 'when the ttl has expired' do
@@ -287,6 +286,14 @@ describe Money::Bank::OpenExchangeRatesBank do
         Timecop.freeze(Time.now + 1001) do
           subject.get_rate('USD', 'EUR').wont_equal @old_usd_eur_rate
           subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
+        end
+      end
+
+      it 'should save rates' do
+        subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+        Timecop.freeze(Time.now + 1001) do
+          subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
+          @global_rates.wont_be_empty
         end
       end
 
@@ -302,6 +309,9 @@ describe Money::Bank::OpenExchangeRatesBank do
     describe 'when the ttl has not expired' do
       it 'not should update the rates' do
         exp_time = subject.rates_expiration
+        dont_allow(subject).update_rates
+        dont_allow(subject).save_rates
+        dont_allow(subject).refresh_rates_expiration
         subject.expire_rates
         subject.rates_expiration.must_equal exp_time
       end
