@@ -113,7 +113,7 @@ or using base currency rate to both currencies forming the pair.
 
 ## Full example configuration initializer with Rails and cache
 
-~~~
+~~~ ruby
 require 'money/bank/open_exchange_rates_bank'
 
 OXR_CACHE_KEY = 'money:exchange_rates'.freeze
