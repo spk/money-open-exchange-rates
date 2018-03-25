@@ -11,8 +11,12 @@ Check [api documentation](https://docs.openexchangerates.org/)
     [180 currencies](https://docs.openexchangerates.org/docs/supported-currencies).
 * [Free plan](https://openexchangerates.org/signup) hourly updates, with USD
     base and up to 1,000 requests/month.
-* Currency caching.
+* Automatically caches API results to file or Rails cache.
 * Calculate pair rates.
+* Automatically fetches new data from API if data becomes stale when
+    `ttl_in_seconds` option is provided.
+* Support for black market and digital currency rates with `show_alternative`
+    option.
 
 ## Installation
 
@@ -107,7 +111,7 @@ end
 Unknown pair rates are transparently calculated: using inverse rate (if known),
 or using base currency rate to both currencies forming the pair.
 
-## Example configuration initializer with Rails and cache
+## Full example configuration initializer with Rails and cache
 
 ~~~
 require 'money/bank/open_exchange_rates_bank'
