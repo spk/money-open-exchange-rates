@@ -1,4 +1,17 @@
 
+v1.0.0 / 2018-03-25
+===================
+
+  * Merge pull request #41 from @b-mandelbrot /add-show-alternative
+    * Add support for black market and digital currency rates
+  * Merge pull request #42 from spk/save-rates-when-ttl-expire
+    * Save rates to cache after first fetch and add example with Rails
+    * Improve documation about cache and rates ttl
+    * Save rates when ttl expire
+  * Merge pull request #40 from @Jetbuilt / deprecate-secure_connection
+    * Closes #39 - Make all requests over https and deprecate `secure_connection`
+  * Support Ruby >= 2.0
+
 v0.7.0 / 2016-10-23
 ===================
 
