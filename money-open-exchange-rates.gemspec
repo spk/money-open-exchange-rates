@@ -21,8 +21,8 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.required_ruby_version = '>= 2.0'
   s.rubygems_version = '1.3.7'
-  s.add_dependency 'money', '~> 6.8'
-  s.add_dependency 'monetize', '~> 1.5'
+  s.add_dependency 'money', '~> 6.6'
+  s.add_dependency 'monetize', '>= 1.3.1', '< 2'
   s.add_development_dependency 'rake', '~> 12'
   s.add_development_dependency 'minitest', '~> 5'
   s.add_development_dependency 'timecop', '~> 0.8'
