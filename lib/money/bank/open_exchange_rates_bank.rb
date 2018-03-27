@@ -326,7 +326,7 @@ class Money
         from_base_rate = get_rate_or_calc_inverse(source, from_currency, opts)
         to_base_rate   = get_rate_or_calc_inverse(source, to_currency, opts)
         if to_base_rate && from_base_rate
-          rate = BigDecimal(to_base_rate) / from_base_rate
+          rate = BigDecimal(to_base_rate.to_s) / from_base_rate
           add_rate(from_currency, to_currency, rate)
           return rate
         end
