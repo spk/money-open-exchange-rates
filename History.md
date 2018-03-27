@@ -1,4 +1,10 @@
 
+v1.0.2 / 2018-03-27
+===================
+
+  * Merge pull request #46 from @cedricpim / fix-float-big-decimal-casting
+    * Fix issue with Float casting for BigDecimal
+
 v1.0.1 / 2018-03-25
 ===================
 
