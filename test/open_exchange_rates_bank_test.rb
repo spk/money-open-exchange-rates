@@ -306,6 +306,15 @@ describe Money::Bank::OpenExchangeRatesBank do
         end
       end
 
+      it 'should save rates and refresh it when cache is invalid' do
+        subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+        Timecop.freeze(Time.now + 1001) do
+          @global_rates = []
+          subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
+          @global_rates.wont_be_empty
+        end
+      end
+
       it 'updates the next expiration time' do
         Timecop.freeze(Time.now + 1001) do
           exp_time = Time.now + 1000
@@ -318,8 +327,8 @@ describe Money::Bank::OpenExchangeRatesBank do
     describe 'when the ttl has not expired' do
       it 'not should update the rates' do
         exp_time = subject.rates_expiration
+        dont_allow(subject).read_from_url
         dont_allow(subject).update_rates
-        dont_allow(subject).save_rates
         dont_allow(subject).refresh_rates_expiration
         subject.expire_rates
         subject.rates_expiration.must_equal exp_time

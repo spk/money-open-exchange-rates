@@ -177,6 +177,7 @@ class Money
       def expire_rates
         return unless ttl_in_seconds
         return if rates_expiration > Time.now
+        read_from_url
         update_rates
         refresh_rates_expiration
       end
@@ -251,11 +252,12 @@ class Money
       #
       # @return [String] Raw string from file or cache proc
       def read_from_cache
-        if cache.is_a?(Proc)
-          cache.call(nil)
-        elsif cache.is_a?(String) && File.exist?(cache)
-          open(cache).read
-        end
+        result = if cache.is_a?(Proc)
+                   cache.call(nil)
+                 elsif cache.is_a?(String) && File.exist?(cache)
+                   open(cache).read
+                 end
+        result if valid_rates?(result)
       end
 
       # Read from url
@@ -276,6 +278,7 @@ class Money
       # @param [String] text is JSON content
       # @return [Boolean] valid or not
       def valid_rates?(text)
+        return false unless text
         parsed = JSON.parse(text)
         parsed && parsed.key?('rates')
       rescue JSON::ParserError

@@ -43,6 +43,7 @@ gem install money-open-exchange-rates
 ~~~ ruby
 require 'money/bank/open_exchange_rates_bank'
 oxr = Money::Bank::OpenExchangeRatesBank.new
+# see https://github.com/spk/money-open-exchange-rates#cache for more info
 oxr.cache = 'path/to/file/cache.json'
 oxr.app_id = 'your app id from https://openexchangerates.org/signup'
 oxr.update_rates
@@ -65,7 +66,7 @@ oxr.source = 'USD'
 # rates. By default, false is used
 # see: https://docs.openexchangerates.org/docs/alternative-currencies
 oxr.show_alternative = true
-
+# (optional)
 # Store in cache
 # Force rates storage in cache, this is done automaticly after TTL is expire.
 # If you are using unicorn-worker-killer gem or on Heroku like platform,
@@ -77,6 +78,8 @@ Money.default_bank = oxr
 
 Money.default_bank.get_rate('USD', 'CAD')
 ~~~
+
+## Cache
 
 You can also provide a `Proc` as a cache to provide your own caching mechanism
 perhaps with Redis or just a thread safe `Hash` (global). For example:
@@ -96,20 +99,15 @@ With `Rails` cache example:
 
 ~~~ ruby
 OXR_CACHE_KEY = 'money:exchange_rates'.freeze
-OXR_CACHE_TTL = 86400
-# using same ttl with refreshing current rates and cache
-oxr.ttl_in_seconds = OXR_CACHE_TTL
+oxr.ttl_in_seconds = 86400
 oxr.cache = Proc.new do |text|
-  if text && !Rails.cache.exist?(OXR_CACHE_KEY)
-    Rails.cache.write(OXR_CACHE_KEY, text, expires_in: OXR_CACHE_TTL)
+  if text
+    Rails.cache.write(OXR_CACHE_KEY, text)
   else
     Rails.cache.read(OXR_CACHE_KEY)
   end
 end
 ~~~
-
-Unknown pair rates are transparently calculated: using inverse rate (if known),
-or using base currency rate to both currencies forming the pair.
 
 ## Full example configuration initializer with Rails and cache
 
@@ -117,12 +115,11 @@ or using base currency rate to both currencies forming the pair.
 require 'money/bank/open_exchange_rates_bank'
 
 OXR_CACHE_KEY = 'money:exchange_rates'.freeze
-OXR_CACHE_TTL = 86400
 oxr = Money::Bank::OpenExchangeRatesBank.new
-oxr.ttl_in_seconds = OXR_CACHE_TTL
+oxr.ttl_in_seconds = 86400
 oxr.cache = Proc.new do |text|
-  if text && !Rails.cache.exist?(OXR_CACHE_KEY)
-    Rails.cache.write(OXR_CACHE_KEY, text, expires_in: OXR_CACHE_TTL)
+  if text
+    Rails.cache.write(OXR_CACHE_KEY, text)
   else
     Rails.cache.read(OXR_CACHE_KEY)
   end
@@ -132,6 +129,11 @@ oxr.update_rates
 
 Money.default_bank = oxr
 ~~~
+
+## Pair rates
+
+Unknown pair rates are transparently calculated: using inverse rate (if known),
+or using base currency rate to both currencies forming the pair.
 
 ## Tests
 
