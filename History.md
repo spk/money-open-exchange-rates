@@ -1,4 +1,10 @@
 
+v1.1.0 / 2018-03-28
+===================
+
+  * Force refresh when ttl is expire and cache invalid (issue #47)
+  * Less strict dependency version for money/monetize
+
 v1.0.2 / 2018-03-27
 ===================
 
