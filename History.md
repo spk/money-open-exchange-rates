@@ -1,4 +1,10 @@
 
+v1.1.1 / 2018-03-30
+===================
+
+  * Merge pull request #50 from @v-kolesnikov / fix/avoid-monetize
+    * Use `monetize` as a development dependency only
+
 v1.1.0 / 2018-03-28
 ===================
 
