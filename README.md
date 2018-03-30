@@ -1,7 +1,9 @@
 # Money Open Exchange Rates
 
 A gem that calculates the exchange rate using published rates from
-[open-exchange-rates](https://openexchangerates.org/)
+[open-exchange-rates](https://openexchangerates.org/). Compatible with
+[Money](https://github.com/RubyMoney/money#currency-exchange) [currency
+exchange](http://www.rubydoc.info/gems/money/Money/Bank/VariableExchange).
 
 Check [api documentation](https://docs.openexchangerates.org/)
 
@@ -42,6 +44,8 @@ gem install money-open-exchange-rates
 
 ~~~ ruby
 require 'money/bank/open_exchange_rates_bank'
+# memory store per default; for others just pass as argument a class like
+# explained in https://github.com/RubyMoney/money#exchange-rate-stores
 oxr = Money::Bank::OpenExchangeRatesBank.new
 # see https://github.com/spk/money-open-exchange-rates#cache for more info
 oxr.cache = 'path/to/file/cache.json'
