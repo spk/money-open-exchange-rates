@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
+require 'coveralls'
+Coveralls.wear!
+
 require 'minitest/autorun'
 require 'rr'
 require 'webmock/minitest'
 require 'money/bank/open_exchange_rates_bank'
 require 'monetize'
 require 'timecop'
-
-require 'coveralls'
-Coveralls.wear!
 
 TEST_APP_ID = 'TEST_APP_ID'.freeze
 
