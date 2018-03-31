@@ -33,7 +33,8 @@ class Money
 
       # @deprecated secure_connection is deprecated and has no effect
       def secure_connection=(*)
-        'secure_connection is deprecated and has no effect'
+        warn 'secure_connection is deprecated and has no effect'
+        nil
       end
 
       # As of the end of August 2012 all requests to the Open Exchange Rates
