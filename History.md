@@ -1,4 +1,14 @@
 
+v1.2.2 / 2018-03-31
+===================
+
+  * Warn secure_connection= is deprecated
+  * More simple code on calc_pair_rate_using_base
+  * Increase code coverage on source_url
+  * Fix parse error specs on refresh_rates
+  * Use Coveralls for coverage
+  * Add tests for rates_timestamp issue
+
 v1.2.1 / 2018-03-31
 ===================
 
