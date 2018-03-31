@@ -155,6 +155,7 @@ oxr.cache = Proc.new do |text|
   end
 end
 oxr.app_id = ENV['OXR_API_KEY']
+oxr.show_alternative = true
 oxr.update_rates
 
 Money.default_bank = oxr
