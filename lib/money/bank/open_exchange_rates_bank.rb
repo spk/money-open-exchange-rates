@@ -113,7 +113,7 @@ class Money
       #
       # @return [Time]
       def rates_timestamp
-        @rates_timestamp || Time.at(0)
+        @rates_timestamp || Time.now
       end
 
       # Set the seconds after than the current rates are automatically expired
