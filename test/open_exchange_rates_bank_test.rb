@@ -7,6 +7,9 @@ describe Money::Bank::OpenExchangeRatesBank do
   let(:oer_historical_url) do
     Money::Bank::OpenExchangeRatesBank::OER_HISTORICAL_URL
   end
+  let(:default_source) do
+    Money::Bank::OpenExchangeRatesBank::OE_SOURCE
+  end
 
   let(:temp_cache_path) do
     data_file('tmp.json')
@@ -380,13 +383,17 @@ describe Money::Bank::OpenExchangeRatesBank do
 
   describe 'source currency' do
     it 'should be changed when a known currency is given' do
-      subject.source = 'EUR'
-      subject.source.must_equal 'EUR'
+      source = 'EUR'
+      subject.source = source
+      subject.source.must_equal source
+      subject.source_url.must_include "base=#{source}"
     end
 
     it 'should use USD when given unknown currency' do
-      subject.source = 'invalid'
-      subject.source.must_equal 'USD'
+      source = 'invalid'
+      subject.source = source
+      subject.source.must_equal default_source
+      subject.source_url.wont_include "base=#{default_source}"
     end
   end
 
