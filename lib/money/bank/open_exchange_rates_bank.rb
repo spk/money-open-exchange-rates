@@ -292,12 +292,19 @@ class Money
         result if valid_rates?(result)
       end
 
+      # Read API
+      #
+      # @return [String]
+      def json_response
+        open(source_url).read
+      end
+
       # Read from url
       #
       # @return [String] JSON content
       def read_from_url
         raise NoAppId if app_id.nil? || app_id.empty?
-        @json_response = open(source_url).read
+        @json_response = json_response
         save_cache if cache
         @json_response
       end
