@@ -44,39 +44,56 @@ gem install money-open-exchange-rates
 
 ~~~ ruby
 require 'money/bank/open_exchange_rates_bank'
-# memory store per default; for others just pass as argument a class like
+
+# Memory store per default; for others just pass as argument a class like
 # explained in https://github.com/RubyMoney/money#exchange-rate-stores
 oxr = Money::Bank::OpenExchangeRatesBank.new
-# see https://github.com/spk/money-open-exchange-rates#cache for more info
-oxr.cache = 'path/to/file/cache.json'
 oxr.app_id = 'your app id from https://openexchangerates.org/signup'
 oxr.update_rates
 
 # (optional)
-# set the seconds after than the current rates are automatically expired
-# by default, they never expire, in this example 1 day.
-oxr.ttl_in_seconds = 86400
+# See https://github.com/spk/money-open-exchange-rates#cache for more info
+# Updated only when `refresh_rates` is called
+oxr.cache = 'path/to/file/cache.json'
+
 # (optional)
-# set historical date of the rate
+# Set the seconds after than the current rates are automatically expired
+# by default, they never expire, in this example 1 day.
+# This ttl is about money store (memory, database ...) passed though
+# `Money::Bank::OpenExchangeRatesBank` as argument not about `cache` option.
+# The base time is the timestamp fetched from API.
+oxr.ttl_in_seconds = 86400
+
+# (optional)
+# Set historical date of the rate
 # see https://openexchangerates.org/documentation#historical-data
 oxr.date = '2015-01-01'
+
 # (optional)
 # Set the base currency for all rates. By default, USD is used.
 # OpenExchangeRates only allows USD as base currency
 # for the free plan users.
 oxr.source = 'USD'
+
 # (optional)
 # Extend returned values with alternative, black market and digital currency
 # rates. By default, false is used
 # see: https://docs.openexchangerates.org/docs/alternative-currencies
 oxr.show_alternative = true
+
 # (optional)
-# Store in cache
-# Force rates storage in cache, this is done automaticly after TTL is expire.
+# Refresh rates, store in cache and update rates
+# Should be used on crontab/worker/scheduler `Money.default_bank.refresh_rates`
 # If you are using unicorn-worker-killer gem or on Heroku like platform,
 # you should avoid to put this on the initializer of your Rails application,
 # because will increase your OXR API usage.
-oxr.save_rates
+oxr.refresh_rates
+
+# (optional)
+# Force refresh rates cache and store on the fly when ttl is expired
+# This will slow down request on get_rate, so use at your on risk, if you don't
+# want to setup crontab/worker/scheduler for your application
+oxr.force_refresh_rate_on_expire = true
 
 Money.default_bank = oxr
 
@@ -113,16 +130,25 @@ oxr.cache = Proc.new do |text|
 end
 ~~~
 
+To update the cache call `Money.default_bank.refresh_rates` on
+crontab/worker/scheduler. This have to be done this way because the fetch can
+take some time (HTTP call) and can fail.
+
 ## Full example configuration initializer with Rails and cache
 
 ~~~ ruby
 require 'money/bank/open_exchange_rates_bank'
 
 OXR_CACHE_KEY = 'money:exchange_rates'.freeze
-oxr = Money::Bank::OpenExchangeRatesBank.new
+# ExchangeRate is an ActiveRecord model
+# more info at https://github.com/RubyMoney/money#exchange-rate-stores
+oxr = Money::Bank::OpenExchangeRatesBank.new(ExchangeRate)
 oxr.ttl_in_seconds = 86400
 oxr.cache = Proc.new do |text|
   if text
+    # only expire when refresh_rates is called or `force_refresh_rate_on_expire`
+    # option is enabled
+    # you can also set `expires_in` option on write to force fetch new rates
     Rails.cache.write(OXR_CACHE_KEY, text)
   else
     Rails.cache.read(OXR_CACHE_KEY)

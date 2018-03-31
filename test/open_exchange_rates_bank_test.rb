@@ -23,7 +23,6 @@ describe Money::Bank::OpenExchangeRatesBank do
       add_to_webmock(subject)
       subject.cache = temp_cache_path
       subject.update_rates
-      subject.save_rates
     end
 
     after do
@@ -148,12 +147,9 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should get from url' do
+      dont_allow(subject).save_cache
       subject.update_rates
       subject.oer_rates.wont_be_empty
-    end
-
-    it 'should return nil when cache is nil' do
-      subject.save_rates.must_equal nil
     end
   end
 
@@ -197,7 +193,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       add_to_webmock(subject)
     end
 
-    it 'should raise an error if invalid path is given to save_rates' do
+    it 'should raise an error if invalid path is given to update_rates' do
       proc { subject.update_rates }.must_raise Money::Bank::InvalidCache
     end
   end
@@ -221,7 +217,6 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should save from url and get from cache' do
-      subject.save_rates
       @global_rates.wont_be_empty
       dont_allow(subject).source_url
       subject.update_rates
@@ -229,12 +224,11 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
   end
 
-  describe 'save rates' do
+  describe '#refresh_rates' do
     before do
       add_to_webmock(subject)
       subject.cache = temp_cache_path
       subject.update_rates
-      subject.save_rates
     end
 
     after do
@@ -243,7 +237,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     it 'should allow update after save' do
       begin
-        subject.update_rates
+        subject.refresh_rates
       rescue
         assert false, 'Should allow updating after saving'
       end
@@ -252,31 +246,45 @@ describe Money::Bank::OpenExchangeRatesBank do
     it 'should not break an existing file if save fails to read' do
       initial_size = File.read(temp_cache_path).size
       stub(subject).read_from_url { '' }
-      subject.save_rates
+      subject.refresh_rates
       File.open(temp_cache_path).read.size.must_equal initial_size
     end
 
     it 'should not break an existing file if save returns json without rates' do
       initial_size = File.read(temp_cache_path).size
       stub(subject).read_from_url { '{"error": "An error"}' }
-      subject.save_rates
+      subject.refresh_rates
       File.open(temp_cache_path).read.size.must_equal initial_size
     end
 
     it 'should not break an existing file if save returns a invalid json' do
       initial_size = File.read(temp_cache_path).size
       stub(subject).read_from_url { '{invalid_json: "An error"}' }
-      subject.save_rates
+      subject.refresh_rates
       File.open(temp_cache_path).read.size.must_equal initial_size
+    end
+  end
+
+  describe '#rates_timestamp' do
+    before do
+      add_to_webmock(subject)
+    end
+
+    it 'should be set on update_rates' do
+      subject.update_rates
+      subject.rates_timestamp.must_equal Time.at(1_414_008_044)
     end
   end
 
   describe '#expire_rates' do
     before do
       add_to_webmock(subject)
-      subject.ttl_in_seconds = 1000
+      # see test/data/latest.json +4
+      subject.rates_timestamp = 1_414_008_044
+      @ttl_in_seconds = 1000
+      subject.ttl_in_seconds = @ttl_in_seconds
       @old_usd_eur_rate = 0.655
-      # see test/latest.json +52
+      # see test/data/latest.json +52
       @new_usd_eur_rate = 0.79085
       subject.add_rate('USD', 'EUR', @old_usd_eur_rate)
       @global_rates = nil
@@ -291,47 +299,57 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     describe 'when the ttl has expired' do
       it 'should update the rates' do
-        subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
-        Timecop.freeze(Time.now + 1001) do
+        Timecop.freeze(subject.rates_timestamp) do
+          subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+        end
+        Timecop.freeze(subject.rates_timestamp + (@ttl_in_seconds + 1)) do
           subject.get_rate('USD', 'EUR').wont_equal @old_usd_eur_rate
           subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
         end
       end
 
       it 'should save rates' do
-        subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
-        Timecop.freeze(Time.now + 1001) do
-          subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
-          @global_rates.wont_be_empty
+        Timecop.freeze(subject.rates_timestamp) do
+          subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
         end
-      end
-
-      it 'should save rates and refresh it when cache is invalid' do
-        subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
-        Timecop.freeze(Time.now + 1001) do
-          @global_rates = []
+        Timecop.freeze(subject.rates_timestamp + (@ttl_in_seconds + 1)) do
           subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
           @global_rates.wont_be_empty
         end
       end
 
       it 'updates the next expiration time' do
-        Timecop.freeze(Time.now + 1001) do
-          exp_time = Time.now + 1000
+        Timecop.freeze(subject.rates_timestamp + (@ttl_in_seconds + 1)) do
+          exp_time = subject.rates_timestamp + @ttl_in_seconds
           subject.expire_rates
           subject.rates_expiration.must_equal exp_time
+        end
+      end
+
+      describe '#force_refresh_rate_on_expire' do
+        it 'should save rates and force refresh' do
+          subject.force_refresh_rate_on_expire = true
+          Timecop.freeze(subject.rates_timestamp) do
+            subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+          end
+          Timecop.freeze(Time.now + 1001) do
+            @global_rates = []
+            subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
+            @global_rates.wont_be_empty
+          end
         end
       end
     end
 
     describe 'when the ttl has not expired' do
-      it 'not should update the rates' do
+      it 'should not update the rates' do
         exp_time = subject.rates_expiration
-        dont_allow(subject).read_from_url
-        dont_allow(subject).update_rates
-        dont_allow(subject).refresh_rates_expiration
-        subject.expire_rates
-        subject.rates_expiration.must_equal exp_time
+        Timecop.freeze(subject.rates_timestamp) do
+          dont_allow(subject).update_rates
+          dont_allow(subject).refresh_rates_expiration
+          subject.expire_rates
+          subject.rates_expiration.must_equal exp_time
+        end
       end
     end
   end

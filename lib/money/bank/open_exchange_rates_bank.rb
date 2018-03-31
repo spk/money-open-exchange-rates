@@ -28,6 +28,8 @@ class Money
 
       # Default base currency "base": "USD"
       OE_SOURCE = 'USD'.freeze
+      RATES_KEY = 'rates'.freeze
+      TIMESTAMP_KEY = 'timestamp'.freeze
 
       # @deprecated secure_connection is deprecated and has no effect
       def secure_connection=(*)
@@ -64,6 +66,13 @@ class Money
       # @return [String] The requested date in YYYY-MM-DD format
       attr_accessor :date
 
+      # Force refresh rates cache and store on the fly when ttl is expired
+      # This will slow down request on get_rate, so use at your on risk, if you
+      # don't want to setup crontab/worker/scheduler for your application
+      #
+      # @param [Boolean]
+      attr_accessor :force_refresh_rate_on_expire
+
       # Rates expiration Time
       #
       # @return [Time] expiration time
@@ -92,6 +101,20 @@ class Money
       # @param [Boolean] if true show alternative
       # @return [Boolean] Setted show alternative
       attr_writer :show_alternative
+
+      # Set current rates timestamp
+      #
+      # @return [Time]
+      def rates_timestamp=(at)
+        @rates_timestamp = Time.at(at)
+      end
+
+      # Current rates timestamp
+      #
+      # @return [Time]
+      def rates_timestamp
+        @rates_timestamp || Time.at(0)
+      end
 
       # Set the seconds after than the current rates are automatically expired
       # by default, they never expire.
@@ -144,17 +167,6 @@ class Money
         end
       end
 
-      # Save rates on cache
-      # Can raise InvalidCache
-      #
-      # @return [Proc,File]
-      def save_rates
-        return nil unless cache
-        store_in_cache(@json_response) if valid_rates?(@json_response)
-      rescue Errno::ENOENT
-        raise InvalidCache
-      end
-
       # Alias super method
       alias super_get_rate get_rate
 
@@ -171,13 +183,23 @@ class Money
         rate || calc_pair_rate_using_base(from_currency, to_currency, opts)
       end
 
+      # Fetch from url and save cache
+      #
+      # @return [Array] Array of exchange rates
+      def refresh_rates
+        read_from_url
+      end
+
+      # Alias refresh_rates method
+      alias save_rates refresh_rates
+
       # Expire rates when expired
       #
       # @return [NilClass, Time] nil if not expired or new expiration time
       def expire_rates
         return unless ttl_in_seconds
         return if rates_expiration > Time.now
-        read_from_url
+        refresh_rates if force_refresh_rate_on_expire
         update_rates
         refresh_rates_expiration
       end
@@ -204,6 +226,16 @@ class Money
       end
 
       protected
+
+      # Save rates on cache
+      # Can raise InvalidCache
+      #
+      # @return [Proc,File]
+      def save_cache
+        store_in_cache(@json_response) if valid_rates?(@json_response)
+      rescue Errno::ENOENT
+        raise InvalidCache
+      end
 
       # Latest url if no date given
       #
@@ -266,7 +298,7 @@ class Money
       def read_from_url
         raise NoAppId if app_id.nil? || app_id.empty?
         @json_response = open(source_url).read
-        save_rates
+        save_cache if cache
         @json_response
       end
 
@@ -280,7 +312,7 @@ class Money
       def valid_rates?(text)
         return false unless text
         parsed = JSON.parse(text)
-        parsed && parsed.key?('rates')
+        parsed && parsed.key?(RATES_KEY) && parsed.key?(TIMESTAMP_KEY)
       rescue JSON::ParserError
         false
       end
@@ -290,14 +322,15 @@ class Money
       # @return [Hash] key is country code (ISO 3166-1 alpha-3) value Float
       def exchange_rates
         doc = JSON.parse(read_from_cache || read_from_url)
-        @oer_rates = doc['rates']
+        self.rates_timestamp = doc[TIMESTAMP_KEY]
+        @oer_rates = doc[RATES_KEY]
       end
 
       # Refresh expiration from now
       #
       # @return [Time] new expiration time
       def refresh_rates_expiration
-        @rates_expiration = Time.now + ttl_in_seconds
+        @rates_expiration = rates_timestamp + ttl_in_seconds
       end
 
       # Get rate or calculate it as inverse rate
