@@ -1,4 +1,11 @@
 
+v1.2.0 / 2018-03-31
+===================
+
+  * Merge pull request #51 from spk/fix-expire_rates
+    * Add force_refresh_rate_on_expire option and use api timestamp
+  * README: info currency-exchange
+
 v1.1.1 / 2018-03-30
 ===================
 
