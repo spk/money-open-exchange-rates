@@ -270,6 +270,10 @@ describe Money::Bank::OpenExchangeRatesBank do
       add_to_webmock(subject)
     end
 
+    it 'should be now when not updated from api' do
+      subject.rates_timestamp.must_be :>, Time.at(1_414_008_044)
+    end
+
     it 'should be set on update_rates' do
       subject.update_rates
       subject.rates_timestamp.must_equal Time.at(1_414_008_044)
