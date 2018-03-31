@@ -195,4 +195,5 @@ Copyright © 2011-2018 Laurent Arnoud <laurent@spkdev.net>
 [![Documentation](https://img.shields.io/badge/doc-rubydoc-blue.svg)](http://www.rubydoc.info/gems/money-open-exchange-rates)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT "MIT")
 [![Code Climate](https://img.shields.io/codeclimate/github/spk/money-open-exchange-rates.svg)](https://codeclimate.com/github/spk/money-open-exchange-rates)
+[![Coverage Status](https://img.shields.io/coveralls/github/spk/money-open-exchange-rates.svg)](https://coveralls.io/github/spk/money-open-exchange-rates?branch=master)
 [![Inline docs](https://inch-ci.org/github/spk/money-open-exchange-rates.svg?branch=master)](http://inch-ci.org/github/spk/money-open-exchange-rates)

@@ -7,6 +7,9 @@ require 'money/bank/open_exchange_rates_bank'
 require 'monetize'
 require 'timecop'
 
+require 'coveralls'
+Coveralls.wear!
+
 TEST_APP_ID = 'TEST_APP_ID'.freeze
 
 def data_file(file)

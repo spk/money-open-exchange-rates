@@ -3,3 +3,4 @@
 *.swp
 TEST_APP_ID
 test/integration/.bundle
+coverage
