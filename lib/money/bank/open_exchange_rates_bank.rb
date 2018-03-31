@@ -368,12 +368,11 @@ class Money
       def calc_pair_rate_using_base(from_currency, to_currency, opts)
         from_base_rate = get_rate_or_calc_inverse(source, from_currency, opts)
         to_base_rate   = get_rate_or_calc_inverse(source, to_currency, opts)
-        if to_base_rate && from_base_rate
-          rate = BigDecimal(to_base_rate.to_s) / from_base_rate
-          add_rate(from_currency, to_currency, rate)
-          return rate
-        end
-        nil
+        return unless to_base_rate
+        return unless from_base_rate
+        rate = BigDecimal(to_base_rate.to_s) / from_base_rate
+        add_rate(from_currency, to_currency, rate)
+        rate
       end
     end
   end

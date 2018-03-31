@@ -70,6 +70,12 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.exchange_with(money, 'TJS').must_equal Money.new(250, 'TJS')
       end
 
+      it "should raise if it can't find an currency" do
+        money = Money.new(0, 'USD')
+        proc { subject.exchange_with(money, 'PLP') }
+          .must_raise Money::Currency::UnknownCurrency
+      end
+
       it "should raise if it can't find an exchange rate" do
         money = Money.new(0, 'USD')
         proc { subject.exchange_with(money, 'SSP') }
@@ -137,10 +143,6 @@ describe Money::Bank::OpenExchangeRatesBank do
     it 'should raise an error if no App ID is set' do
       proc { subject.update_rates }.must_raise Money::Bank::NoAppId
     end
-
-    # TODO: As App IDs are compulsory soon, need to add more tests handle
-    # app_id-specific errors from
-    # https://openexchangerates.org/documentation#errors
   end
 
   describe 'no cache' do
