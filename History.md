@@ -1,4 +1,9 @@
 
+v1.2.1 / 2018-03-31
+===================
+
+  * Fix rates_timestamp should be now per default
+
 v1.2.0 / 2018-03-31
 ===================
 
