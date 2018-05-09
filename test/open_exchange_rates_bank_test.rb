@@ -242,7 +242,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       subject.app_id = TEST_APP_ID
       subject.cache = temp_cache_path
-      stub(subject).json_response { File.read(oer_latest_path) }
+      stub(subject).api_response { File.read(oer_latest_path) }
       subject.update_rates
     end
 
@@ -260,21 +260,21 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     it 'should not break an existing file if save fails to read' do
       initial_size = File.read(temp_cache_path).size
-      stub(subject).json_response { '' }
+      stub(subject).api_response { '' }
       subject.refresh_rates
       File.open(temp_cache_path).read.size.must_equal initial_size
     end
 
     it 'should not break an existing file if save returns json without rates' do
       initial_size = File.read(temp_cache_path).size
-      stub(subject).json_response { '{"error": "An error"}' }
+      stub(subject).api_response { '{"error": "An error"}' }
       subject.refresh_rates
       File.open(temp_cache_path).read.size.must_equal initial_size
     end
 
     it 'should not break an existing file if save returns a invalid json' do
       initial_size = File.read(temp_cache_path).size
-      stub(subject).json_response { '{invalid_json: "An error"}' }
+      stub(subject).api_response { '{invalid_json: "An error"}' }
       subject.refresh_rates
       File.open(temp_cache_path).read.size.must_equal initial_size
     end

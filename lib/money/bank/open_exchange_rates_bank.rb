@@ -296,7 +296,7 @@ class Money
       # Read API
       #
       # @return [String]
-      def json_response
+      def api_response
         open(source_url).read
       end
 
@@ -305,7 +305,7 @@ class Money
       # @return [String] JSON content
       def read_from_url
         raise NoAppId if app_id.nil? || app_id.empty?
-        @json_response = json_response
+        @json_response = api_response
         save_cache if cache
         @json_response
       end
