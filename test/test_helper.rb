@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
-require 'coveralls'
-Coveralls.wear!
+begin
+  require 'coveralls'
+  Coveralls.wear!
+rescue LoadError
+  STDERR.puts 'coveralls not loaded'
+end
 
 require 'minitest/autorun'
 require 'minitest/focus'
