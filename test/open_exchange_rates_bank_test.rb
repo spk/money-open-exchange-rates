@@ -94,6 +94,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     it 'should update itself with exchange rates from OpenExchangeRates' do
       subject.oer_rates.keys.each do |currency|
         next unless Money::Currency.find(currency)
+
         subject.get_rate('USD', currency).must_be :>, 0
       end
     end
@@ -253,7 +254,9 @@ describe Money::Bank::OpenExchangeRatesBank do
     it 'should allow update after save' do
       begin
         subject.refresh_rates
+        # rubocop:disable Style/RescueStandardError
       rescue
+        # rubocop:enable Style/RescueStandardError
         assert false, 'Should allow updating after saving'
       end
     end
@@ -438,3 +441,4 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

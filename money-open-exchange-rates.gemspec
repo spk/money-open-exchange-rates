@@ -19,15 +19,16 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
   s.test_files = Dir.glob('test/*_test.rb')
   s.require_paths = ['lib']
-  s.required_ruby_version = '>= 2.0'
+  s.required_ruby_version = '>= 2.2'
   s.rubygems_version = '1.3.7'
-  s.add_dependency 'money', '~> 6.6'
-  s.add_development_dependency 'monetize', '>= 1.3.1', '< 2'
-  s.add_development_dependency 'rake', '~> 12'
   s.add_development_dependency 'minitest', '~> 5'
   s.add_development_dependency 'minitest-focus', '~> 1'
-  s.add_development_dependency 'timecop', '~> 0.8'
-  s.add_development_dependency 'rr', '~> 1.1'
-  s.add_development_dependency 'webmock', '~> 2.3'
-  s.add_development_dependency 'rubocop', '~> 0.49.0'
+  s.add_dependency 'money', '~> 6.12'
+  s.add_development_dependency 'monetize', '>= 1.3.1', '< 2'
+  s.add_development_dependency 'rake', '~> 12'
+  s.add_development_dependency 'rr', '~> 1.2'
+  s.add_development_dependency 'rubocop', '~> 0.58.0'
+  s.add_development_dependency 'timecop', '~> 0.9'
+  s.add_development_dependency 'webmock', '~> 3.4'
 end
+# rubocop:enable Metrics/BlockLength

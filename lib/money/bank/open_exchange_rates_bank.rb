@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
+require 'net/http'
 require 'uri'
-require 'open-uri'
 require 'money'
 require 'json'
-require File.expand_path('../../../open_exchange_rates_bank/version', __FILE__)
+require File.expand_path('../../open_exchange_rates_bank/version', __dir__)
 
 # Money gem class
 # rubocop:disable ClassLength
@@ -34,7 +34,6 @@ class Money
       # @deprecated secure_connection is deprecated and has no effect
       def secure_connection=(*)
         warn 'secure_connection is deprecated and has no effect'
-        nil
       end
 
       # As of the end of August 2012 all requests to the Open Exchange Rates
@@ -129,7 +128,7 @@ class Money
       def ttl_in_seconds=(value)
         @ttl_in_seconds = value
         refresh_rates_expiration if ttl_in_seconds
-        @ttl_in_seconds
+        ttl_in_seconds
       end
 
       # Set the base currency for all rates. By default, USD is used.
@@ -143,9 +142,12 @@ class Money
       #
       # @return [String] chosen base currency
       def source=(value)
-        @source = Money::Currency.find(value.to_s).iso_code
-      rescue
-        @source = OE_SOURCE
+        scurrency = Money::Currency.find(value.to_s)
+        @source = if scurrency
+                    scurrency.iso_code
+                  else
+                    OE_SOURCE
+                  end
       end
 
       # Get the base currency for all rates. By default, USD is used.
@@ -163,6 +165,7 @@ class Money
           rate = exchange_rate.last
           currency = exchange_rate.first
           next unless Money::Currency.find(currency)
+
           set_rate(source, currency, rate)
           set_rate(currency, source, 1.0 / rate)
         end
@@ -200,6 +203,7 @@ class Money
       def expire_rates
         return unless ttl_in_seconds
         return if rates_expiration > Time.now
+
         refresh_rates if force_refresh_rate_on_expire
         update_rates
         refresh_rates_expiration
@@ -275,7 +279,7 @@ class Money
         if cache.is_a?(Proc)
           cache.call(text)
         elsif cache.is_a?(String)
-          open(cache, 'w') do |f|
+          File.open(cache, 'w') do |f|
             f.write(text)
           end
         end
@@ -288,7 +292,7 @@ class Money
         result = if cache.is_a?(Proc)
                    cache.call(nil)
                  elsif cache.is_a?(String) && File.exist?(cache)
-                   open(cache).read
+                   File.open(cache).read
                  end
         result if valid_rates?(result)
       end
@@ -297,7 +301,7 @@ class Money
       #
       # @return [String]
       def api_response
-        open(source_url).read
+        Net::HTTP.get(URI(source_url))
       end
 
       # Read from url
@@ -305,6 +309,7 @@ class Money
       # @return [String] JSON content
       def read_from_url
         raise NoAppId if app_id.nil? || app_id.empty?
+
         @json_response = api_response
         save_cache if cache
         @json_response
@@ -319,6 +324,7 @@ class Money
       # @return [Boolean] valid or not
       def valid_rates?(text)
         return false unless text
+
         parsed = JSON.parse(text)
         parsed && parsed.key?(RATES_KEY) && parsed.key?(TIMESTAMP_KEY)
       rescue JSON::ParserError
@@ -371,6 +377,7 @@ class Money
         to_base_rate   = get_rate_or_calc_inverse(source, to_currency, opts)
         return unless to_base_rate
         return unless from_base_rate
+
         rate = BigDecimal(to_base_rate.to_s) / from_base_rate
         add_rate(from_currency, to_currency, rate)
         rate
@@ -378,3 +385,4 @@ class Money
     end
   end
 end
+# rubocop:enable ClassLength

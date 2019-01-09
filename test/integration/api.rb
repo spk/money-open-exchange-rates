@@ -29,6 +29,9 @@ begin
   puts 'Money to_currency', cad_rate
   # rubocop:disable Style/AndOr
   json_to_currency == cad_rate or raise ERROR_MSG
+  # rubocop:enable Style/AndOr
+  # rubocop:disable Style/RescueStandardError
 rescue
+  # rubocop:enable Style/RescueStandardError
   raise ERROR_MSG
 end
