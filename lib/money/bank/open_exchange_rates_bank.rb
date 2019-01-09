@@ -237,18 +237,12 @@ class Money
       #
       # @return [String] URL
       def source_url
-        str = if source == OE_SOURCE
-                "#{oer_url}?app_id=#{app_id}" \
-                  "&show_alternative=#{show_alternative}"
-              else
-                "#{oer_url}?app_id=#{app_id}&base=#{source}" \
-                  "&show_alternative=#{show_alternative}"
-              end
-
-        if symbols.present? && symbols.is_a?(Array)
+        str = "#{oer_url}?app_id=#{app_id}"
+        str = "#{str}&base=#{source}" unless source == OE_SOURCE
+        str = "#{str}&show_alternative=#{show_alternative}"
+        if symbols && symbols.is_a?(Array)
           str = "#{str}&symbols=#{symbols.join(',')}"
         end
-
         str
       end
 
