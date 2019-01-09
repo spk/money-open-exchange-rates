@@ -102,6 +102,15 @@ class Money
       # @return [Boolean] Setted show alternative
       attr_writer :show_alternative
 
+      # Filter response to a list of symbols
+      # see https://docs.openexchangerates.org/docs/alternative-currencies
+      # @example
+      #   oxr.symbols = [:usd, :cad]
+      #
+      # @param [Array] list of symbols
+      # @return [Array] Setted list of symbols
+      attr_writer :symbols
+
       # Set current rates timestamp
       #
       # @return [Time]
@@ -216,18 +225,31 @@ class Money
         @show_alternative ||= false
       end
 
+      # Get symbols
+      #
+      # @return [Array] list of symbols to filter by
+      def symbols
+        @symbols ||= nil
+      end
+
       # Source url of openexchangerates
       # defined with app_id
       #
       # @return [String] URL
       def source_url
-        if source == OE_SOURCE
-          "#{oer_url}?app_id=#{app_id}" \
-          "&show_alternative=#{show_alternative}"
-        else
-          "#{oer_url}?app_id=#{app_id}&base=#{source}" \
-          "&show_alternative=#{show_alternative}"
+        str = if source == OE_SOURCE
+                "#{oer_url}?app_id=#{app_id}" \
+                  "&show_alternative=#{show_alternative}"
+              else
+                "#{oer_url}?app_id=#{app_id}&base=#{source}" \
+                  "&show_alternative=#{show_alternative}"
+              end
+
+        if symbols.present? && symbols.is_a?(Array)
+          str = "#{str}&symbols=#{symbols.join(',')}"
         end
+
+        str
       end
 
       protected
