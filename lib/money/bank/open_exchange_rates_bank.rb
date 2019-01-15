@@ -103,7 +103,7 @@ class Money
       attr_writer :show_alternative
 
       # Filter response to a list of symbols
-      # see https://docs.openexchangerates.org/docs/alternative-currencies
+      # see https://docs.openexchangerates.org/docs/get-specific-currencies
       # @example
       #   oxr.symbols = [:usd, :cad]
       #
