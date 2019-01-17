@@ -106,6 +106,15 @@ class Money
       # @return [Array] Setted list of symbols
       attr_writer :symbols
 
+      # Minified Response ('prettyprint')
+      # see https://docs.openexchangerates.org/docs/prettyprint
+      # @example
+      #   oxr.prettyprint = false
+      #
+      # @param [Boolean] Set to false to receive minified (default: true)
+      # @return [Boolean]
+      attr_writer :prettyprint
+
       # Set current rates timestamp
       #
       # @return [Time]
@@ -220,6 +229,15 @@ class Money
         @show_alternative ||= false
       end
 
+      # Get prettyprint option
+      #
+      # @return [Boolean]
+      def prettyprint
+        return true unless defined? @prettyprint
+        return true if @prettyprint.nil?
+        @prettyprint
+      end
+
       # Get symbols
       #
       # @return [Array] list of symbols to filter by
@@ -235,6 +253,7 @@ class Money
         str = "#{oer_url}?app_id=#{app_id}"
         str = "#{str}&base=#{source}" unless source == OE_SOURCE
         str = "#{str}&show_alternative=#{show_alternative}"
+        str = "#{str}&prettyprint=#{prettyprint}"
         if symbols && symbols.is_a?(Array)
           str = "#{str}&symbols=#{symbols.join(',')}"
         end
