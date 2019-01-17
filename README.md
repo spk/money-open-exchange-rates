@@ -24,9 +24,9 @@ Check [api documentation](https://docs.openexchangerates.org/)
 
 Add this line to your application's Gemfile:
 
-~~~ ruby
+``` ruby
 gem 'money-open-exchange-rates'
-~~~
+```
 
 And then execute:
 
@@ -42,7 +42,7 @@ gem install money-open-exchange-rates
 
 ## Usage
 
-~~~ ruby
+``` ruby
 require 'money/bank/open_exchange_rates_bank'
 
 # Memory store per default; for others just pass as argument a class like
@@ -98,14 +98,14 @@ oxr.force_refresh_rate_on_expire = true
 Money.default_bank = oxr
 
 Money.default_bank.get_rate('USD', 'CAD')
-~~~
+```
 
 ## Cache
 
 You can also provide a `Proc` as a cache to provide your own caching mechanism
 perhaps with Redis or just a thread safe `Hash` (global). For example:
 
-~~~ ruby
+``` ruby
 oxr.cache = Proc.new do |v|
   key = 'money:exchange_rates'
   if v
@@ -114,12 +114,12 @@ oxr.cache = Proc.new do |v|
     Thread.current[key]
   end
 end
-~~~
+```
 
 With `Rails` cache example:
 
-~~~ ruby
-OXR_CACHE_KEY = 'money:exchange_rates'.freeze
+``` ruby
+OXR_CACHE_KEY = "#{Rails.env}:money:exchange_rates".freeze
 oxr.ttl_in_seconds = 86400
 oxr.cache = Proc.new do |text|
   if text
@@ -128,7 +128,7 @@ oxr.cache = Proc.new do |text|
     Rails.cache.read(OXR_CACHE_KEY)
   end
 end
-~~~
+```
 
 To update the cache call `Money.default_bank.refresh_rates` on
 crontab/worker/scheduler. This have to be done this way because the fetch can
@@ -136,10 +136,10 @@ take some time (HTTP call) and can fail.
 
 ## Full example configuration initializer with Rails and cache
 
-~~~ ruby
+``` ruby
 require 'money/bank/open_exchange_rates_bank'
 
-OXR_CACHE_KEY = 'money:exchange_rates'.freeze
+OXR_CACHE_KEY = "#{Rails.env}:money:exchange_rates".freeze
 # ExchangeRate is an ActiveRecord model
 # more info at https://github.com/RubyMoney/money#exchange-rate-stores
 oxr = Money::Bank::OpenExchangeRatesBank.new(ExchangeRate)
@@ -159,7 +159,27 @@ oxr.show_alternative = true
 oxr.update_rates
 
 Money.default_bank = oxr
-~~~
+```
+
+### Tests
+
+To avoid to hit the API we can use the cache option with a saved file like this:
+
+``` ruby
+OXR_CACHE_KEY = "#{Rails.env}:money:exchange_rates".freeze
+if Rails.env.test?
+  oxr.cache = Rails.root.join("test/fixtures/currency-rates.json").to_s
+else
+  oxr.ttl_in_seconds = 5.minutes.to_i
+  oxr.cache = Proc.new do |text|
+    if text
+      Rails.cache.write(OXR_CACHE_KEY, text)
+    else
+      Rails.cache.read(OXR_CACHE_KEY)
+    end
+  end
+end
+```
 
 ## Pair rates
 
