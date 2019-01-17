@@ -191,15 +191,6 @@ describe Money::Bank::OpenExchangeRatesBank do
         subject.source_url.must_include '/api/latest.json'
       end
     end
-
-    describe 'secure_connection=' do
-      it 'do nothing' do
-        _out, err = capture_io do
-          subject.secure_connection = false
-        end
-        err.must_include 'deprecated'
-      end
-    end
   end
 
   describe 'no valid file for cache' do

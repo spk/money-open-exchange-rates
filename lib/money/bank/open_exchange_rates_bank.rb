@@ -31,11 +31,6 @@ class Money
       RATES_KEY = 'rates'.freeze
       TIMESTAMP_KEY = 'timestamp'.freeze
 
-      # @deprecated secure_connection is deprecated and has no effect
-      def secure_connection=(*)
-        warn 'secure_connection is deprecated and has no effect'
-      end
-
       # As of the end of August 2012 all requests to the Open Exchange Rates
       # API must have a valid app_id
       # see https://docs.openexchangerates.org/docs/authentication
