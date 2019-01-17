@@ -82,6 +82,11 @@ oxr.source = 'USD'
 oxr.show_alternative = true
 
 # (optional)
+# Minified Response ('prettyprint')
+# see https://docs.openexchangerates.org/docs/prettyprint
+oxr.prettyprint = false
+
+# (optional)
 # Refresh rates, store in cache and update rates
 # Should be used on crontab/worker/scheduler `Money.default_bank.refresh_rates`
 # If you are using unicorn-worker-killer gem or on Heroku like platform,
@@ -156,6 +161,7 @@ oxr.cache = Proc.new do |text|
 end
 oxr.app_id = ENV['OXR_API_KEY']
 oxr.show_alternative = true
+oxr.prettyprint = false
 oxr.update_rates
 
 Money.default_bank = oxr

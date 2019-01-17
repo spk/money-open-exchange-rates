@@ -163,8 +163,11 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       subject.app_id = TEST_APP_ID
     end
+    let(:default_options) do
+      '&show_alternative=false&prettyprint=true'
+    end
     let(:source_url) do
-      "#{oer_url}#{subject.date}?app_id=#{TEST_APP_ID}&show_alternative=false"
+      "#{oer_url}#{subject.date}?app_id=#{TEST_APP_ID}#{default_options}"
     end
 
     describe 'historical' do
@@ -174,7 +177,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
       let(:historical_url) do
         "#{oer_historical_url}#{subject.date}.json?app_id=#{TEST_APP_ID}" \
-          '&show_alternative=false'
+          "#{default_options}"
       end
 
       it 'should use the secure https url' do
@@ -399,6 +402,36 @@ describe Money::Bank::OpenExchangeRatesBank do
       subject.source = source
       subject.source.must_equal default_source
       subject.source_url.wont_include "base=#{default_source}"
+    end
+  end
+
+  describe 'prettyprint' do
+    describe 'when no value given' do
+      before do
+        subject.prettyprint = nil
+      end
+
+      it 'should return the default value' do
+        subject.prettyprint.must_equal true
+      end
+
+      it 'should include prettyprint param as true' do
+        subject.source_url.must_include 'prettyprint=true'
+      end
+    end
+
+    describe 'when value is given' do
+      before do
+        subject.prettyprint = false
+      end
+
+      it 'should return the value' do
+        subject.prettyprint.must_equal false
+      end
+
+      it 'should include prettyprint param as false' do
+        subject.source_url.must_include 'prettyprint=false'
+      end
     end
   end
 
