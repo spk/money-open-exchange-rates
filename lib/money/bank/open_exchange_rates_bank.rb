@@ -235,6 +235,7 @@ class Money
       def prettyprint
         return true unless defined? @prettyprint
         return true if @prettyprint.nil?
+
         @prettyprint
       end
 
