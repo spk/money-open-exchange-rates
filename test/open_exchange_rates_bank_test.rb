@@ -153,7 +153,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should get from url' do
-      dont_allow(subject).save_cache
+      subject.expects(:save_cache).never
       subject.update_rates
       subject.oer_rates.wont_be_empty
     end
@@ -227,7 +227,7 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     it 'should save from url and get from cache' do
       @global_rates.wont_be_empty
-      dont_allow(subject).source_url
+      subject.expects(:source_url).never
       subject.update_rates
       subject.oer_rates.wont_be_empty
     end
@@ -237,7 +237,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     before do
       subject.app_id = TEST_APP_ID
       subject.cache = temp_cache_path
-      stub(subject).api_response { File.read(oer_latest_path) }
+      subject.stubs(:api_response).returns File.read(oer_latest_path)
       subject.update_rates
     end
 
@@ -257,21 +257,21 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     it 'should not break an existing file if save fails to read' do
       initial_size = File.read(temp_cache_path).size
-      stub(subject).api_response { '' }
+      subject.stubs(:api_response).returns ''
       subject.refresh_rates
       File.open(temp_cache_path).read.size.must_equal initial_size
     end
 
     it 'should not break an existing file if save returns json without rates' do
       initial_size = File.read(temp_cache_path).size
-      stub(subject).api_response { '{"error": "An error"}' }
+      subject.stubs(:api_response).returns '{"error": "An error"}'
       subject.refresh_rates
       File.open(temp_cache_path).read.size.must_equal initial_size
     end
 
     it 'should not break an existing file if save returns a invalid json' do
       initial_size = File.read(temp_cache_path).size
-      stub(subject).api_response { '{invalid_json: "An error"}' }
+      subject.stubs(:api_response).returns '{invalid_json: "An error"}'
       subject.refresh_rates
       File.open(temp_cache_path).read.size.must_equal initial_size
     end
@@ -361,8 +361,8 @@ describe Money::Bank::OpenExchangeRatesBank do
       it 'should not update the rates' do
         exp_time = subject.rates_expiration
         Timecop.freeze(subject.rates_timestamp) do
-          dont_allow(subject).update_rates
-          dont_allow(subject).refresh_rates_expiration
+          subject.expects(:update_rates).never
+          subject.expects(:refresh_rates_expiration).never
           subject.expire_rates
           subject.rates_expiration.must_equal exp_time
         end
