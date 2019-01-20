@@ -29,6 +29,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake', '~> 12'
   s.add_development_dependency 'rubocop', '~> 0.63'
   s.add_development_dependency 'timecop', '~> 0.9'
-  s.add_development_dependency 'webmock', '~> 3.4'
+  s.add_development_dependency 'webmock', '~> 3.5'
 end
 # rubocop:enable Metrics/BlockLength
