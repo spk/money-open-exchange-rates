@@ -1,4 +1,23 @@
 
+1.3.0 / 2019-01-20
+==================
+
+  * Update webmock to 3.5
+  * Update rubocop to 0.63
+  * Switch from rr to mocha/minitest
+  * Add prettyprint option
+  * README: add info about tests
+  * Remove deprecated secure_connection= option
+  * Merge pull request #54 from @LinkUpStudioUA / symbols-doc-link-fix
+    * Fix link to filtering by symbols doc
+  * Fix bundler to <2 on travis (dropped support Ruby < 2.3)
+  * Fix bundler to 1.17.3 (2.0 dropped support Ruby < 2.3)
+  * Merge pull request #52 from @thejchap / feature/symbols
+    * add support for symbols query param
+  * Remove ruby 2.0/2.1 support and fix rubocop offenses
+  * Add minitest-focus gem
+  * Avoid redefine json_response method
+
 v1.2.2 / 2018-03-31
 ===================
 
