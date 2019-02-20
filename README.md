@@ -97,12 +97,34 @@ oxr.refresh_rates
 # (optional)
 # Force refresh rates cache and store on the fly when ttl is expired
 # This will slow down request on get_rate, so use at your on risk, if you don't
-# want to setup crontab/worker/scheduler for your application
+# want to setup crontab/worker/scheduler for your application.
+# Again this is not safe with multiple servers and could increase API usage.
 oxr.force_refresh_rate_on_expire = true
 
 Money.default_bank = oxr
 
 Money.default_bank.get_rate('USD', 'CAD')
+```
+
+## Refresh rates
+
+### With [whenever](https://github.com/javan/whenever)
+
+``` ruby
+every :hour do
+  runner "Money.default_bank.refresh_rates"
+end
+```
+
+### With rake task
+
+``` ruby
+namespace :open_exchange_rates do
+  desc "Refresh rates when called"
+  task :refresh_rates => :environment do
+    Money.default_bank.refresh_rates
+  end
+end
 ```
 
 ## Cache
