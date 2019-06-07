@@ -20,16 +20,16 @@ class Money
     # OpenExchangeRatesBank base class
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
       VERSION = ::OpenExchangeRatesBank::VERSION
-      BASE_URL = 'https://openexchangerates.org/api/'.freeze
+      BASE_URL = 'https://openexchangerates.org/api/'
 
       # OpenExchangeRates urls
       OER_URL = URI.join(BASE_URL, 'latest.json')
       OER_HISTORICAL_URL = URI.join(BASE_URL, 'historical/')
 
       # Default base currency "base": "USD"
-      OE_SOURCE = 'USD'.freeze
-      RATES_KEY = 'rates'.freeze
-      TIMESTAMP_KEY = 'timestamp'.freeze
+      OE_SOURCE = 'USD'
+      RATES_KEY = 'rates'
+      TIMESTAMP_KEY = 'timestamp'
 
       # As of the end of August 2012 all requests to the Open Exchange Rates
       # API must have a valid app_id
@@ -255,9 +255,7 @@ class Money
         str = "#{str}&base=#{source}" unless source == OE_SOURCE
         str = "#{str}&show_alternative=#{show_alternative}"
         str = "#{str}&prettyprint=#{prettyprint}"
-        if symbols && symbols.is_a?(Array)
-          str = "#{str}&symbols=#{symbols.join(',')}"
-        end
+        str = "#{str}&symbols=#{symbols.join(',')}" if symbols&.is_a?(Array)
         str
       end
 
@@ -357,7 +355,7 @@ class Money
         return false unless text
 
         parsed = JSON.parse(text)
-        parsed && parsed.key?(RATES_KEY) && parsed.key?(TIMESTAMP_KEY)
+        parsed&.key?(RATES_KEY) && parsed&.key?(TIMESTAMP_KEY)
       rescue JSON::ParserError
         false
       end

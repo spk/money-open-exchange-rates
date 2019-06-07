@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'money/bank/open_exchange_rates_bank'
 
-ERROR_MSG = 'Integration test failed!'.freeze
+ERROR_MSG = 'Integration test failed!'
 cache_path = '/tmp/latest.json'
 to_currency = 'CAD'
 app_id = ENV['OXR_APP_ID']

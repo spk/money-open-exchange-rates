@@ -4,7 +4,7 @@ begin
   require 'coveralls'
   Coveralls.wear!
 rescue LoadError
-  STDERR.puts 'coveralls not loaded'
+  warn 'coveralls not loaded'
 end
 
 require 'minitest/autorun'
@@ -15,7 +15,7 @@ require 'money/bank/open_exchange_rates_bank'
 require 'monetize'
 require 'timecop'
 
-TEST_APP_ID = 'TEST_APP_ID'.freeze
+TEST_APP_ID = 'TEST_APP_ID'
 
 def data_file(file)
   File.expand_path(File.join(File.dirname(__FILE__), 'data', file))
