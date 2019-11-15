@@ -7,7 +7,7 @@ require 'json'
 require File.expand_path('../../open_exchange_rates_bank/version', __dir__)
 
 # Money gem class
-# rubocop:disable ClassLength
+# rubocop:disable Metrics/ClassLength
 class Money
   # https://github.com/RubyMoney/money#exchange-rate-stores
   module Bank
@@ -414,4 +414,4 @@ class Money
     end
   end
 end
-# rubocop:enable ClassLength
+# rubocop:enable Metrics/ClassLength
