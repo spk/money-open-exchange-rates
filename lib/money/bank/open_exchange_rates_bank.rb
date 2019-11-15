@@ -298,6 +298,7 @@ class Money
 
       # Store the provided text data by calling the proc method provided
       # for the cache, or write to the cache file.
+      # Can raise InvalidCache
       #
       # @example
       #   oxr.store_in_cache("{\"rates\": {\"AED\": 3.67304}}")
@@ -307,10 +308,12 @@ class Money
       def store_in_cache(text)
         if cache.is_a?(Proc)
           cache.call(text)
-        elsif cache.is_a?(String)
-          File.open(cache, 'w') do |f|
+        elsif cache.is_a?(String) || cache.is_a?(Pathname)
+          File.open(cache.to_s, 'w') do |f|
             f.write(text)
           end
+        else
+          raise InvalidCache
         end
       end
 
@@ -320,7 +323,7 @@ class Money
       def read_from_cache
         result = if cache.is_a?(Proc)
                    cache.call(nil)
-                 elsif cache.is_a?(String) && File.exist?(cache)
+                 elsif File.exist?(cache.to_s)
                    File.open(cache).read
                  end
         result if valid_rates?(result)

@@ -16,6 +16,9 @@ describe Money::Bank::OpenExchangeRatesBank do
   let(:temp_cache_path) do
     data_file('tmp.json')
   end
+  let(:temp_cache_pathname) do
+    Pathname.new('test/data/tmp.json')
+  end
   let(:oer_latest_path) do
     data_file('latest.json')
   end
@@ -145,6 +148,26 @@ describe Money::Bank::OpenExchangeRatesBank do
 
     it 'should raise an error if no App ID is set' do
       proc { subject.update_rates }.must_raise Money::Bank::NoAppId
+    end
+  end
+
+  describe '#cache' do
+    before do
+      subject.app_id = TEST_APP_ID
+    end
+
+    it 'support Pathname object' do
+      subject.cache = temp_cache_pathname
+      subject.stubs(:api_response).returns File.read(oer_latest_path)
+      subject.update_rates
+      subject.expects(:read_from_url).never
+      subject.update_rates
+    end
+
+    it 'raise InvalidCache when the arg is not known' do
+      subject.cache = Array
+      add_to_webmock(subject)
+      proc { subject.update_rates }.must_raise Money::Bank::InvalidCache
     end
   end
 
