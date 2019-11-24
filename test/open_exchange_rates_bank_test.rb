@@ -40,12 +40,12 @@ describe Money::Bank::OpenExchangeRatesBank do
     describe 'without rates' do
       it 'able to exchange a money to its own currency even without rates' do
         money = Money.new(0, 'USD')
-        subject.exchange_with(money, 'USD').must_equal money
+        _(subject.exchange_with(money, 'USD')).must_equal money
       end
 
       it "raise if it can't find an exchange rate" do
         money = Money.new(0, 'USD')
-        proc { subject.exchange_with(money, 'SSP') }
+        _(proc { subject.exchange_with(money, 'SSP') })
           .must_raise Money::Bank::UnknownRate
       end
     end
@@ -57,33 +57,33 @@ describe Money::Bank::OpenExchangeRatesBank do
 
       it 'should be able to exchange money from USD to a known exchange rate' do
         money = Money.new(100, 'USD')
-        subject.exchange_with(money, 'BBD').must_equal Money.new(200, 'BBD')
+        _(subject.exchange_with(money, 'BBD')).must_equal Money.new(200, 'BBD')
       end
 
       it 'should be able to exchange money from a known exchange rate to USD' do
         money = Money.new(200, 'BBD')
-        subject.exchange_with(money, 'USD').must_equal Money.new(100, 'USD')
+        _(subject.exchange_with(money, 'USD')).must_equal Money.new(100, 'USD')
       end
 
       it 'should be able to exchange money when direct rate is unknown' do
         money = Money.new(100, 'BBD')
-        subject.exchange_with(money, 'BMD').must_equal Money.new(50, 'BMD')
+        _(subject.exchange_with(money, 'BMD')).must_equal Money.new(50, 'BMD')
       end
 
       it 'should be able to handle non integer rates' do
         money = Money.new(100, 'BBD')
-        subject.exchange_with(money, 'TJS').must_equal Money.new(250, 'TJS')
+        _(subject.exchange_with(money, 'TJS')).must_equal Money.new(250, 'TJS')
       end
 
       it "should raise if it can't find an currency" do
         money = Money.new(0, 'USD')
-        proc { subject.exchange_with(money, 'PLP') }
+        _(proc { subject.exchange_with(money, 'PLP') })
           .must_raise Money::Currency::UnknownCurrency
       end
 
       it "should raise if it can't find an exchange rate" do
         money = Money.new(0, 'USD')
-        proc { subject.exchange_with(money, 'SSP') }
+        _(proc { subject.exchange_with(money, 'SSP') })
           .must_raise Money::Bank::UnknownRate
       end
     end
@@ -100,7 +100,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       subject.oer_rates.keys.each do |currency|
         next unless Money::Currency.find(currency)
 
-        subject.get_rate('USD', currency).must_be :>, 0
+        _(subject.get_rate('USD', currency)).must_be :>, 0
       end
     end
 
@@ -118,7 +118,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       Money::Currency.register(wtf)
       subject.add_rate('USD', 'WTF', 2)
       subject.add_rate('WTF', 'USD', 2)
-      subject.exchange_with(5000.to_money('WTF'), 'USD').cents.wont_equal 0
+      _(subject.exchange_with(5000.to_money('WTF'), 'USD').cents).wont_equal 0
     end
 
     # in response to #4
@@ -137,7 +137,8 @@ describe Money::Bank::OpenExchangeRatesBank do
       rate = 13.7603
       subject.add_rate('USD', 'BTC', 1 / 13.7603)
       subject.add_rate('BTC', 'USD', rate)
-      subject.exchange_with(100.to_money('BTC'), 'USD').cents.must_equal 137_603
+      _(subject.exchange_with(100.to_money('BTC'), 'USD').cents)
+        .must_equal 137_603
     end
   end
 
@@ -148,7 +149,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should raise an error if no App ID is set' do
-        proc { subject.update_rates }.must_raise Money::Bank::NoAppId
+        _(proc { subject.update_rates }).must_raise Money::Bank::NoAppId
       end
     end
 
@@ -158,7 +159,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should raise an error if no App ID is set' do
-        proc { subject.update_rates }.must_raise Money::Bank::NoAppId
+        _(proc { subject.update_rates }).must_raise Money::Bank::NoAppId
       end
     end
   end
@@ -179,7 +180,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     it 'raise InvalidCache when the arg is not known' do
       subject.cache = Array
       add_to_webmock(subject)
-      proc { subject.update_rates }.must_raise Money::Bank::InvalidCache
+      _(proc { subject.update_rates }).must_raise Money::Bank::InvalidCache
     end
   end
 
@@ -192,7 +193,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     it 'should get from url' do
       subject.expects(:save_cache).never
       subject.update_rates
-      subject.oer_rates.wont_be_empty
+      _(subject.oer_rates).wont_be_empty
     end
   end
 
@@ -218,17 +219,18 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should use the secure https url' do
-        subject.source_url.must_equal historical_url
-        subject.source_url.must_include 'https://'
-        subject.source_url.must_include "/api/historical/#{subject.date}.json"
+        _(subject.source_url).must_equal historical_url
+        _(subject.source_url).must_include 'https://'
+        exp_url = "/api/historical/#{subject.date}.json"
+        _(subject.source_url).must_include exp_url
       end
     end
 
     describe 'latest' do
       it 'should use the secure https url' do
-        subject.source_url.must_equal source_url
-        subject.source_url.must_include 'https://'
-        subject.source_url.must_include '/api/latest.json'
+        _(subject.source_url).must_equal source_url
+        _(subject.source_url).must_include 'https://'
+        _(subject.source_url).must_include '/api/latest.json'
       end
     end
   end
@@ -240,7 +242,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should raise an error if invalid path is given to update_rates' do
-      proc { subject.update_rates }.must_raise Money::Bank::InvalidCache
+      _(proc { subject.update_rates }).must_raise Money::Bank::InvalidCache
     end
   end
 
@@ -259,14 +261,14 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should get from url normally' do
-      subject.oer_rates.wont_be_empty
+      _(subject.oer_rates).wont_be_empty
     end
 
     it 'should save from url and get from cache' do
-      @global_rates.wont_be_empty
+      _(@global_rates).wont_be_empty
       subject.expects(:source_url).never
       subject.update_rates
-      subject.oer_rates.wont_be_empty
+      _(subject.oer_rates).wont_be_empty
     end
   end
 
@@ -296,21 +298,21 @@ describe Money::Bank::OpenExchangeRatesBank do
       initial_size = File.read(temp_cache_path).size
       subject.stubs(:api_response).returns ''
       subject.refresh_rates
-      File.open(temp_cache_path).read.size.must_equal initial_size
+      _(File.open(temp_cache_path).read.size).must_equal initial_size
     end
 
     it 'should not break an existing file if save returns json without rates' do
       initial_size = File.read(temp_cache_path).size
       subject.stubs(:api_response).returns '{"error": "An error"}'
       subject.refresh_rates
-      File.open(temp_cache_path).read.size.must_equal initial_size
+      _(File.open(temp_cache_path).read.size).must_equal initial_size
     end
 
     it 'should not break an existing file if save returns a invalid json' do
       initial_size = File.read(temp_cache_path).size
       subject.stubs(:api_response).returns '{invalid_json: "An error"}'
       subject.refresh_rates
-      File.open(temp_cache_path).read.size.must_equal initial_size
+      _(File.open(temp_cache_path).read.size).must_equal initial_size
     end
   end
 
@@ -320,12 +322,12 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should be now when not updated from api' do
-      subject.rates_timestamp.must_be :>, Time.at(1_414_008_044)
+      _(subject.rates_timestamp).must_be :>, Time.at(1_414_008_044)
     end
 
     it 'should be set on update_rates' do
       subject.update_rates
-      subject.rates_timestamp.must_equal Time.at(1_414_008_044)
+      _(subject.rates_timestamp).must_equal Time.at(1_414_008_044)
     end
   end
 
@@ -353,21 +355,21 @@ describe Money::Bank::OpenExchangeRatesBank do
     describe 'when the ttl has expired' do
       it 'should update the rates' do
         Timecop.freeze(subject.rates_timestamp) do
-          subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+          _(subject.get_rate('USD', 'EUR')).must_equal @old_usd_eur_rate
         end
         Timecop.freeze(subject.rates_timestamp + (@ttl_in_seconds + 1)) do
-          subject.get_rate('USD', 'EUR').wont_equal @old_usd_eur_rate
-          subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
+          _(subject.get_rate('USD', 'EUR')).wont_equal @old_usd_eur_rate
+          _(subject.get_rate('USD', 'EUR')).must_equal @new_usd_eur_rate
         end
       end
 
       it 'should save rates' do
         Timecop.freeze(subject.rates_timestamp) do
-          subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+          _(subject.get_rate('USD', 'EUR')).must_equal @old_usd_eur_rate
         end
         Timecop.freeze(subject.rates_timestamp + (@ttl_in_seconds + 1)) do
-          subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
-          @global_rates.wont_be_empty
+          _(subject.get_rate('USD', 'EUR')).must_equal @new_usd_eur_rate
+          _(@global_rates).wont_be_empty
         end
       end
 
@@ -375,7 +377,7 @@ describe Money::Bank::OpenExchangeRatesBank do
         Timecop.freeze(subject.rates_timestamp + (@ttl_in_seconds + 1)) do
           exp_time = subject.rates_timestamp + @ttl_in_seconds
           subject.expire_rates
-          subject.rates_expiration.must_equal exp_time
+          _(subject.rates_expiration).must_equal exp_time
         end
       end
 
@@ -383,12 +385,12 @@ describe Money::Bank::OpenExchangeRatesBank do
         it 'should save rates and force refresh' do
           subject.force_refresh_rate_on_expire = true
           Timecop.freeze(subject.rates_timestamp) do
-            subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+            _(subject.get_rate('USD', 'EUR')).must_equal @old_usd_eur_rate
           end
           Timecop.freeze(Time.now + 1001) do
             @global_rates = []
-            subject.get_rate('USD', 'EUR').must_equal @new_usd_eur_rate
-            @global_rates.wont_be_empty
+            _(subject.get_rate('USD', 'EUR')).must_equal @new_usd_eur_rate
+            _(@global_rates).wont_be_empty
           end
         end
       end
@@ -401,7 +403,7 @@ describe Money::Bank::OpenExchangeRatesBank do
           subject.expects(:update_rates).never
           subject.expects(:refresh_rates_expiration).never
           subject.expire_rates
-          subject.rates_expiration.must_equal exp_time
+          _(subject.rates_expiration).must_equal exp_time
         end
       end
     end
@@ -418,11 +420,11 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should be different than the latest' do
-      subject.get_rate('USD', 'EUR').must_equal @latest_usd_eur_rate
+      _(subject.get_rate('USD', 'EUR')).must_equal @latest_usd_eur_rate
       subject.date = '2015-01-01'
       add_to_webmock(subject, oer_historical_path)
       subject.update_rates
-      subject.get_rate('USD', 'EUR').must_equal @old_usd_eur_rate
+      _(subject.get_rate('USD', 'EUR')).must_equal @old_usd_eur_rate
     end
   end
 
@@ -430,15 +432,15 @@ describe Money::Bank::OpenExchangeRatesBank do
     it 'should be changed when a known currency is given' do
       source = 'EUR'
       subject.source = source
-      subject.source.must_equal source
-      subject.source_url.must_include "base=#{source}"
+      _(subject.source).must_equal source
+      _(subject.source_url).must_include "base=#{source}"
     end
 
     it 'should use USD when given unknown currency' do
       source = 'invalid'
       subject.source = source
-      subject.source.must_equal default_source
-      subject.source_url.wont_include "base=#{default_source}"
+      _(subject.source).must_equal default_source
+      _(subject.source_url).wont_include "base=#{default_source}"
     end
   end
 
@@ -449,11 +451,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should return the default value' do
-        subject.prettyprint.must_equal true
+        _(subject.prettyprint).must_equal true
       end
 
       it 'should include prettyprint param as true' do
-        subject.source_url.must_include 'prettyprint=true'
+        _(subject.source_url).must_include 'prettyprint=true'
       end
     end
 
@@ -463,11 +465,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should return the value' do
-        subject.prettyprint.must_equal false
+        _(subject.prettyprint).must_equal false
       end
 
       it 'should include prettyprint param as false' do
-        subject.source_url.must_include 'prettyprint=false'
+        _(subject.source_url).must_include 'prettyprint=false'
       end
     end
   end
@@ -479,11 +481,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should return the default value' do
-        subject.show_alternative.must_equal false
+        _(subject.show_alternative).must_equal false
       end
 
       it 'should include show_alternative param as false' do
-        subject.source_url.must_include 'show_alternative=false'
+        _(subject.source_url).must_include 'show_alternative=false'
       end
     end
 
@@ -493,11 +495,11 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
 
       it 'should return the value' do
-        subject.show_alternative.must_equal true
+        _(subject.show_alternative).must_equal true
       end
 
       it 'should include show_alternative param as true' do
-        subject.source_url.must_include 'show_alternative=true'
+        _(subject.source_url).must_include 'show_alternative=true'
       end
     end
   end
