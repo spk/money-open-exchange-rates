@@ -142,12 +142,24 @@ describe Money::Bank::OpenExchangeRatesBank do
   end
 
   describe 'App ID' do
-    before do
-      subject.cache = temp_cache_path
+    describe 'nil' do
+      before do
+        subject.app_id = nil
+      end
+
+      it 'should raise an error if no App ID is set' do
+        proc { subject.update_rates }.must_raise Money::Bank::NoAppId
+      end
     end
 
-    it 'should raise an error if no App ID is set' do
-      proc { subject.update_rates }.must_raise Money::Bank::NoAppId
+    describe 'empty' do
+      before do
+        subject.app_id = ''
+      end
+
+      it 'should raise an error if no App ID is set' do
+        proc { subject.update_rates }.must_raise Money::Bank::NoAppId
+      end
     end
   end
 
