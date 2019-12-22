@@ -47,8 +47,14 @@ require 'money/bank/open_exchange_rates_bank'
 
 # Memory store per default; for others just pass as argument a class like
 # explained in https://github.com/RubyMoney/money#exchange-rate-stores
-oxr = Money::Bank::OpenExchangeRatesBank.new
+oxr = Money::Bank::OpenExchangeRatesBank.new(Money::RatesStore::Memory.new)
 oxr.app_id = 'your app id from https://openexchangerates.org/signup'
+
+# Update the rates for the current rates storage
+# If the storage is memory you will have to restart the server to be taken into
+# account.
+# If the storage is a database, file, this can be added to
+# crontab/worker/scheduler `Money.default_bank.update_rates`
 oxr.update_rates
 
 # (optional)
@@ -113,6 +119,8 @@ Money.default_bank.get_rate('USD', 'CAD')
 ``` ruby
 every :hour do
   runner "Money.default_bank.refresh_rates"
+  # you will have to restart the server if you are using memory rate store
+  runner "Money.default_bank.update_rates"
 end
 ```
 
@@ -120,9 +128,11 @@ end
 
 ``` ruby
 namespace :open_exchange_rates do
-  desc "Refresh rates when called"
+  desc "Refresh rates from cache and update rates"
   task :refresh_rates => :environment do
     Money.default_bank.refresh_rates
+    # you will have to restart the server if you are using memory rate store
+    Money.default_bank.update_rates
   end
 end
 ```
@@ -184,10 +194,14 @@ end
 oxr.app_id = ENV['OXR_API_KEY']
 oxr.show_alternative = true
 oxr.prettyprint = false
+
+# This can be removed is you have data to avoid http call on boot for production
 oxr.update_rates
 
 Money.default_bank = oxr
 ```
+
+See also how to [refresh and update rates](#refresh-rates)
 
 ### Tests
 
