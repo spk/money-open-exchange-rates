@@ -24,11 +24,10 @@ Gem::Specification.new do |s|
   s.rubygems_version = '1.3.7'
   s.add_dependency 'money', '~> 6.12'
   s.add_development_dependency 'minitest', '~> 5'
-  s.add_development_dependency 'minitest-focus', '~> 1'
   s.add_development_dependency 'mocha', '~> 1.2'
   s.add_development_dependency 'monetize', '>= 1.3.1', '< 2'
   s.add_development_dependency 'rake', '~> 12'
-  s.add_development_dependency 'rubocop', '~> 0.76'
+  s.add_development_dependency 'rubocop', '~> 0.76.0'
   s.add_development_dependency 'timecop', '~> 0.9'
   s.add_development_dependency 'webmock', '~> 3.5'
 end

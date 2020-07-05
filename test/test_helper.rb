@@ -8,7 +8,6 @@ rescue LoadError
 end
 
 require 'minitest/autorun'
-require 'minitest/focus'
 require 'mocha/minitest'
 require 'webmock/minitest'
 require 'money/bank/open_exchange_rates_bank'
