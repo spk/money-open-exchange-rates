@@ -1,7 +1,8 @@
+---
 before_script:
   - ruby -v
   - which ruby
-  - gem install bundler --no-ri --no-rdoc
+  - gem install bundler --no-document
   - bundle install --jobs $(nproc)  "${FLAGS[@]}"
 
 rspec:
