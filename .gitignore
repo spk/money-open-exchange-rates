@@ -1,6 +1,5 @@
-*.lock
 *.gem
-*.swp
+*.lock
 TEST_APP_ID
-test/integration/.bundle
 coverage
+test/integration/.bundle

@@ -30,15 +30,15 @@ gem 'money-open-exchange-rates'
 
 And then execute:
 
-~~~
+```
 bundle
-~~~
+```
 
 Or install it yourself as:
 
-~~~
+```
 gem install money-open-exchange-rates
-~~~
+```
 
 ## Usage
 
@@ -195,7 +195,7 @@ oxr.app_id = ENV['OXR_API_KEY']
 oxr.show_alternative = true
 oxr.prettyprint = false
 
-# This can be removed is you have data to avoid http call on boot for production
+# This can be removed if you have data to avoid http call on boot for production
 oxr.update_rates
 
 Money.default_bank = oxr
@@ -230,9 +230,9 @@ or using base currency rate to both currencies forming the pair.
 
 ## Tests
 
-~~~
+```
 bundle exec rake
-~~~
+```
 
 ## Refs
 
@@ -249,7 +249,7 @@ See [GitHub](https://github.com/spk/money-open-exchange-rates/graphs/contributor
 
 The MIT License
 
-Copyright © 2011-2019 Laurent Arnoud <laurent@spkdev.net>
+Copyright © 2011-2020 Laurent Arnoud <laurent@spkdev.net>
 
 ---
 [![Build](https://img.shields.io/travis/spk/money-open-exchange-rates.svg)](https://travis-ci.org/spk/money-open-exchange-rates)
