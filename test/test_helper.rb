@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 begin
-  require 'coveralls'
-  Coveralls.wear!
+  require 'simplecov'
+  SimpleCov.start
 rescue LoadError
-  warn 'coveralls not loaded'
+  warn 'simplecov not loaded'
 end
 
 require 'minitest/autorun'

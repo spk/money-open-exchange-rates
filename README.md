@@ -252,9 +252,9 @@ The MIT License
 Copyright © 2011-2020 Laurent Arnoud <laurent@spkdev.net>
 
 ---
-[![Build](https://img.shields.io/travis/spk/money-open-exchange-rates.svg)](https://travis-ci.org/spk/money-open-exchange-rates)
+[![Build](https://img.shields.io/gitlab/pipeline/spkdev/money-open-exchange-rates/master)](https://gitlab.com/spkdev/money-open-exchange-rates/-/commits/master)
+[![Coverage](https://gitlab.com/spkdev/money-open-exchange-rates/badges/master/coverage.svg)](https://gitlab.com/spkdev/money-open-exchange-rates/-/commits/master)
 [![Version](https://img.shields.io/gem/v/money-open-exchange-rates.svg)](https://rubygems.org/gems/money-open-exchange-rates)
 [![Documentation](https://img.shields.io/badge/doc-rubydoc-blue.svg)](http://www.rubydoc.info/gems/money-open-exchange-rates)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT "MIT")
-[![Coverage Status](https://img.shields.io/coveralls/github/spk/money-open-exchange-rates.svg)](https://coveralls.io/github/spk/money-open-exchange-rates?branch=master)
 [![Inline docs](https://inch-ci.org/github/spk/money-open-exchange-rates.svg?branch=master)](http://inch-ci.org/github/spk/money-open-exchange-rates)

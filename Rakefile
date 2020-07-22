@@ -3,8 +3,7 @@
 require 'rake/testtask'
 require 'rubocop/rake_task'
 
-default = %i[test]
-default << :rubocop unless RUBY_ENGINE == 'rbx'
+default = %i[test rubocop]
 task default: default
 
 Rake::TestTask.new do |t|
