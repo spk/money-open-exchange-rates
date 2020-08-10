@@ -6,13 +6,6 @@ default:
     - gem install bundler --no-document
     - bundle install --jobs $(nproc)  "${FLAGS[@]}"
 
-test:2.3:
-  image: 'ruby:2.3'
-  script:
-    - bundle exec rake
-    - cd test/integration && bundle install
-    - bundle exec ruby api.rb
-
 test:2.4:
   image: 'ruby:2.4'
   script:
