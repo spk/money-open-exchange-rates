@@ -1,4 +1,8 @@
 ---
+stages:
+  - test
+  - coverage
+
 default:
   before_script:
     - ruby -v
@@ -6,40 +10,38 @@ default:
     - gem install bundler --no-document
     - bundle install --jobs $(nproc)  "${FLAGS[@]}"
 
-test:2.4:
-  image: 'ruby:2.4'
+.tests:
   script:
     - bundle exec rake
     - cd test/integration && bundle install
     - bundle exec ruby api.rb
+  stage: test
+
+test:2.4:
+  extends: .tests
+  image: 'ruby:2.4'
 
 test:2.5:
+  extends: .tests
   image: 'ruby:2.5'
-  script:
-    - bundle exec rake
-    - cd test/integration && bundle install
-    - bundle exec ruby api.rb
 
 test:2.6:
+  extends: .tests
   image: 'ruby:2.6'
-  script:
-    - bundle exec rake
-    - cd test/integration && bundle install
-    - bundle exec ruby api.rb
 
 test:2.7:
+  extends: .tests
+  image: 'ruby:2.7'
+
+test:jruby:
+  extends: .tests
+  image: 'jruby:9.2.12-jre'
+
+coverage:
   image: 'ruby:2.7'
   script:
-    - bundle exec rake
-    - cd test/integration && bundle install
-    - bundle exec ruby api.rb
+    - bundle exec rake test
   artifacts:
     paths:
       - coverage/
-
-test:jruby:
-  image: 'jruby:9.2.12-jre'
-  script:
-    - bundle exec rake
-    - cd test/integration && bundle install
-    - bundle exec ruby api.rb
+  stage: coverage
