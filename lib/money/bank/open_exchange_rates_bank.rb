@@ -182,6 +182,7 @@ class Money
           set_rate(source, currency, rate)
           set_rate(currency, source, 1.0 / rate)
         end
+        clear_calculated_pair_rates!
       end
 
       # Alias super method
@@ -413,6 +414,17 @@ class Money
         rate = BigDecimal(to_base_rate.to_s) / from_base_rate
         add_rate(from_currency, to_currency, rate)
         rate
+      end
+
+      # Clears calculated rates in store
+      #
+      # @return [Hash] All rates from store as Hash
+      def clear_calculated_pair_rates!
+        store.each_rate do |iso_from, iso_to|
+          next if iso_from == source || iso_to == source
+
+          add_rate(iso_from, iso_to, nil)
+        end
       end
     end
   end
