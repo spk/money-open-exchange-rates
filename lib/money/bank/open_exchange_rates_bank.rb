@@ -325,7 +325,7 @@ class Money
         result = if cache.is_a?(Proc)
                    cache.call(nil)
                  elsif File.exist?(cache.to_s)
-                   File.open(cache).read
+                   File.read(cache)
                  end
         result if valid_rates?(result)
       end
