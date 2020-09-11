@@ -35,7 +35,7 @@ test:2.7:
 
 test:jruby:
   extends: .tests
-  image: 'jruby:9.2.12-jre'
+  image: 'jruby:9.2-jre'
 
 coverage:
   image: 'ruby:2.7'

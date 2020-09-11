@@ -412,10 +412,10 @@ describe Money::Bank::OpenExchangeRatesBank do
   describe 'historical' do
     before do
       add_to_webmock(subject)
-      # see test/latest.json +52
+      # see test/data/latest.json +52
       @latest_usd_eur_rate = 0.79085
       @latest_chf_eur_rate = 0.830792859
-      # see test/2015-01-01.json +52
+      # see test/data/2015-01-01.json +52
       @old_usd_eur_rate = 0.830151
       @old_chf_eur_rate = 0.832420177
       subject.update_rates
@@ -430,11 +430,13 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should update cross courses' do
-      _(subject.get_rate('CHF', 'EUR')).must_equal @latest_chf_eur_rate
+      _(subject.get_rate('CHF', 'EUR').round(9).to_f)
+        .must_equal @latest_chf_eur_rate
       subject.date = '2015-01-01'
       add_to_webmock(subject, oer_historical_path)
       subject.update_rates
-      _(subject.get_rate('CHF', 'EUR')).must_equal @old_chf_eur_rate
+      _(subject.get_rate('CHF', 'EUR').round(9).to_f)
+        .must_equal @old_chf_eur_rate
     end
   end
 
