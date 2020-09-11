@@ -430,7 +430,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should update cross courses' do
-      subject.get_rate('CHF', 'EUR').must_equal @latest_chf_eur_rate
+      _(subject.get_rate('CHF', 'EUR')).must_equal @latest_chf_eur_rate
       subject.date = '2015-01-01'
       add_to_webmock(subject, oer_historical_path)
       subject.update_rates
