@@ -1,4 +1,30 @@
 
+1.4.0 / 2020-09-11
+==================
+
+  * Fix jruby test for cross courses
+  * Fix deprecation global use of must_equal
+  * Merge pull request #66 from @korun / clear-cross-courses
+    * Update rates inside transaction, to prevent RC issues
+  * Merge pull request #65 from @korun / ensure-file-closed
+    * Fix unclosed file descriptor after read_from_cache
+  * Merge pull request #64 from @anton-smagin / clear-cross-courses
+    * Set old rates to nil on #update_rates before set new one to expire pair rates using base
+  * Add coverage stage on ci
+  * Remove Ruby 2.3 support
+  * Switch to gitlab ci
+  * Update README
+  * Fix rubocop to 0.76.0 and remove minitest-focus
+  * Update gitlab ci gem install does not have --no-ri anymore
+  * README add more doc about update_rates
+  * Fix deprecation for minitest 6
+  * Fix flaky test about Money::Bank::NoAppId
+  * Support Pathname for cache
+  * Update rubocop to 0.76
+  * Remove Ruby 2.2 support and update rubocop
+  * Update travis list
+  * README: improve refresh doc
+
 1.3.0 / 2019-01-20
 ==================
 
