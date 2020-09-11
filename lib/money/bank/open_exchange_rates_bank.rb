@@ -174,15 +174,17 @@ class Money
       #
       # @return [Array] Array of exchange rates
       def update_rates
-        exchange_rates.each do |exchange_rate|
-          rate = exchange_rate.last
-          currency = exchange_rate.first
-          next unless Money::Currency.find(currency)
+        store.transaction do
+          clear_rates!
+          exchange_rates.each do |exchange_rate|
+            rate = exchange_rate.last
+            currency = exchange_rate.first
+            next unless Money::Currency.find(currency)
 
-          set_rate(source, currency, rate)
-          set_rate(currency, source, 1.0 / rate)
+            set_rate(source, currency, rate)
+            set_rate(currency, source, 1.0 / rate)
+          end
         end
-        clear_calculated_pair_rates!
       end
 
       # Alias super method
@@ -416,13 +418,11 @@ class Money
         rate
       end
 
-      # Clears calculated rates in store
+      # Clears cached rates in store
       #
       # @return [Hash] All rates from store as Hash
-      def clear_calculated_pair_rates!
+      def clear_rates!
         store.each_rate do |iso_from, iso_to|
-          next if iso_from == source || iso_to == source
-
           add_rate(iso_from, iso_to, nil)
         end
       end
