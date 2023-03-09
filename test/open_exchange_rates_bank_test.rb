@@ -103,7 +103,7 @@ describe Money::Bank::OpenExchangeRatesBank do
       subject.cache = nil
       filepath = oer_access_restricted_error_path
       subject.stubs(:api_response).returns File.read(filepath)
-      (proc { subject.update_rates }).must_raise Money::Bank::AccessRestricted
+      _(proc { subject.update_rates }).must_raise Money::Bank::AccessRestricted
     end
 
     it 'should update itself with exchange rates from OpenExchangeRates' do
