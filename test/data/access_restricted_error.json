@@ -1,0 +1,6 @@
+{
+  "error": true,
+  "status": 429,
+  "message": "access_restricted",
+  "description": "Access restricted until 2050-01-01 (reason: too_many_requests). If there has been a mistake, please contact support@openexchangerates.org."
+}

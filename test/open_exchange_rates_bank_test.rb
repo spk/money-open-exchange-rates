@@ -25,6 +25,9 @@ describe Money::Bank::OpenExchangeRatesBank do
   let(:oer_historical_path) do
     data_file('2015-01-01.json')
   end
+  let(:oer_access_restricted_error_path) do
+    data_file('access_restricted_error.json')
+  end
 
   describe 'exchange' do
     before do
@@ -94,6 +97,13 @@ describe Money::Bank::OpenExchangeRatesBank do
       subject.app_id = TEST_APP_ID
       subject.cache = oer_latest_path
       subject.update_rates
+    end
+
+    it 'should raise AccessRestricted error when restricted by oer' do
+      subject.cache = nil
+      filepath = oer_access_restricted_error_path
+      subject.stubs(:api_response).returns File.read(filepath)
+      _(proc { subject.update_rates }).must_raise Money::Bank::AccessRestricted
     end
 
     it 'should update itself with exchange rates from OpenExchangeRates' do

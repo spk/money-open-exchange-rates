@@ -17,6 +17,9 @@ class Money
     # APP_ID not set error
     class NoAppId < StandardError; end
 
+    # Access restricted (e.g. usage/request limit exceeded for account)
+    class AccessRestricted < StandardError; end
+
     # OpenExchangeRatesBank base class
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
       VERSION = ::OpenExchangeRatesBank::VERSION
@@ -371,6 +374,10 @@ class Money
       # @return [Hash] key is country code (ISO 3166-1 alpha-3) value Float
       def exchange_rates
         doc = JSON.parse(read_from_cache || read_from_url)
+        if doc['error'] && doc['message'] == 'access_restricted'
+          raise AccessRestricted
+        end
+
         self.rates_timestamp = doc[TIMESTAMP_KEY]
         @oer_rates = doc[RATES_KEY]
       end
