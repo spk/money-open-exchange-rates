@@ -305,13 +305,11 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should allow update after save' do
-      begin
-        subject.refresh_rates
-        # rubocop:disable Style/RescueStandardError
-      rescue
-        # rubocop:enable Style/RescueStandardError
-        assert false, 'Should allow updating after saving'
-      end
+      subject.refresh_rates
+      # rubocop:disable Style/RescueStandardError
+    rescue
+      # rubocop:enable Style/RescueStandardError
+      assert false, 'Should allow updating after saving'
     end
 
     it 'should not break an existing file if save fails to read' do
