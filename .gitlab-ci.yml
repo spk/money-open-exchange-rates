@@ -25,6 +25,10 @@ test:2.7:
   extends: .tests
   image: 'ruby:2.7'
 
+test:3.0:
+  extends: .tests
+  image: 'ruby:3.0'
+
 test:3.1:
   extends: .tests
   image: 'ruby:3.1'
