@@ -1,4 +1,11 @@
 
+1.4.1 / 2023-05-07
+==================
+
+  * Merge pull request #69 from @fuentesjr / identify-access-restricted-errors
+    * Fixing typo in scoping of must_raise in access restricted test
+    * Raise a new AccessRestricted error when account is restricted by oer
+
 1.4.0 / 2020-09-11
 ==================
 
