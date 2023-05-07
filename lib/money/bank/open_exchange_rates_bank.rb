@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-require 'net/http'
-require 'uri'
-require 'money'
 require 'json'
+require 'money'
+require 'net/http'
+require 'time'
+require 'uri'
 require File.expand_path('../../open_exchange_rates_bank/version', __dir__)
 
 # Money gem class
@@ -19,6 +20,14 @@ class Money
 
     # Access restricted (e.g. usage/request limit exceeded for account)
     class AccessRestricted < StandardError; end
+
+    # app_id_inactive
+    class AppIdInactive < StandardError; end
+
+    ERROR_MAP = {
+      access_restricted: AccessRestricted,
+      app_id_inactive: AppIdInactive
+    }.freeze
 
     # OpenExchangeRatesBank base class
     class OpenExchangeRatesBank < Money::Bank::VariableExchange
@@ -374,8 +383,8 @@ class Money
       # @return [Hash] key is country code (ISO 3166-1 alpha-3) value Float
       def exchange_rates
         doc = JSON.parse(read_from_cache || read_from_url)
-        if doc['error'] && doc['message'] == 'access_restricted'
-          raise AccessRestricted
+        if doc['error'] && ERROR_MAP.key?(doc['message'].to_sym)
+          raise ERROR_MAP[doc['message'].to_sym]
         end
 
         self.rates_timestamp = doc[TIMESTAMP_KEY]

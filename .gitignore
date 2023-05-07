@@ -3,3 +3,4 @@
 TEST_APP_ID
 coverage
 test/integration/.bundle
+test/data/tmp.json

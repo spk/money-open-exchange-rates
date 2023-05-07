@@ -1,4 +1,6 @@
 # frozen_string_literal: true
 
+source 'https://rubygems.org'
+
 gem 'money', '~> 6.7'
 gem 'money-open-exchange-rates', path: '../../'

@@ -20,8 +20,7 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
   s.test_files = Dir.glob('test/*_test.rb')
   s.require_paths = ['lib']
-  s.required_ruby_version = '>= 2.4'
-  s.rubygems_version = '1.3.7'
+  s.required_ruby_version = '>= 2.6'
   s.add_dependency 'money', '~> 6.12'
   s.add_development_dependency 'minitest', '~> 5'
   s.add_development_dependency 'mocha', '~> 1.2'

@@ -28,6 +28,9 @@ describe Money::Bank::OpenExchangeRatesBank do
   let(:oer_access_restricted_error_path) do
     data_file('access_restricted_error.json')
   end
+  let(:oer_app_id_inactive_error_path) do
+    data_file('app_id_inactive.json')
+  end
 
   describe 'exchange' do
     before do
@@ -104,6 +107,13 @@ describe Money::Bank::OpenExchangeRatesBank do
       filepath = oer_access_restricted_error_path
       subject.stubs(:api_response).returns File.read(filepath)
       _(proc { subject.update_rates }).must_raise Money::Bank::AccessRestricted
+    end
+
+    it 'should raise AppIdInactive error when restricted by oer' do
+      subject.cache = nil
+      filepath = oer_app_id_inactive_error_path
+      subject.stubs(:api_response).returns File.read(filepath)
+      _(proc { subject.update_rates }).must_raise Money::Bank::AppIdInactive
     end
 
     it 'should update itself with exchange rates from OpenExchangeRates' do
