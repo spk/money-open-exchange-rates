@@ -249,7 +249,7 @@ See [GitHub](https://github.com/spk/money-open-exchange-rates/graphs/contributor
 
 The MIT License
 
-Copyright © 2011-2020 Laurent Arnoud <laurent@spkdev.net>
+Copyright © 2011-2023 Laurent Arnoud <laurent@spkdev.net>
 
 ---
 [![Build](https://img.shields.io/gitlab/pipeline/spkdev/money-open-exchange-rates/master)](https://gitlab.com/spkdev/money-open-exchange-rates/-/commits/master)
