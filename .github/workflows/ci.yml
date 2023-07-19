@@ -9,6 +9,7 @@ on:
 
 jobs:
   test:
+    name: "Ruby ${{ matrix.ruby }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -21,13 +22,13 @@ jobs:
           - head
           - jruby-9.4
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
           ruby-version: ${{ matrix.ruby }}
       - name: Install dependencies
-        run: bundle install -j 3
+        run: bundle install -j $(getconf _NPROCESSORS_ONLN) --retry 3
       - name: Run tests
         run: bundle exec rake
