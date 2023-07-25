@@ -1,4 +1,17 @@
 
+1.4.2 / 2023-07-25
+==================
+
+  * gitlab: Ruby 3.2 in, 2.6 out
+  * Merge pull request #70 from @swiknaba / master
+    * CI: nicer name, latest versions of Github actions
+    * CI: Ruby 3.2 in, 2.6 out
+  * Bump year
+  * Update jruby version
+  * Update rubocop target ruby version
+  * Update Rubies on CIs
+  * Handle AppIdInactive error
+
 1.4.1 / 2023-05-07
 ==================
 
