@@ -7,6 +7,7 @@ rescue LoadError
   warn 'simplecov not loaded'
 end
 
+require 'minitest/unit'
 require 'minitest/autorun'
 require 'mocha/minitest'
 require 'webmock/minitest'
