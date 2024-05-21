@@ -24,6 +24,8 @@ class Money
     # app_id_inactive
     class AppIdInactive < StandardError; end
 
+    class NoRateError < StandardError; end
+
     ERROR_MAP = {
       access_restricted: AccessRestricted,
       app_id_inactive: AppIdInactive
@@ -62,6 +64,8 @@ class Money
       # @param [String,Proc] for a String a filepath
       # @return [String,Proc] for a String a filepath
       attr_accessor :cache
+
+      attr_accessor :fetch_bid_ask_rates
 
       # Date for historical api
       # see https://docs.openexchangerates.org/docs/historical-json
@@ -189,14 +193,22 @@ class Money
         store.transaction do
           clear_rates!
           exchange_rates.each do |exchange_rate|
-            rate = exchange_rate.last
             currency = exchange_rate.first
-            next unless Money::Currency.find(currency)
+            details = exchange_rate.last
+            unless Money::Currency.find(currency) && details['rate'].is_a?(Numeric)
+              next
+            end
 
+            rate = details['rate'].to_f
             set_rate(source, currency, rate)
-            set_rate(currency, source, 1.0 / rate)
+            set_rate(currency, source, 1.0 / rate) if rate != 0
           end
         end
+      end
+
+      def initialize
+        super
+        @fetch_bid_ask_rates = false # Default to not fetching bid/ask unless explicitly enabled
       end
 
       # Alias super method
@@ -208,18 +220,87 @@ class Money
       # @param [String] to_currency Currency ISO code. ex. 'CAD'
       #
       # @return [Numeric] rate.
+      # Override to include options for fetching bid and ask rates
       def get_rate(from_currency, to_currency, opts = {})
-        super if opts[:call_super]
-        expire_rates
-        rate = get_rate_or_calc_inverse(from_currency, to_currency, opts)
-        rate || calc_pair_rate_using_base(from_currency, to_currency, opts)
+        rate_key = case opts[:rate_type]
+                   when :bid then "#{to_currency}_bid"
+                   when :ask then "#{to_currency}_ask"
+                   else to_currency
+                   end
+        rate = store.get_rate(from_currency, rate_key)
+        puts "Fetching rate for #{from_currency} to #{rate_key}: #{rate}" # Debug output
+        unless rate
+          raise Money::Bank::NoRateError, "No #{opts[:rate_type]} rate available for #{from_currency} to #{to_currency}"
+        end
+
+        rate
       end
 
       # Fetch from url and save cache
       #
       # @return [Array] Array of exchange rates
       def refresh_rates
-        read_from_url
+        api_url = custom_api_endpoint || build_api_url
+        response = fetch_rates_from_api(api_url)
+        parse_and_store_data(response) if valid_rates?(response)
+      end
+
+      def build_api_url
+        base_endpoint = fetch_bid_ask_rates ? 'with-bid-ask.json' : 'latest.json'
+        url = URI.join(BASE_URL, base_endpoint)
+        url += "?app_id=#{app_id}&base=#{source}"
+        url += "&symbols=#{symbols.join(',')}" if symbols
+        url
+      end
+
+      # New method to parse and store bid and ask rates along with the normal rates
+      def parse_and_store_data(json_response)
+        data = JSON.parse(json_response)
+        puts "Parsed data: #{data}" # Debugging output
+        return unless data[RATES_KEY] && data[TIMESTAMP_KEY] # Ensure necessary keys exist
+
+        store.transaction do
+          clear_rates!
+          data[RATES_KEY].each do |currency, details|
+            unless Money::Currency.find(currency) && valid_rate_details?(details)
+              next
+            end
+
+            rate = details['rate'].to_f
+            set_rate(source, currency, rate)
+            set_rate(currency, source, 1.0 / rate) if rate != 0
+            if fetch_bid_ask_rates && details['bid'] && details['ask']
+              set_bid_ask_rates(currency, details['bid'].to_f, details['ask'].to_f)
+            end
+          end
+        end
+      end
+
+      def valid_rate_details?(details)
+        details['rate'].is_a?(Numeric) && (!fetch_bid_ask_rates || (details['bid'].is_a?(Numeric) && details['ask'].is_a?(Numeric)))
+      end
+
+      # Method to store bid and ask rates
+      def set_bid_ask_rates(currency, bid, ask)
+        puts "Attempting to store rates for #{currency}: bid=#{bid}, ask=#{ask}"
+        bid_key = "#{currency}_bid"
+        ask_key = "#{currency}_ask"
+
+        # Store bid rate
+        store.add_rate(source, bid_key, bid)
+        stored_bid = store.get_rate(source, bid_key)
+        puts "Stored bid rate for #{bid_key}: #{stored_bid}"
+        unless bid == stored_bid
+          raise "Failed to store bid rate for #{currency}. Expected: #{bid}, got: #{stored_bid}"
+        end
+
+        # Store ask rate
+        store.add_rate(source, ask_key, ask)
+        stored_ask = store.get_rate(source, ask_key)
+        puts "Stored ask rate for #{ask_key}: #{stored_ask}"
+        unless ask == stored_ask
+          raise "Failed to store ask rate for #{currency}. Expected: #{ask}, got: #{stored_ask}"
+        end
       end
 
       # Alias refresh_rates method
@@ -373,7 +454,9 @@ class Money
         return false unless text
 
         parsed = JSON.parse(text)
-        parsed&.key?(RATES_KEY) && parsed&.key?(TIMESTAMP_KEY)
+        valid = parsed.key?(RATES_KEY) && parsed.key?(TIMESTAMP_KEY)
+        valid &&= parsed[RATES_KEY].all? { |_, v| v.key?('rate') && (!fetch_bid_ask_rates || (v.key?('bid') && v.key?('ask'))) }
+        valid
       rescue JSON::ParserError
         false
       end
