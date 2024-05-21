@@ -247,11 +247,15 @@ class Money
 
       def build_api_url
         base_endpoint = fetch_bid_ask_rates ? 'with-bid-ask.json' : 'latest.json'
-        url = URI.join(BASE_URL, base_endpoint)
-        url += "?app_id=#{app_id}&base=#{source}"
-        url += "&symbols=#{symbols.join(',')}" if symbols
-        url
+        uri = URI.join(BASE_URL, base_endpoint)
+        uri.query = URI.encode_www_form({
+          app_id: app_id,
+          base: source,
+          symbols: symbols.join(',')
+        }.reject { |_, v| v.nil? || v.empty? }) # Ensures no nil or empty parameters are included
+        uri.to_s
       end
+      
 
       def custom_api_endpoint
         # If you have a custom endpoint, return it here
@@ -260,12 +264,14 @@ class Money
       end
 
       def fetch_rates_from_api(url)
-        uri = URI.parse(url)
+        uri = URI(url) # Make sure it is converted to a URI object properly
         response = Net::HTTP.get_response(uri)
-        response.body if response.is_a?(Net::HTTPSuccess)
+        raise "API request failed: #{response.message}" unless response.is_a?(Net::HTTPSuccess)
+        response.body
       rescue => e
         raise "Failed to fetch rates from API: #{e.message}"
       end
+      
 
 
 
