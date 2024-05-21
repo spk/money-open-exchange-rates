@@ -246,16 +246,19 @@ class Money
         parse_and_store_data(response) if valid_rates?(response)
       end
 
+
       def build_api_url
-        base_endpoint = fetch_bid_ask_rates ? 'with-bid-ask.json' : 'latest.json'
+        base_endpoint = 'latest.json'  # Use the latest.json endpoint
         uri = URI.join(BASE_URL, base_endpoint)
         uri.query = URI.encode_www_form({
           app_id: app_id,
           base: source,
-          symbols: (symbols || []).join(',')  # Provides an empty array as default if `symbols` is nil
+          symbols: (symbols || []).join(','),
+          show_bid_ask: fetch_bid_ask_rates ? 1 : nil  # Add show_bid_ask parameter
         }.reject { |_, v| v.nil? || v.empty? })  # Ensures no nil or empty parameters are included
         uri.to_s
       end
+      
       
       
 
@@ -280,25 +283,32 @@ class Money
       # New method to parse and store bid and ask rates along with the normal rates
       def parse_and_store_data(json_response)
         data = JSON.parse(json_response)
-        puts "Parsed data: #{data}" # Debugging output
-        return unless data[RATES_KEY] && data[TIMESTAMP_KEY] # Ensure necessary keys exist
-
+        puts "Parsed data: #{data}"  # Debugging output
+        return unless data[RATES_KEY] && data[TIMESTAMP_KEY]  # Ensure necessary keys exist
+      
         store.transaction do
           clear_rates!
           data[RATES_KEY].each do |currency, details|
             unless Money::Currency.find(currency) && valid_rate_details?(details)
               next
             end
-
-            rate = details['rate'].to_f
-            set_rate(source, currency, rate)
-            set_rate(currency, source, 1.0 / rate) if rate != 0
-            if fetch_bid_ask_rates && details['bid'] && details['ask']
-              set_bid_ask_rates(currency, details['bid'].to_f, details['ask'].to_f)
+      
+            if details.is_a?(Hash)
+              rate = details['mid'].to_f  # Use 'mid' for the regular rate
+              set_rate(source, currency, rate)
+              set_rate(currency, source, 1.0 / rate) if rate != 0
+              if fetch_bid_ask_rates && details['bid'] && details['ask']
+                set_bid_ask_rates(currency, details['bid'].to_f, details['ask'].to_f)
+              end
+            else
+              rate = details.to_f
+              set_rate(source, currency, rate)
+              set_rate(currency, source, 1.0 / rate) if rate != 0
             end
           end
         end
       end
+      
 
       def valid_rate_details?(details)
         details['rate'].is_a?(Numeric) && (!fetch_bid_ask_rates || (details['bid'].is_a?(Numeric) && details['ask'].is_a?(Numeric)))
