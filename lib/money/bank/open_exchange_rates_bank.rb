@@ -209,6 +209,7 @@ class Money
       def initialize
         super
         @fetch_bid_ask_rates = false # Default to not fetching bid/ask unless explicitly enabled
+        @symbols = [] 
       end
 
       # Alias super method
@@ -251,10 +252,11 @@ class Money
         uri.query = URI.encode_www_form({
           app_id: app_id,
           base: source,
-          symbols: symbols.join(',')
-        }.reject { |_, v| v.nil? || v.empty? }) # Ensures no nil or empty parameters are included
+          symbols: (symbols || []).join(',')  # Provides an empty array as default if `symbols` is nil
+        }.reject { |_, v| v.nil? || v.empty? })  # Ensures no nil or empty parameters are included
         uri.to_s
       end
+      
       
 
       def custom_api_endpoint
