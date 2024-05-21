@@ -195,17 +195,30 @@ class Money
           exchange_rates.each do |exchange_rate|
             currency = exchange_rate.first
             details = exchange_rate.last
-            unless Money::Currency.find(currency) && details['rate'].is_a?(Numeric)
+      
+            # Handling different formats of rate details
+            if details.is_a?(Hash)
+              # Check if it has 'rate', 'bid', and 'ask' and process accordingly
+              rate = details['rate'] || details['mid']
+              rate = rate.to_f if rate
+              bid = details['bid'].to_f if fetch_bid_ask_rates && details['bid']
+              ask = details['ask'].to_f if fetch_bid_ask_rates && details['ask']
+            elsif details.is_a?(Numeric)
+              rate = details.to_f
+            else
               next
             end
-
-            rate = details['rate'].to_f
-            set_rate(source, currency, rate)
+      
+            set_rate(source, currency, rate) if rate
             set_rate(currency, source, 1.0 / rate) if rate != 0
+      
+            if fetch_bid_ask_rates && bid && ask
+              set_bid_ask_rates(currency, bid, ask)
+            end
           end
         end
       end
-
+      
       def initialize
         super
         @fetch_bid_ask_rates = false # Default to not fetching bid/ask unless explicitly enabled
