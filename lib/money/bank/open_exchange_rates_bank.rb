@@ -292,10 +292,6 @@ class Money
         store.transaction do
           clear_rates!
           data[RATES_KEY].each do |currency, details|
-            unless Money::Currency.find(currency) && valid_rate_details?(details)
-              next
-            end
-      
             if details.is_a?(Hash)
               rate = details['mid'].to_f  # Use 'mid' for the regular rate
               set_rate(source, currency, rate)
@@ -303,7 +299,7 @@ class Money
               if fetch_bid_ask_rates && details['bid'] && details['ask']
                 set_bid_ask_rates(currency, details['bid'].to_f, details['ask'].to_f)
               end
-            else
+            elsif details.is_a?(Numeric)
               rate = details.to_f
               set_rate(source, currency, rate)
               set_rate(currency, source, 1.0 / rate) if rate != 0
@@ -311,6 +307,7 @@ class Money
           end
         end
       end
+      
       
 
       def valid_rate_details?(details)
