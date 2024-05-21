@@ -253,6 +253,12 @@ class Money
         url
       end
 
+      def custom_api_endpoint
+        # If you have a custom endpoint, return it here
+        # For now, returning nil will ensure it defaults to build_api_url
+        nil
+      end
+
       # New method to parse and store bid and ask rates along with the normal rates
       def parse_and_store_data(json_response)
         data = JSON.parse(json_response)
