@@ -259,6 +259,16 @@ class Money
         nil
       end
 
+      def fetch_rates_from_api(url)
+        uri = URI.parse(url)
+        response = Net::HTTP.get_response(uri)
+        response.body if response.is_a?(Net::HTTPSuccess)
+      rescue => e
+        raise "Failed to fetch rates from API: #{e.message}"
+      end
+
+
+
       # New method to parse and store bid and ask rates along with the normal rates
       def parse_and_store_data(json_response)
         data = JSON.parse(json_response)
