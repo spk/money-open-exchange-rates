@@ -246,18 +246,21 @@ class Money
         parse_and_store_data(response) if valid_rates?(response)
       end
 
-
       def build_api_url
         base_endpoint = 'latest.json'  # Use the latest.json endpoint
         uri = URI.join(BASE_URL, base_endpoint)
-        uri.query = URI.encode_www_form({
+        query_params = {
           app_id: app_id,
           base: source,
           symbols: (symbols || []).join(','),
           show_bid_ask: fetch_bid_ask_rates ? 1 : nil  # Add show_bid_ask parameter
-        }.reject { |_, v| v.nil? || v.empty? })  # Ensures no nil or empty parameters are included
+        }
+      
+        # Filter out nil values but leave the integer 1 for show_bid_ask
+        uri.query = URI.encode_www_form(query_params.reject { |_, v| v.nil? })
         uri.to_s
       end
+      
       
       
       
