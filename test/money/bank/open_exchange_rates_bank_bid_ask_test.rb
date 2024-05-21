@@ -25,7 +25,7 @@ class OpenExchangeRatesBankBidAskTest < Minitest::Test
       timestamp: Time.now.to_i
     }.to_json
 
-    stub_request(:get, 'https://openexchangerates.org/api/latest.json?app_id=test_app_id&prettyprint=true&show_alternative=false')
+    stub_request(:get, 'https://openexchangerates.org/api/latest.json?app_id=test_app_id&prettyprint=true&show_alternative=false&symbols=')
       .to_return(status: 200, body: json_response)
 
     @bank.update_rates
