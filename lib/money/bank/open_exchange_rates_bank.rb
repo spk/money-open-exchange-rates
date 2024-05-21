@@ -294,8 +294,8 @@ class Money
           data[RATES_KEY].each do |currency, details|
             if details.is_a?(Hash)
               rate = details['mid'] || details['rate']
-              set_rate(source, currency, rate)
-              set_rate(currency, source, 1.0 / rate) if rate != 0
+              set_rate(source, currency, rate.to_f)
+              set_rate(currency, source, 1.0 / rate.to_f) if rate != 0
               if fetch_bid_ask_rates && details['bid'] && details['ask']
                 set_bid_ask_rates(currency, details['bid'].to_f, details['ask'].to_f)
               end
@@ -488,14 +488,17 @@ class Money
       # @return [Boolean] valid or not
       def valid_rates?(text)
         return false unless text
-
+      
         parsed = JSON.parse(text)
         valid = parsed.key?(RATES_KEY) && parsed.key?(TIMESTAMP_KEY)
-        valid &&= parsed[RATES_KEY].all? { |_, v| v.key?('rate') && (!fetch_bid_ask_rates || (v.key?('bid') && v.key?('ask'))) }
+        valid &&= parsed[RATES_KEY].all? do |_, v|
+          v.is_a?(Numeric) || (v.is_a?(Hash) && (v.key?('mid') || v.key?('rate')) && (!fetch_bid_ask_rates || (v.key?('bid') && v.key?('ask'))))
+        end
         valid
       rescue JSON::ParserError
         false
       end
+      
 
       # Get expire rates, first from cache and then from url
       #
