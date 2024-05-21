@@ -253,10 +253,10 @@ class Money
           app_id: app_id,
           base: source,
           symbols: (symbols || []).join(','),
-          show_bid_ask: fetch_bid_ask_rates ? 1 : nil  # Add show_bid_ask parameter
+          show_bid_ask: fetch_bid_ask_rates ? '1' : nil  # Add show_bid_ask parameter
         }
-      
-        # Filter out nil values but leave the integer 1 for show_bid_ask
+        
+        # Filter out nil values but leave the string '1' for show_bid_ask
         uri.query = URI.encode_www_form(query_params.reject { |_, v| v.nil? })
         uri.to_s
       end
@@ -293,7 +293,7 @@ class Money
           clear_rates!
           data[RATES_KEY].each do |currency, details|
             if details.is_a?(Hash)
-              rate = details['mid'].to_f  # Use 'mid' for the regular rate
+              rate = details['mid'] || details['rate']
               set_rate(source, currency, rate)
               set_rate(currency, source, 1.0 / rate) if rate != 0
               if fetch_bid_ask_rates && details['bid'] && details['ask']
@@ -309,11 +309,13 @@ class Money
       end
       
       
-
       def valid_rate_details?(details)
-        details['rate'].is_a?(Numeric) && (!fetch_bid_ask_rates || (details['bid'].is_a?(Numeric) && details['ask'].is_a?(Numeric)))
+        if details.is_a?(Hash)
+          details['rate'].is_a?(Numeric) || (fetch_bid_ask_rates && details['bid'].is_a?(Numeric) && details['ask'].is_a?(Numeric))
+        else
+          details.is_a?(Numeric)
+        end
       end
-
       # Method to store bid and ask rates
       def set_bid_ask_rates(currency, bid, ask)
         puts "Attempting to store rates for #{currency}: bid=#{bid}, ask=#{ask}"
