@@ -196,9 +196,10 @@ class Money
             currency = exchange_rate.first
             details = exchange_rate.last
       
-            # Handling different formats of rate details
+            # Skip the currency if it's not recognized by the Money gem
+            next unless Money::Currency.find(currency)
+      
             if details.is_a?(Hash)
-              # Check if it has 'rate', 'bid', and 'ask' and process accordingly
               rate = details['rate'] || details['mid']
               rate = rate.to_f if rate
               bid = details['bid'].to_f if fetch_bid_ask_rates && details['bid']
@@ -218,6 +219,7 @@ class Money
           end
         end
       end
+      
       
       def initialize
         super
