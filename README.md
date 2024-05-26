@@ -117,9 +117,28 @@ Money.default_bank = oxr
 Money.default_bank.get_rate('USD', 'CAD')
 ```
 
+
+
+## Fetching Bid and Ask Rates
+
+``` ruby
+
+Once fetch_bid_ask_rates is enabled, the system fetches these rates where available. This is particularly useful for applications that require a deeper understanding of the market, such as trading platforms or financial analysis tools.
+
+# Fetch the current bid rate for USD to EUR
+usd_to_eur_bid = Money.default_bank.get_rate('USD', 'EUR', { rate_type: :bid })
+
+# Fetch the current ask rate for USD to EUR
+usd_to_eur_ask = Money.default_bank.get_rate('USD', 'EUR', { rate_type: :ask })
+
+puts "Bid Rate: #{usd_to_eur_bid}, Ask Rate: #{usd_to_eur_ask}"
+
+```
+
 ## Refresh rates
 
 ### With [whenever](https://github.com/javan/whenever)
+
 
 ``` ruby
 every :hour do
