@@ -19,6 +19,7 @@ Check [api documentation](https://docs.openexchangerates.org/)
     `ttl_in_seconds` option is provided.
 * Support for black market and digital currency rates with `show_alternative`
     option.
+* Enhanced Currency Rates: Fetch and display both bid and ask rates, if enabled via the fetch_bid_ask_rates configuration. This allows for more precise financial operations.
 
 ## Installation
 
@@ -69,6 +70,10 @@ oxr.cache = 'path/to/file/cache.json'
 # `Money::Bank::OpenExchangeRatesBank` as argument not about `cache` option.
 # The base time is the timestamp fetched from API.
 oxr.ttl_in_seconds = 86400
+
+# (optional)
+# Enable fetching of bid and ask rates
+oxr.fetch_bid_ask_rates = true
 
 # (optional)
 # Set historical date of the rate
