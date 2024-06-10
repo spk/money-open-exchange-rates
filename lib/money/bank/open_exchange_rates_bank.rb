@@ -195,10 +195,9 @@ class Money
           exchange_rates.each do |exchange_rate|
             currency = exchange_rate.first
             details = exchange_rate.last
-      
             # Skip the currency if it's not recognized by the Money gem
             next unless Money::Currency.find(currency)
-      
+
             if details.is_a?(Hash)
               rate = details['rate'] || details['mid']
               rate = rate.to_f if rate
@@ -209,22 +208,17 @@ class Money
             else
               next
             end
-      
             set_rate(source, currency, rate) if rate
             set_rate(currency, source, 1.0 / rate) if rate != 0
-      
-            if fetch_bid_ask_rates && bid && ask
-              set_bid_ask_rates(currency, bid, ask)
-            end
+            set_bid_ask_rates(currency, bid, ask) if fetch_bid_ask_rates && bid && ask
           end
         end
       end
-      
-      
+
       def initialize
         super
         @fetch_bid_ask_rates = false # Default to not fetching bid/ask unless explicitly enabled
-        @symbols = [] 
+        @symbols = []
       end
 
       # Alias super method
@@ -237,19 +231,31 @@ class Money
       #
       # @return [Numeric] rate.
       # Override to include options for fetching bid and ask rates
-      def get_rate(from_currency, to_currency, opts = {})
-        rate_key = case opts[:rate_type]
-                   when :bid then "#{to_currency}_bid"
-                   when :ask then "#{to_currency}_ask"
-                   else to_currency
-                   end
-        rate = store.get_rate(from_currency, rate_key)
-        puts "Fetching rate for #{from_currency} to #{rate_key}: #{rate}" # Debug output
-        unless rate
-          raise Money::Bank::NoRateError, "No #{opts[:rate_type]} rate available for #{from_currency} to #{to_currency}"
+      # Assuming the existence of a method to get direct rates, let's define or refine it to handle cross rates:
+      def get_rate(from_currency, to_currency, _opts = {})
+        # First, try to get the direct rate
+        direct_rate = super_get_rate(from_currency, to_currency)
+        return direct_rate if direct_rate
+
+        # If the direct rate isn't available, calculate the cross rate via USD
+        return calculate_cross_rate(from_currency, to_currency) unless from_currency == 'USD' || to_currency == 'USD'
+
+        # Raise an error if no rate can be determined
+        raise Money::Bank::NoRateError, "No rate available for #{from_currency} to #{to_currency}"
+      end
+
+      # Helper method to calculate cross rates via USD
+      def calculate_cross_rate(from_currency, to_currency)
+        from_to_usd = super_get_rate(from_currency, 'USD')
+        usd_to_to = super_get_rate('USD', to_currency)
+
+        if from_to_usd && usd_to_to
+          cross_rate = from_to_usd * usd_to_to
+          store.add_rate(from_currency, to_currency, cross_rate) # Optionally cache this rate
+          return cross_rate
         end
 
-        rate
+        nil # Return nil if either rate is missing
       end
 
       # Fetch from url and save cache
@@ -262,23 +268,19 @@ class Money
       end
 
       def build_api_url
-        base_endpoint = 'latest.json'  # Use the latest.json endpoint
+        base_endpoint = 'latest.json' # Use the latest.json endpoint
         uri = URI.join(BASE_URL, base_endpoint)
         query_params = {
           app_id: app_id,
           base: source,
           symbols: (symbols || []).join(','),
-          show_bid_ask: fetch_bid_ask_rates ? '1' : nil  # Add show_bid_ask parameter
+          show_bid_ask: fetch_bid_ask_rates ? '1' : nil # Add show_bid_ask parameter
         }
-        
+
         # Filter out nil values but leave the string '1' for show_bid_ask
         uri.query = URI.encode_www_form(query_params.reject { |_, v| v.nil? })
         uri.to_s
       end
-      
-      
-      
-      
 
       def custom_api_endpoint
         # If you have a custom endpoint, return it here
@@ -290,20 +292,18 @@ class Money
         uri = URI(url) # Make sure it is converted to a URI object properly
         response = Net::HTTP.get_response(uri)
         raise "API request failed: #{response.message}" unless response.is_a?(Net::HTTPSuccess)
+
         response.body
-      rescue => e
+      rescue StandardError => e
         raise "Failed to fetch rates from API: #{e.message}"
       end
-      
-
-
 
       # New method to parse and store bid and ask rates along with the normal rates
       def parse_and_store_data(json_response)
         data = JSON.parse(json_response)
-        puts "Parsed data: #{data}"  # Debugging output
-        return unless data[RATES_KEY] && data[TIMESTAMP_KEY]  # Ensure necessary keys exist
-      
+        puts "Parsed data: #{data}" # Debugging output
+        return unless data[RATES_KEY] && data[TIMESTAMP_KEY] # Ensure necessary keys exist
+
         store.transaction do
           clear_rates!
           data[RATES_KEY].each do |currency, details|
@@ -322,8 +322,7 @@ class Money
           end
         end
       end
-      
-      
+
       def valid_rate_details?(details)
         if details.is_a?(Hash)
           details['rate'].is_a?(Numeric) || (fetch_bid_ask_rates && details['bid'].is_a?(Numeric) && details['ask'].is_a?(Numeric))
@@ -331,6 +330,7 @@ class Money
           details.is_a?(Numeric)
         end
       end
+
       # Method to store bid and ask rates
       def set_bid_ask_rates(currency, bid, ask)
         puts "Attempting to store rates for #{currency}: bid=#{bid}, ask=#{ask}"
@@ -341,17 +341,15 @@ class Money
         store.add_rate(source, bid_key, bid)
         stored_bid = store.get_rate(source, bid_key)
         puts "Stored bid rate for #{bid_key}: #{stored_bid}"
-        unless bid == stored_bid
-          raise "Failed to store bid rate for #{currency}. Expected: #{bid}, got: #{stored_bid}"
-        end
+        raise "Failed to store bid rate for #{currency}. Expected: #{bid}, got: #{stored_bid}" unless bid == stored_bid
 
         # Store ask rate
         store.add_rate(source, ask_key, ask)
         stored_ask = store.get_rate(source, ask_key)
         puts "Stored ask rate for #{ask_key}: #{stored_ask}"
-        unless ask == stored_ask
-          raise "Failed to store ask rate for #{currency}. Expected: #{ask}, got: #{stored_ask}"
-        end
+        return if ask == stored_ask
+
+        raise "Failed to store ask rate for #{currency}. Expected: #{ask}, got: #{stored_ask}"
       end
 
       # Alias refresh_rates method
@@ -399,10 +397,11 @@ class Money
       # @return [String] URL
       def source_url
         str = "#{oer_url}?app_id=#{app_id}"
-        str = "#{str}&base=#{source}" unless source == OE_SOURCE
-        str = "#{str}&show_alternative=#{show_alternative}"
-        str = "#{str}&prettyprint=#{prettyprint}"
-        str = "#{str}&symbols=#{symbols.join(',')}" if symbols&.is_a?(Array)
+        str += "&base=#{source}" unless source == OE_SOURCE
+        str += "&show_alternative=#{show_alternative}"
+        str += "&prettyprint=#{prettyprint}"
+        # Ensure symbols is an array and is not empty before appending
+        str += "&symbols=#{symbols.join(',')}" if symbols.is_a?(Array) && symbols.any?
         str
       end
 
@@ -503,7 +502,7 @@ class Money
       # @return [Boolean] valid or not
       def valid_rates?(text)
         return false unless text
-      
+
         parsed = JSON.parse(text)
         valid = parsed.key?(RATES_KEY) && parsed.key?(TIMESTAMP_KEY)
         valid &&= parsed[RATES_KEY].all? do |_, v|
@@ -513,16 +512,13 @@ class Money
       rescue JSON::ParserError
         false
       end
-      
 
       # Get expire rates, first from cache and then from url
       #
       # @return [Hash] key is country code (ISO 3166-1 alpha-3) value Float
       def exchange_rates
         doc = JSON.parse(read_from_cache || read_from_url)
-        if doc['error'] && ERROR_MAP.key?(doc['message'].to_sym)
-          raise ERROR_MAP[doc['message'].to_sym]
-        end
+        raise ERROR_MAP[doc['message'].to_sym] if doc['error'] && ERROR_MAP.key?(doc['message'].to_sym)
 
         self.rates_timestamp = doc[TIMESTAMP_KEY]
         @oer_rates = doc[RATES_KEY]
