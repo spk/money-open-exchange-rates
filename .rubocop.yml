@@ -19,3 +19,6 @@ Metrics/MethodLength:
 
 Metrics/PerceivedComplexity:
   Enabled: false
+
+Style/BracesAroundHashParameters:
+  Enabled: false
