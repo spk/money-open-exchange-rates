@@ -19,6 +19,7 @@ Check [api documentation](https://docs.openexchangerates.org/)
     `ttl_in_seconds` option is provided.
 * Support for black market and digital currency rates with `show_alternative`
     option.
+* Enhanced Currency Rates: Fetch and display both bid and ask rates, if enabled via the fetch_bid_ask_rates configuration. This allows for more precise financial operations.
 
 ## Installation
 
@@ -71,6 +72,10 @@ oxr.cache = 'path/to/file/cache.json'
 oxr.ttl_in_seconds = 86400
 
 # (optional)
+# Enable fetching of bid and ask rates
+oxr.fetch_bid_ask_rates = true
+
+# (optional)
 # Set historical date of the rate
 # see https://openexchangerates.org/documentation#historical-data
 oxr.date = '2015-01-01'
@@ -112,9 +117,28 @@ Money.default_bank = oxr
 Money.default_bank.get_rate('USD', 'CAD')
 ```
 
+
+
+## Fetching Bid and Ask Rates
+
+``` ruby
+
+Once fetch_bid_ask_rates is enabled, the system fetches these rates where available. This is particularly useful for applications that require a deeper understanding of the market, such as trading platforms or financial analysis tools.
+
+# Fetch the current bid rate for USD to EUR
+usd_to_eur_bid = Money.default_bank.get_rate('USD', 'EUR', { rate_type: :bid })
+
+# Fetch the current ask rate for USD to EUR
+usd_to_eur_ask = Money.default_bank.get_rate('USD', 'EUR', { rate_type: :ask })
+
+puts "Bid Rate: #{usd_to_eur_bid}, Ask Rate: #{usd_to_eur_ask}"
+
+```
+
 ## Refresh rates
 
 ### With [whenever](https://github.com/javan/whenever)
+
 
 ``` ruby
 every :hour do
