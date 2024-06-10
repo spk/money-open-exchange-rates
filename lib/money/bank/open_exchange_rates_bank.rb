@@ -189,7 +189,7 @@ class Money
       # Update all rates from openexchangerates JSON
       #
       # @return [Array] Array of exchange rates
-      def update_rates
+      def update_rates # rubocop:disable Metrics/PerceivedComplexity, Lint/RedundantCopDisableDirective
         store.transaction do
           clear_rates!
           exchange_rates.each do |exchange_rate|
@@ -311,7 +311,7 @@ class Money
               rate = details['mid'] || details['rate']
               set_rate(source, currency, rate.to_f)
               set_rate(currency, source, 1.0 / rate.to_f) if rate != 0
-              if fetch_bid_ask_rates && details['bid'] && details['ask']
+              if fetch_bid_ask_rates && details['bid'] && details['ask'] # rubocop:disable Style/IfUnlessModifier
                 set_bid_ask_rates(currency, details['bid'].to_f, details['ask'].to_f)
               end
             elsif details.is_a?(Numeric)
