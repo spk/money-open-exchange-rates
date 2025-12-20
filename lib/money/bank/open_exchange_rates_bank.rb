@@ -270,7 +270,7 @@ class Money
         str = "#{str}&base=#{source}" unless source == OE_SOURCE
         str = "#{str}&show_alternative=#{show_alternative}"
         str = "#{str}&prettyprint=#{prettyprint}"
-        str = "#{str}&symbols=#{symbols.join(',')}" if symbols&.is_a?(Array)
+        str = "#{str}&symbols=#{symbols.join(',')}" if symbols.is_a?(Array)
         str
       end
 
@@ -324,9 +324,7 @@ class Money
         if cache.is_a?(Proc)
           cache.call(text)
         elsif cache.is_a?(String) || cache.is_a?(Pathname)
-          File.open(cache.to_s, 'w') do |f|
-            f.write(text)
-          end
+          File.write(cache.to_s, text)
         else
           raise InvalidCache
         end
@@ -373,7 +371,7 @@ class Money
         return false unless text
 
         parsed = JSON.parse(text)
-        parsed&.key?(RATES_KEY) && parsed&.key?(TIMESTAMP_KEY)
+        parsed&.key?(RATES_KEY) && parsed.key?(TIMESTAMP_KEY)
       rescue JSON::ParserError
         false
       end
@@ -383,9 +381,7 @@ class Money
       # @return [Hash] key is country code (ISO 3166-1 alpha-3) value Float
       def exchange_rates
         doc = JSON.parse(read_from_cache || read_from_url)
-        if doc['error'] && ERROR_MAP.key?(doc['message'].to_sym)
-          raise ERROR_MAP[doc['message'].to_sym]
-        end
+        raise ERROR_MAP[doc['message'].to_sym] if doc['error'] && ERROR_MAP.key?(doc['message'].to_sym)
 
         self.rates_timestamp = doc[TIMESTAMP_KEY]
         @oer_rates = doc[RATES_KEY]

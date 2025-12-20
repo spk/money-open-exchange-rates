@@ -1,4 +1,14 @@
 
+2.0.0 / 2025-12-20
+==================
+
+  * BREAKING: Upgrade to money ~> 7.0
+  * BREAKING: Require Ruby >= 3.1
+  * Update monetize dependency to ~> 2.0
+  * Update CI to test Ruby 3.1, 3.2, 3.3, 3.4
+  * Remove support for Ruby 2.7, 3.0
+  * Update README with money 7.x default currency configuration
+
 1.4.2 / 2023-07-25
 ==================
 

@@ -2,5 +2,5 @@
 
 source 'https://rubygems.org'
 
-gem 'money', '~> 6.7'
+gem 'money', '~> 7.0'
 gem 'money-open-exchange-rates', path: '../../'
