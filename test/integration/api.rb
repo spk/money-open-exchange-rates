@@ -3,10 +3,13 @@
 require 'json'
 require 'money/bank/open_exchange_rates_bank'
 
+# Money 7.x requires explicit default currency configuration
+Money.default_currency = Money::Currency.new('USD')
+
 ERROR_MSG = 'Integration test failed!'
 cache_path = '/tmp/latest.json'
 to_currency = 'CAD'
-app_id = ENV['OXR_APP_ID']
+app_id = ENV.fetch('OXR_APP_ID', nil)
 
 if app_id.nil? || app_id.empty?
   puts 'OXR_APP_ID env var not set skipping integration tests'
@@ -29,10 +32,8 @@ begin
   json_to_currency = JSON.parse(File.read(cache_path))['rates'][to_currency]
   puts 'JSON to_currency', json_to_currency
   puts 'Money to_currency', cad_rate
-  # rubocop:disable Style/AndOr
   json_to_currency == cad_rate or raise ERROR_MSG
-  # rubocop:enable Style/AndOr
-  # rubocop:disable Style/RescueStandardError
+# rubocop:disable Style/RescueStandardError
 rescue
   # rubocop:enable Style/RescueStandardError
   raise ERROR_MSG

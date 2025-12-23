@@ -15,6 +15,9 @@ require 'money/bank/open_exchange_rates_bank'
 require 'monetize'
 require 'timecop'
 
+# Money 7.x requires explicit default currency configuration
+Money.default_currency = Money::Currency.new('USD')
+
 TEST_APP_ID = 'TEST_APP_ID'
 
 def data_file(file)

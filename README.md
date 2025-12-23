@@ -45,6 +45,9 @@ gem install money-open-exchange-rates
 ``` ruby
 require 'money/bank/open_exchange_rates_bank'
 
+# Money 7.x requires explicit default currency configuration
+Money.default_currency = Money::Currency.new('USD')
+
 # Memory store per default; for others just pass as argument a class like
 # explained in https://github.com/RubyMoney/money#exchange-rate-stores
 oxr = Money::Bank::OpenExchangeRatesBank.new(Money::RatesStore::Memory.new)
@@ -175,6 +178,9 @@ take some time (HTTP call) and can fail.
 
 ``` ruby
 require 'money/bank/open_exchange_rates_bank'
+
+# Money 7.x requires explicit default currency configuration
+Money.default_currency = Money::Currency.new('USD')
 
 OXR_CACHE_KEY = "#{Rails.env}:money:exchange_rates".freeze
 # ExchangeRate is an ActiveRecord model

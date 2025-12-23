@@ -17,21 +17,21 @@ default:
     - bundle exec ruby api.rb
   stage: test
 
-test:2.7:
-  extends: .tests
-  image: 'ruby:2.7'
-
-test:3.0:
-  extends: .tests
-  image: 'ruby:3.0'
-
 test:3.1:
   extends: .tests
   image: 'ruby:3.1'
 
 test:3.2:
   extends: .tests
-  image: 'ruby:3.1'
+  image: 'ruby:3.2'
+
+test:3.3:
+  extends: .tests
+  image: 'ruby:3.3'
+
+test:3.4:
+  extends: .tests
+  image: 'ruby:3.4'
 
 test:jruby:
   extends: .tests

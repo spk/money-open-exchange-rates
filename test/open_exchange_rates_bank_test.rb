@@ -117,7 +117,7 @@ describe Money::Bank::OpenExchangeRatesBank do
     end
 
     it 'should update itself with exchange rates from OpenExchangeRates' do
-      subject.oer_rates.keys.each do |currency|
+      subject.oer_rates.each_key do |currency|
         next unless Money::Currency.find(currency)
 
         _(subject.get_rate('USD', currency)).must_be :>, 0
@@ -316,21 +316,21 @@ describe Money::Bank::OpenExchangeRatesBank do
       initial_size = File.read(temp_cache_path).size
       subject.stubs(:api_response).returns ''
       subject.refresh_rates
-      _(File.open(temp_cache_path).read.size).must_equal initial_size
+      _(File.read(temp_cache_path).size).must_equal initial_size
     end
 
     it 'should not break an existing file if save returns json without rates' do
       initial_size = File.read(temp_cache_path).size
       subject.stubs(:api_response).returns '{"error": "An error"}'
       subject.refresh_rates
-      _(File.open(temp_cache_path).read.size).must_equal initial_size
+      _(File.read(temp_cache_path).size).must_equal initial_size
     end
 
     it 'should not break an existing file if save returns a invalid json' do
       initial_size = File.read(temp_cache_path).size
       subject.stubs(:api_response).returns '{invalid_json: "An error"}'
       subject.refresh_rates
-      _(File.open(temp_cache_path).read.size).must_equal initial_size
+      _(File.read(temp_cache_path).size).must_equal initial_size
     end
   end
 
