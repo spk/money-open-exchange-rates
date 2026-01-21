@@ -1,4 +1,10 @@
 
+2.0.1 / 2026-01-21
+==================
+
+  * Merge pull request #75 from @ps-97 / adarsh/preserve-rates-on-partial-api-response
+    * fix: preserve rates for currencies missing from API response
+
 2.0.0 / 2025-12-23
 ==================
 
