@@ -17,10 +17,6 @@ default:
     - bundle exec ruby api.rb
   stage: test
 
-test:3.1:
-  extends: .tests
-  image: 'ruby:3.1'
-
 test:3.2:
   extends: .tests
   image: 'ruby:3.2'
@@ -33,12 +29,12 @@ test:3.4:
   extends: .tests
   image: 'ruby:3.4'
 
-test:jruby:
+test:4.0:
   extends: .tests
-  image: 'jruby:9.4-jre'
+  image: 'ruby:4.0'
 
 coverage:
-  image: 'ruby:3.2'
+  image: 'ruby:3.3'
   script:
     - bundle exec rake test
   artifacts:
