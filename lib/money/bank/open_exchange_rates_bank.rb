@@ -187,15 +187,14 @@ class Money
       # @return [Array] Array of exchange rates
       def update_rates
         store.transaction do
-          clear_rates!
-          exchange_rates.each do |exchange_rate|
-            rate = exchange_rate.last
-            currency = exchange_rate.first
+          new_rates = exchange_rates
+          new_rates.each do |currency, rate|
             next unless Money::Currency.find(currency)
 
             set_rate(source, currency, rate)
             set_rate(currency, source, 1.0 / rate)
           end
+          clear_cross_rates_for(new_rates)
         end
       end
 
@@ -435,6 +434,20 @@ class Money
       # @return [Hash] All rates from store as Hash
       def clear_rates!
         store.each_rate do |iso_from, iso_to|
+          add_rate(iso_from, iso_to, nil)
+        end
+      end
+
+      # Clears cross-rates for currencies present in new_rates
+      # Cross-rates are calculated on next access via calc_pair_rate_using_base
+      # Direct rates (source -> X) are not cleared, just overwritten
+      #
+      # @param new_rates [Hash] Rates hash from API response
+      def clear_cross_rates_for(new_rates)
+        store.each_rate do |iso_from, iso_to|
+          next if iso_from == source || iso_to == source
+          next unless new_rates.key?(iso_from) || new_rates.key?(iso_to)
+
           add_rate(iso_from, iso_to, nil)
         end
       end

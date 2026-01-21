@@ -533,5 +533,48 @@ describe Money::Bank::OpenExchangeRatesBank do
       end
     end
   end
+
+  describe 'missing currencies' do
+    let(:oer_partial_path) do
+      data_file('partial_latest.json')
+    end
+
+    before do
+      add_to_webmock(subject)
+      # see test/data/latest.json +52
+      @latest_usd_eur_rate = 0.79085
+      # see test/data/latest.json +33
+      @latest_usd_cad_rate = 1.124161
+      subject.update_rates
+    end
+
+    it 'should preserve direct rates' do
+      _(subject.get_rate('USD', 'EUR')).must_equal @latest_usd_eur_rate
+      subject.cache = nil
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_partial_path))
+      subject.update_rates
+      _(subject.get_rate('USD', 'EUR')).must_equal @latest_usd_eur_rate
+    end
+
+    it 'should update rates for currencies in response' do
+      _(subject.get_rate('USD', 'CAD')).must_equal @latest_usd_cad_rate
+      subject.cache = nil
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_partial_path))
+      subject.update_rates
+      _(subject.get_rate('USD', 'CAD')).must_equal @latest_usd_cad_rate
+    end
+
+    it 'should exchange with preserved rates' do
+      money = Money.new(100, 'USD')
+      _(subject.exchange_with(money, 'EUR')).must_equal Money.new(79, 'EUR')
+      subject.cache = nil
+      stub_request(:get, subject.source_url)
+        .to_return(status: 200, body: File.read(oer_partial_path))
+      subject.update_rates
+      _(subject.exchange_with(money, 'EUR')).must_equal Money.new(79, 'EUR')
+    end
+  end
 end
 # rubocop:enable Metrics/BlockLength

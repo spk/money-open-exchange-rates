@@ -1,0 +1,16 @@
+{
+  "disclaimer": "Exchange rates are provided for informational purposes only.",
+  "license": "Data sourced from various providers.",
+  "timestamp": 1414008100,
+  "base": "USD",
+  "rates": {
+    "AED": 3.67304,
+    "AUD": 1.139103,
+    "BBD": 2,
+    "CAD": 1.124161,
+    "CHF": 0.951922,
+    "GBP": 0.62292,
+    "JPY": 107.0718,
+    "USD": 1
+  }
+}
